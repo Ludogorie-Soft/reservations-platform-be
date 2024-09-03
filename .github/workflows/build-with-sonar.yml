@@ -21,18 +21,15 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
+#      - name: Grant execute permission for Gradle wrapper
+#        run: chmod +x ./gradlew
 
-      - name: Cache Gradle Wrapper
+      - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.gradle/wrapper/
-            ~/.gradle/caches/
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
@@ -42,8 +39,8 @@ jobs:
 
       - name: SonarQube Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Make sure to add SONAR_TOKEN in GitHub Secrets
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube \
-          -Dsonar.projectKey=your_project_key \
+          -Dsonar.projectKey= # your_project_key \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
