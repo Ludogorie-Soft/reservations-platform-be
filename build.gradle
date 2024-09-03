@@ -46,7 +46,6 @@ tasks.named('test') {
 
 jacoco {
 	toolVersion = "0.8.12"
-//	reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
 }
 
 test {
@@ -57,7 +56,6 @@ jacocoTestReport {
 	reports {
 		xml.required = true
 		csv.required = false
-//		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
 }
 
