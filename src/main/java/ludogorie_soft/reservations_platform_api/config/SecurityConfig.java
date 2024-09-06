@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> {
                     authorize.requestMatchers("/register").permitAll();
                     authorize.requestMatchers("/login").permitAll();
-                    authorize.requestMatchers("/products/drinks").permitAll();
+                    authorize.requestMatchers("/bookings").permitAll();
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
