@@ -32,8 +32,8 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> {
-                    authorize.requestMatchers("/register").permitAll();
-                    authorize.requestMatchers("/login").permitAll();
+                    authorize.requestMatchers("/auth/register").permitAll();
+                    authorize.requestMatchers("/auth/login").permitAll();
                     authorize.requestMatchers("/bookings").permitAll();
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                 })
