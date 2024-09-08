@@ -6,6 +6,7 @@ import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exceotion.APIException;
+import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import ludogorie_soft.reservations_platform_api.service.UserService;
@@ -20,34 +21,35 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
     @Override
     public String register(RegisterDto registerDto) {
-        if (userRepository.existsByUsername(registerDto.getUsername())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
-        }
-        if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Email already exists!.");
+        if (!registerDto.getPassword().equals(registerDto.getRepeatPassword())) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Passwords do not match!");
         }
 
-        User user = new User();
-        user.setName(registerDto.getName());
-        user.setUsername(registerDto.getUsername());
-        user.setEmail(registerDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+        if (userRepository.existsByUsername(registerDto.getName())) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
+        }
+
+        if (userRepository.existsByEmail(registerDto.getEmail())) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Email already exists!");
+        }
+
+        User user = userMapper.toEntity(registerDto);
 
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName("ROLE_USER");
         roles.add(userRole);
-
         user.setRoles(roles);
 
         userRepository.save(user);
 
-        return "User Registered Successfully!.";
+        return "User Registered Successfully!";
     }
     @Override
     public String login(LoginDto loginDto) {

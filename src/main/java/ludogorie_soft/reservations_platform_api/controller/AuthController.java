@@ -36,5 +36,8 @@ public class AuthController {
         }
     }
 
-
+    @GetMapping("/hello")
+    public String printHelloWorld(){
+        return "Hello world!";
+    }
 }
