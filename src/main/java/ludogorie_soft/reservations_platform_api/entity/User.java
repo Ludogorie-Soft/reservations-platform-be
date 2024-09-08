@@ -1,6 +1,7 @@
 package ludogorie_soft.reservations_platform_api.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class User {
     private String name;
     @Column(nullable = false, unique = true)
     private String username;
+    @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
