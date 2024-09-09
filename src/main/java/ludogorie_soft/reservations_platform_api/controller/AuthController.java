@@ -35,9 +35,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponse);
         }
     }
-
-    @GetMapping("/hello")
-    public String printHelloWorld(){
-        return "Hello world!";
-    }
 }
