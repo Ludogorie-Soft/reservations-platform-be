@@ -1,27 +1,36 @@
 package ludogorie_soft.reservations_platform_api.mapper;
 
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.User;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class UserMapper {
 
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
-    public UserMapper(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    private void configureMappings() {
+        modelMapper.addMappings(new PropertyMap<RegisterDto, User>() {
+            @Override
+            protected void configure() {
+                skip(destination.getPassword());
+                skip(destination.getId());
+            }
+        });
     }
-
     public User toEntity(RegisterDto registerDto) {
         if (registerDto == null) {
             return null;
         }
-        User user = new User();
-        user.setName(registerDto.getName());
-        user.setEmail(registerDto.getEmail());
-        user.setUsername(registerDto.getUsername());
+
+        User user = modelMapper.map(registerDto, User.class);
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         return user;
     }

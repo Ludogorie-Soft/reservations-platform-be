@@ -1,4 +1,4 @@
-package ludogorie_soft.reservations_platform_api.exceotion;
+package ludogorie_soft.reservations_platform_api.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

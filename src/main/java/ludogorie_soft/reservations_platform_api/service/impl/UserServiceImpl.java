@@ -5,7 +5,7 @@ import ludogorie_soft.reservations_platform_api.dto.LoginDto;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
-import ludogorie_soft.reservations_platform_api.exceotion.APIException;
+import ludogorie_soft.reservations_platform_api.exception.APIException;
 import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
@@ -22,30 +22,24 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public String register(RegisterDto registerDto) {
         if (!registerDto.getPassword().equals(registerDto.getRepeatPassword())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Passwords do not match!");
         }
-
         if (userRepository.existsByUsername(registerDto.getName())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
         }
-
         if (userRepository.existsByEmail(registerDto.getEmail())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Email already exists!");
         }
-
         User user = userMapper.toEntity(registerDto);
-
         Set<Role> roles = new HashSet<>();
-
         Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"));
-
         Role userRole;
         if (optionalUserRole.isPresent()) {
             userRole = optionalUserRole.get();
@@ -54,12 +48,9 @@ public class UserServiceImpl implements UserService {
             userRole.setName("ROLE_USER");
             roleRepository.save(userRole);
         }
-
         roles.add(userRole);
         user.setRoles(roles);
-
         userRepository.save(user);
-
         return "User Registered Successfully!";
     }
     @Override
@@ -70,12 +61,10 @@ public class UserServiceImpl implements UserService {
         if (!userOptional.isPresent()) {
             return "Invalid username or email";
         }
-
         User user = userOptional.get();
         if (!passwordEncoder.matches(password, user.getPassword())) {
             return "Invalid password";
         }
         return "Login successful";
     }
-
 }
