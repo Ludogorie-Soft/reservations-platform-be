@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         return "User Registered Successfully!";
     }
 
-    //will change after JWT token is added
+    //change after JWT token is added
     @Override
     public String login(LoginDto loginDto) {
         String usernameOrEmail = loginDto.getUsernameOrEmail();
