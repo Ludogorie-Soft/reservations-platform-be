@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.3'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'jacoco'
+	id "org.sonarqube" version "4.4.1.3373"
 }
 
 group = 'ludogorie-soft'
@@ -41,4 +43,40 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+test {
+	finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		csv.required = false
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		enabled = false
+		rule {
+			limit {
+				minimum = 0.8
+			}
+		}
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
+sonar {
+	properties {
+		property "sonar.projectKey", "Ludogorie-Soft_reservations-platform-be"
+		property "sonar.organization", "ludogorie-soft-1"
+		property "sonar.host.url", "https://sonarcloud.io"
+	}
 }
