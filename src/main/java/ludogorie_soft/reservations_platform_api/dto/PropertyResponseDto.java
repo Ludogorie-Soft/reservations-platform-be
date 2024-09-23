@@ -15,4 +15,5 @@ public class PropertyResponseDto {
     private String airBnbUrl;
     private String bookingUrl;
     private List<BookingResponseDto> bookings;
+    private String syncUrl;
 }

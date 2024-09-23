@@ -25,4 +25,6 @@ public class Property {
 
     @OneToMany(mappedBy = "property")
     private List<Booking> bookings;
+
+    private String syncUrl;
 }

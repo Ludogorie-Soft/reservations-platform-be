@@ -20,7 +20,7 @@ public class ReservationController {
 
     @PostMapping
     ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws FileNotFoundException, URISyntaxException {
-        BookingResponseDto response = bookingService.createReservation(bookingRequestDto);
+        BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

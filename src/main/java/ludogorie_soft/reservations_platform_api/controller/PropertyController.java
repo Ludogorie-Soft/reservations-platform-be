@@ -30,7 +30,7 @@ public class PropertyController {
     }
 
     @PutMapping("/booking/{id}")
-    public ResponseEntity<PropertyResponseDto> updateBookingUrl(@PathVariable("id") Long id, @RequestParam("url") String url) {
+    public ResponseEntity<PropertyResponseDto> updateBookingUrl(@PathVariable("id") Long id, @RequestParam("url") String url) throws FileNotFoundException {
         PropertyResponseDto responseDto = propertyService.updateBookingUrlOfProperty(id, url);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }

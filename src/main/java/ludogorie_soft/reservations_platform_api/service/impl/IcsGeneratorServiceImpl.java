@@ -29,17 +29,6 @@ public class IcsGeneratorServiceImpl implements IcsGeneratorService {
     @Value("${booking.ics.directory}")
     private String icsDirectory;
 
-    public String getUrlForBooking(String uid) {
-
-        Booking booking = bookingRepository.findByUid(uid);
-
-        if (booking != null) {
-            return booking.getUrl();
-        } else {
-            return "No matching bookings!";
-        }
-    }
-
     public String createCalendarEvent(Booking booking) throws URISyntaxException {
 
         try {

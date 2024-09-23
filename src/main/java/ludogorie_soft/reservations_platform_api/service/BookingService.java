@@ -10,11 +10,9 @@ import java.util.List;
 
 public interface BookingService {
 
-    BookingResponseDto createReservation(BookingRequestDto bookingRequestDto) throws FileNotFoundException, URISyntaxException;
-    List<BookingResponseDto> getAllReservations();
-    List<Booking> findAllReservations();
+    BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws FileNotFoundException, URISyntaxException;
+    List<Booking> getAllBookingsOfProperty(Long id);
     boolean existsByUid(String uid);
     Booking findByUid(String uid);
-    void updateReservation(Booking booking);
     Booking findById(Long id);
 }

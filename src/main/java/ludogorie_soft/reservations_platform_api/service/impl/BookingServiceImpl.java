@@ -29,7 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final PropertyService propertyService;
 
     @Override
-    public BookingResponseDto createReservation(BookingRequestDto bookingRequestDto) throws URISyntaxException {
+    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws URISyntaxException {
 
         User user = userRepository
                 .findByUsernameOrEmail(bookingRequestDto.getEmail(), bookingRequestDto.getEmail())
@@ -43,6 +43,8 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = bookingRepository
                 .findByStartDateAndEndDate(bookingRequestDto.getStartDate(), bookingRequestDto.getEndDate());
+
+        //TODO: Find in external calendars for available dates
 
         if (booking == null) {
             booking = new Booking();
@@ -61,15 +63,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllReservations() {
-        return findAllReservations().stream()
-                .map(reservation -> modelMapper.map(reservation, BookingResponseDto.class))
-                .toList();
-    }
-
-    @Override
-    public List<Booking> findAllReservations() {
-        return bookingRepository.findAll();
+    public List<Booking> getAllBookingsOfProperty(Long id) {
+        return bookingRepository.findByPropertyId(id);
     }
 
     @Override
@@ -80,12 +75,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking findByUid(String uid) {
         return bookingRepository.findByUid(uid);
-    }
-
-    @Override
-    public void updateReservation(Booking booking) {
-        bookingRepository.save(booking);
-        //TODO: update .ics file for the current reservation
     }
 
     @Override

@@ -7,5 +7,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 
 public interface CalendarSyncService {
+    String syncMyCalendar(Long propertyId) throws IOException, URISyntaxException;
+
     void syncAirBnbCalendar(Long propertyId) throws URISyntaxException, IOException, ParserException, ParseException;
 }
