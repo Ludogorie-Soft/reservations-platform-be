@@ -9,7 +9,7 @@ import java.util.List;
 public class PropertyResponseDto {
 
     private Long id;
-    private User owner;
+    private UserResponseDto owner;
     private String name;
     private String type;
     private String airBnbUrl;

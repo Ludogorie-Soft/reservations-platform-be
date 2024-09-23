@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
+
 @RestController
 @RequestMapping("/api/property")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class PropertyController {
     }
 
     @PutMapping("/air-bnb/{id}")
-    public ResponseEntity<PropertyResponseDto> updateAirBnbUrl(@PathVariable("id") Long id, @RequestParam("url") String url) {
+    public ResponseEntity<PropertyResponseDto> updateAirBnbUrl(@PathVariable("id") Long id, @RequestParam("url") String url) throws FileNotFoundException {
         PropertyResponseDto responseDto = propertyService.updateAirBnbUrlOfProperty(id, url);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }

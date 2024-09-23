@@ -4,8 +4,8 @@ import net.fortuna.ical4j.data.ParserException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 
 public interface CalendarSyncService {
-
-    String syncCalendar(Long propertyId) throws IOException, ParserException, URISyntaxException;
+    void syncAirBnbCalendar(Long propertyId) throws URISyntaxException, IOException, ParserException, ParseException;
 }

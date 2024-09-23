@@ -41,11 +41,11 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Start date must be before end date!");
         }
 
-        List<Booking> bookings = bookingRepository
+        Booking booking = bookingRepository
                 .findByStartDateAndEndDate(bookingRequestDto.getStartDate(), bookingRequestDto.getEndDate());
 
-        if (bookings.isEmpty()) {
-            Booking booking = new Booking();
+        if (booking == null) {
+            booking = new Booking();
             booking.setProperty(property);
             booking.setEmail(user.getEmail());
             booking.setStartDate(bookingRequestDto.getStartDate());
