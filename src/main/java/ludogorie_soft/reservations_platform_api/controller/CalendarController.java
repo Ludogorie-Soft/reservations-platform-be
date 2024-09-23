@@ -1,47 +1,57 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.RequiredArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.ReservationResponseDto;
-import ludogorie_soft.reservations_platform_api.dto.SyncDto;
 import ludogorie_soft.reservations_platform_api.service.CalendarSyncService;
 import ludogorie_soft.reservations_platform_api.service.impl.IcsGeneratorServiceImpl;
-import net.fortuna.ical4j.data.ParserException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/calendar")
+@RequestMapping("/calendar/ical")
 @RequiredArgsConstructor
 public class CalendarController {
 
     private final IcsGeneratorServiceImpl icsGeneratorService;
     private final CalendarSyncService calendarSyncService;
 
-    @GetMapping("/export")
-    ResponseEntity<Resource> exportCalendar() {
-        String file = icsGeneratorService.createCalendarFileForAllReservations();
+    @Value("${booking.ics.directory}")
+    private String icsDirectory;
 
-        if (file == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        FileSystemResource fileSystemResource = new FileSystemResource(file);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + new File(file).getName())
-                .body(fileSystemResource);
+    // Get URL of .ics for reservation with Uid:reservationUid
+    @GetMapping("/booking/{reservationUid}")
+    public ResponseEntity<String> getIcsFileUrl(@PathVariable("reservationUid") String reservationUid) {
+        String fileUrl = icsGeneratorService.getUrlForBooking(reservationUid);
+        return ResponseEntity.ok(fileUrl);
     }
 
-    @GetMapping("/sync")
-    ResponseEntity<ReservationResponseDto> syncCalendar(@RequestBody SyncDto syncDto) throws ParserException, IOException, URISyntaxException {
-        ReservationResponseDto response = calendarSyncService.syncCalendar(syncDto.getUrl());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    // Download .ics file
+    @GetMapping("/{filename}")
+    public ResponseEntity<FileSystemResource> getIcsFile(@PathVariable("filename") String filename) {
+        try {
+
+            File file = new File(icsDirectory + File.separator + filename);
+
+            if (file.exists()) {
+                FileSystemResource resource = new FileSystemResource(file);
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+
+                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

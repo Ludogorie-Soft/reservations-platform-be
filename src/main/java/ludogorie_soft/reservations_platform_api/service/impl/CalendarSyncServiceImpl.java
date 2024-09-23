@@ -1,23 +1,21 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.ReservationResponseDto;
-import ludogorie_soft.reservations_platform_api.entity.Reservation;
+import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.Property;
+import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
+import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarSyncService;
-import ludogorie_soft.reservations_platform_api.service.ReservationService;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -25,20 +23,29 @@ import java.util.Iterator;
 @RequiredArgsConstructor
 public class CalendarSyncServiceImpl implements CalendarSyncService {
 
-    private final ReservationService reservationService;
+    private final BookingRepository bookingRepository;
     private final ModelMapper modelMapper;
+    private final PropertyRepository propertyRepository;
 
     @Override
-    public ReservationResponseDto syncCalendar(String externalUrl) throws IOException, ParserException, URISyntaxException {
+    public String syncCalendar(Long propertyId) throws IOException, ParserException {
 
-        URL url = new URL(externalUrl);
+        Property property = propertyRepository.findById(propertyId).orElseThrow(
+                () -> new IllegalArgumentException("Property not found!")
+        );
 
+        if (property.getAirBnbUrl() != null) {
+            return syncCalendar(property.getBookingUrl());
+        }
+        return "No calendars to sync";
+    }
+
+    private String syncCalendar(String url1) throws IOException, ParserException {
+        URL url = new URL(url1);
         InputStream inputStream = url.openStream();
 
         CalendarBuilder calendarBuilder = new CalendarBuilder();
         Calendar calendar = calendarBuilder.build(inputStream);
-
-        ReservationResponseDto reservationResponseDto = new ReservationResponseDto();
 
         for (Iterator<CalendarComponent> iterator = calendar.getComponents().iterator(); iterator.hasNext(); ) {
             VEvent vEvent = (VEvent) iterator.next();
@@ -48,30 +55,11 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
             java.util.Date startDate = vEvent.getStartDate().getDate(); // Start date
             java.util.Date endDate = vEvent.getEndDate().getDate(); // End date
 
-            if (reservationService.existsByUid(uid)) {
-                Reservation reservation = reservationService.findByUid(uid);
-                reservationResponseDto = modelMapper.map(reservation, ReservationResponseDto.class);
-//
-//                if (!reservation.getStartDate().equals(startDate) ||
-//                        !reservation.getEndDate().equals(endDate) ||
-//                        !reservation.getDescription().equals(summary)) {
-//
-//                    // Update the existing reservation
-//                    reservation.setStartDate(startDate);
-//                    reservation.setEndDate(endDate);
-//                    reservation.setDescription(summary);
-//
-//                    reservationService.updateReservation(reservation);
-//                }
-            } else {
-                Reservation newReservation = new Reservation();
-                newReservation.setUid(uid);
-                newReservation.setStartDate(startDate);
-                newReservation.setEndDate(endDate);
-                newReservation.setDescription(summary);
-                reservationResponseDto = reservationService.createReservation(newReservation);
+            if (bookingRepository.existsByUid(uid)) {
+                Booking booking = bookingRepository.findByUid(uid);
+                return "You have already reservation from " + booking.getStartDate() + " to " + booking.getEndDate();
             }
         }
-        return reservationResponseDto;
+        return "Available dates!";
     }
 }

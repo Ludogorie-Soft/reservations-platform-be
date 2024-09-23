@@ -1,8 +1,8 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ludogorie_soft.reservations_platform_api.entity.Reservation;
-import ludogorie_soft.reservations_platform_api.repository.ReservationRepository;
+import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.service.IcsGeneratorService;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
@@ -16,69 +16,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class IcsGeneratorServiceImpl implements IcsGeneratorService {
 
-    // Read the directory path from application.properties
-    @Value("${reservation.ics.directory}")
+    private static final String BASE_URL = "http://localhost:8080/calendar/ical/";
+
+    private final BookingRepository bookingRepository;
+
+    @Value("${booking.ics.directory}")
     private String icsDirectory;
 
-    private final ReservationRepository reservationRepository;
+    public String getUrlForBooking(String uid) {
 
-    public String createCalendarFileForAllReservations() {
+        Booking booking = bookingRepository.findByUid(uid);
 
-        List<Reservation> reservations = reservationRepository.findAll();
-
-        try {
-            Calendar calendar = new Calendar();
-            ProdId prodId = new ProdId();
-            prodId.setValue("//Reservation Platform//ver. 1.0//EN");
-            calendar.getProperties().add(prodId);
-            calendar.getProperties().add(Version.VERSION_2_0);
-            calendar.getProperties().add(CalScale.GREGORIAN);
-
-            for (Reservation reservation : reservations) {
-                java.util.Calendar startCal = java.util.Calendar.getInstance();
-                startCal.setTime(reservation.getStartDate());
-                java.util.Calendar endCal = java.util.Calendar.getInstance();
-                endCal.setTime(reservation.getEndDate());
-//                endCal.add(java.util.Calendar.DATE, 1);
-
-                VEvent reservationEvent = new VEvent(
-                        new net.fortuna.ical4j.model.Date(startCal.getTime()),
-                        new net.fortuna.ical4j.model.Date(endCal.getTime()),
-                        reservation.getDescription());
-
-                reservationEvent.getProperties().add(new Uid("reservation-" + reservation.getId()));
-                reservationEvent.getProperties().add(new Description(reservation.getDescription()));
-                reservationEvent.getProperties().add(new Organizer("mailto:" + reservation.getEmail()));
-
-                calendar.getComponents().add(reservationEvent);
-            }
-
-            // Define the file path
-            String filename = "platform-calendar.ics";
-            String filePath = icsDirectory + File.separator + filename;
-
-            // Write the calendar to an .ics file
-            try (FileOutputStream fileOutputStream = new FileOutputStream(filePath)) {
-                CalendarOutputter calendarOutputter = new CalendarOutputter();
-                calendarOutputter.output(calendar, fileOutputStream);
-            }
-
-            return filePath;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if (booking != null) {
+            return booking.getUrl();
+        } else {
+            return "No matching bookings!";
         }
-
     }
 
-    public String createCalendarEvent(Reservation reservation) throws URISyntaxException {
+    public String createCalendarEvent(Booking booking) throws URISyntaxException {
 
         try {
             Calendar calendar = new Calendar();
@@ -89,10 +51,10 @@ public class IcsGeneratorServiceImpl implements IcsGeneratorService {
             calendar.getProperties().add(CalScale.GREGORIAN);
 
             java.util.Calendar startCal = java.util.Calendar.getInstance();
-            startCal.setTime(reservation.getStartDate());
+            startCal.setTime(booking.getStartDate());
 
             java.util.Calendar endCal = java.util.Calendar.getInstance();
-            endCal.setTime(reservation.getEndDate());
+            endCal.setTime(booking.getEndDate());
 
             // Make the last day inclusive
 //        endCal.add(java.util.Calendar.DATE, 1);
@@ -104,18 +66,14 @@ public class IcsGeneratorServiceImpl implements IcsGeneratorService {
             VEvent reservationEvent = new VEvent(
                     new net.fortuna.ical4j.model.Date(startDate),
                     new net.fortuna.ical4j.model.Date(endDate),
-                    reservation.getDescription());
+                    booking.getDescription());
 
-            reservationEvent.getProperties().add(new Uid("reservation-" + reservation.getId()));
-            reservationEvent.getProperties().add(new Description(reservation.getDescription()));
-            reservationEvent.getProperties().add(new Organizer("mailto:" + reservation.getEmail()));
+            // Add properties to event
+            reservationEvent.getProperties().add(new Uid(UUID.randomUUID() + "-" + booking.getId()));
+            reservationEvent.getProperties().add(new Organizer("mailto:" + booking.getEmail()));
 
             // Add event to calendar
             calendar.getComponents().add(reservationEvent);
-
-            // Set Uid to reservation
-            reservation.setUid(reservationEvent.getUid().getValue());
-            reservationRepository.save(reservation);
 
             // Write to .ics file
             File directory = new File(icsDirectory);
@@ -123,9 +81,14 @@ public class IcsGeneratorServiceImpl implements IcsGeneratorService {
                 directory.mkdirs();
             }
 
-            String filename = "reservation-" + reservation.getId() + ".ics";
+            String filename = reservationEvent.getUid().getValue() + ".ics";
             String filePath = icsDirectory + File.separator + filename;
+            String url = BASE_URL + filename;
 
+            // Set Uid and Url to reservation entity
+            booking.setUid(reservationEvent.getUid().getValue());
+            booking.setUrl(url);
+            bookingRepository.save(booking);
 
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             CalendarOutputter calendarOutputter = new CalendarOutputter();

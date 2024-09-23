@@ -1,29 +1,26 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.RequiredArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.ReservationResponseDto;
-import ludogorie_soft.reservations_platform_api.entity.Reservation;
-import ludogorie_soft.reservations_platform_api.service.ReservationService;
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reservations")
+@RequestMapping("/api/bookings")
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final BookingService bookingService;
 
     @PostMapping
-    ResponseEntity<ReservationResponseDto> createReservation(@RequestBody Reservation reservation) throws FileNotFoundException, URISyntaxException {
-        ReservationResponseDto response = reservationService.createReservation(reservation);
+    ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws FileNotFoundException, URISyntaxException {
+        BookingResponseDto response = bookingService.createReservation(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

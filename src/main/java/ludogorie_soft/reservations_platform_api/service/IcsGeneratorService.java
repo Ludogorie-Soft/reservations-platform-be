@@ -1,11 +1,11 @@
 package ludogorie_soft.reservations_platform_api.service;
 
-import ludogorie_soft.reservations_platform_api.entity.Reservation;
+import ludogorie_soft.reservations_platform_api.entity.Booking;
 
 import java.net.URISyntaxException;
 
 public interface IcsGeneratorService {
 
-    String createCalendarFileForAllReservations();
-    String createCalendarEvent(Reservation reservation) throws URISyntaxException;
+    String getUrlForBooking(String uid);
+    String createCalendarEvent(Booking booking) throws URISyntaxException;
 }

@@ -7,14 +7,18 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "reservations")
-public class Reservation {
+@Table(name = "bookings")
+public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String uid;  // Unique identifier for the reservation (from .ics UID)
+    private String uid;  // Unique identifier for the booking (from .ics UID)
+
+    @ManyToOne
+    @JoinColumn(name = "property_id")
+    private Property property;
 
     private String email;
 
@@ -25,4 +29,6 @@ public class Reservation {
     private Date endDate;
 
     private String description;
+
+    private String url;
 }
