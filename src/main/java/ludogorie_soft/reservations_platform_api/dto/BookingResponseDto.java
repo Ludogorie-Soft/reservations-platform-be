@@ -9,6 +9,4 @@ public class BookingResponseDto {
     private String startDate;
     private String endDate;
     private String description;
-    private String url;
-
 }

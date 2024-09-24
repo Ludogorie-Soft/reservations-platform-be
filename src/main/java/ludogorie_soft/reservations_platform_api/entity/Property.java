@@ -23,8 +23,10 @@ public class Property {
     private String airBnbUrl;
     private String bookingUrl;
 
+    private String syncUrl;
+
     @OneToMany(mappedBy = "property")
     private List<Booking> bookings;
 
-    private String syncUrl;
+
 }

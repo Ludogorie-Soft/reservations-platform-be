@@ -5,14 +5,15 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 
 import java.io.FileNotFoundException;
-import java.util.List;
 
 public interface PropertyService {
     PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto);
 
     PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException;
+
     PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException;
 
     Property findById(Long id);
-    List<Property> findAll();
+
+    String getPropertySyncUrl(Long id);
 }

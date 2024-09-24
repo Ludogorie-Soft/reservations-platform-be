@@ -8,18 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/bookings")
-public class ReservationController {
+public class BookingController {
 
     private final BookingService bookingService;
 
     @PostMapping
-    ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws FileNotFoundException, URISyntaxException {
+    ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException {
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

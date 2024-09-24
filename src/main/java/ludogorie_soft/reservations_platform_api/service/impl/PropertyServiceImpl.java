@@ -3,7 +3,6 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
-import ludogorie_soft.reservations_platform_api.dto.UserResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
@@ -33,8 +32,11 @@ public class PropertyServiceImpl implements PropertyService {
     private final ModelMapper modelMapper;
     private final CalendarSyncService calendarSyncService;
 
-    @Value("${booking.ics.directory}")
-    private String icsDirectory;
+    @Value("${booking.ics.airBnb.directory}")
+    private String icsAirBnbDirectory;
+
+    @Value("${booking.ics.booking.directory}")
+    private String icsBookingDirectory;
 
     @Override
     public PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto) {
@@ -48,9 +50,25 @@ public class PropertyServiceImpl implements PropertyService {
         property.setOwner(user);
 
         Property createdProperty = propertyRepository.save(property);
-        PropertyResponseDto result = modelMapper.map(createdProperty, PropertyResponseDto.class);
-        result.setOwner(modelMapper.map(user, UserResponseDto.class));
-        return result;
+        return modelMapper.map(createdProperty, PropertyResponseDto.class);
+    }
+
+    @Override
+    public PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException {
+        Property property = findById(id);
+        property.setAirBnbUrl(url);
+        Property updatedProperty = propertyRepository.save(property);
+        createIcsFile("airBnbCalendar-" + property.getId() + ".ics", icsAirBnbDirectory);
+        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
+    }
+
+    @Override
+    public PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException {
+        Property property = findById(id);
+        property.setBookingUrl(url);
+        Property updatedProperty = propertyRepository.save(property);
+        createIcsFile("bookingCalendar-" + property.getId() + ".ics", icsBookingDirectory);
+        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
     }
 
     @Override
@@ -61,27 +79,9 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public List<Property> findAll() {
-        return propertyRepository.findAll();
-    }
-
-    @Override
-    public PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException {
+    public String getPropertySyncUrl(Long id) {
         Property property = findById(id);
-        property.setAirBnbUrl(url);
-        Property updatedProperty = propertyRepository.save(property);
-
-        createIcsFile("airBnbCalendar.ics");
-        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
-    }
-
-    @Override
-    public PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException {
-        Property property = findById(id);
-        property.setBookingUrl(url);
-        Property updatedProperty = propertyRepository.save(property);
-        createIcsFile("bookingCalendar.ics");
-        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
+        return property.getSyncUrl();
     }
 
     @Scheduled(fixedRate = 10000) //TODO: from 10000 to 3600000
@@ -99,12 +99,12 @@ public class PropertyServiceImpl implements PropertyService {
                 });
     }
 
-    private FileOutputStream createIcsFile(String filename) throws FileNotFoundException {
-        File directory = new File(icsDirectory);
+    private FileOutputStream createIcsFile(String filename, String path) throws FileNotFoundException {
+        File directory = new File(path);
         if (!directory.exists()) {
             directory.mkdirs();
         }
-        String filePath = icsDirectory + File.separator + filename;
+        String filePath = path + File.separator + filename;
         return new FileOutputStream(filePath);
     }
 }

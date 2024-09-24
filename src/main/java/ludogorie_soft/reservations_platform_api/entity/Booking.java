@@ -14,13 +14,13 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String uid;  // Unique identifier for the booking (from .ics UID)
-
     @ManyToOne
     @JoinColumn(name = "property_id")
     private Property property;
 
-    private String email;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -30,5 +30,5 @@ public class Booking {
 
     private String description;
 
-    private String url;
+    private String uid;
 }

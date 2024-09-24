@@ -35,4 +35,7 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Property> properties;
+
+    @OneToMany(mappedBy = "user")
+    private List<Booking> bookings;
 }
