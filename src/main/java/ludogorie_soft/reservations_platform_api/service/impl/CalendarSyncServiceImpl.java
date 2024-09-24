@@ -61,13 +61,16 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
             Date startDate = startCal.getTime();
             Date endDate = endCal.getTime();
 
-            VEvent reservationEvent = new VEvent(
+            VEvent vEvent = new VEvent(
                     new net.fortuna.ical4j.model.Date(startDate),
                     new net.fortuna.ical4j.model.Date(endDate),
                     booking.getDescription());
-            reservationEvent.getProperties().add(new Uid(property.getName() + "-" + property.getId()));
-            reservationEvent.getProperties().add(new Organizer("mailto:" + booking.getUser().getEmail()));
-            calendar.getComponents().add(reservationEvent);
+            vEvent.getProperties().add(new Uid(property.getName() + "-" + property.getId() + booking.getId()));
+            vEvent.getProperties().add(new Organizer("mailto:" + booking.getUser().getEmail()));
+            calendar.getComponents().add(vEvent);
+
+            booking.setUid(vEvent.getUid().getValue());
+            bookingRepository.save(booking);
         }
 
         File directory = new File(icsMyCalDirectory);
@@ -139,17 +142,13 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
                     java.util.Date startDate = vEvent.getStartDate().getDate();
                     java.util.Date endDate = vEvent.getEndDate().getDate();
 
-                    // Check for any overlap with range
-                    if (startDateRequest.before(endDate) && endDateRequest.after(startDate)) {
+                    if (startDateRequest.equals(startDate) &&
+                            startDate.equals(endDate)) {
                         return false;
                     }
 
-                    // Special case: if the request is for a single day
-                    if (startDateRequest.equals(endDateRequest)) {
-                        // Check if the single day falls within any existing event period
-                        if (!startDateRequest.before(startDate) && !startDateRequest.after(endDate)) {
-                            return false;
-                        }
+                    if (startDateRequest.before(endDate) && endDateRequest.after(startDate)) {
+                        return false;
                     }
                 }
             }
