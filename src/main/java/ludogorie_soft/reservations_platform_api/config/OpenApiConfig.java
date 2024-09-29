@@ -15,17 +15,11 @@ import io.swagger.v3.oas.annotations.servers.Server;
         info = @Info(
                 contact = @Contact(
                         name = "Ludogorie Soft",
-                        email = "contacts@ludogoriesoft.com",
-                        url = "https://ludogoriesoft.com/"
+                        email = "contacts@ludogoriesoft.com"
                 ),
                 description = "A backend rest api for handling reservations",
                 title = "Reservations Platform BE",
-                version = "0.1",
-                license = @License(
-                        name = "No license",
-                        url = "license-url-placeholder.org"
-                ),
-                termsOfService = "Terms of Service"
+                version = "0.1"
         ),
         servers = {
                 @Server(
@@ -33,21 +27,6 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         url = "http://localhost:8080/"
                 )
         }
-//        security = {
-//                @SecurityRequirement(
-//                        name = "bearerAuth"
-//                )
-//        }
 )
-//@SecuritySchemes(
-//        @SecurityScheme(
-//                name = "bearerAuth",
-//                description = "JWT auth description",
-//                scheme = "bearer",
-//                type = SecuritySchemeType.HTTP,
-//                bearerFormat = "JWT",
-//                in = SecuritySchemeIn.HEADER
-//        )
-//)
 public class OpenApiConfig {
 }
