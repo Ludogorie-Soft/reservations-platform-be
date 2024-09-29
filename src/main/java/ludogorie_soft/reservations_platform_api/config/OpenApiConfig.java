@@ -14,8 +14,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "Ludogorie Soft",
-                        email = "contacts@ludogoriesoft.com"
+                        name = "Ludogorie Soft"
                 ),
                 description = "A backend rest api for handling reservations",
                 title = "Reservations Platform BE",
