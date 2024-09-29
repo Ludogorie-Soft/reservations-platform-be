@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,11 @@ public class CalendarController {
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
 
-                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+                return ResponseEntity.ok()
+                        .headers(headers)
+//                        .contentLength(file.length())
+//                        .contentType(MediaType.parseMediaType("text/calendar"))
+                        .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
             }

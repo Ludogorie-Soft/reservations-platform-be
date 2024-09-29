@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
@@ -45,11 +46,11 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
         List<Booking> bookings = bookingRepository.findByPropertyId(propertyId);
 
         Calendar calendar = new Calendar();
-        ProdId prodId = new ProdId();
-        prodId.setValue("//" + property.getName() + "//Reservation Platform//ver. 1.0//EN");
+        ProdId prodId = new ProdId("X-RICAL-TZSOURCE=TZINFO:-//Reservation Platform//Hosting Calendar 1.0//EN");
+
         calendar.getProperties().add(prodId);
-        calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
+        calendar.getProperties().add(Version.VERSION_2_0);
 
         for (Booking booking : bookings) {
             java.util.Calendar startCal = java.util.Calendar.getInstance();
@@ -61,12 +62,12 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
             Date startDate = startCal.getTime();
             Date endDate = endCal.getTime();
 
-            VEvent vEvent = new VEvent(
-                    new net.fortuna.ical4j.model.Date(startDate),
-                    new net.fortuna.ical4j.model.Date(endDate),
-                    booking.getDescription());
-            vEvent.getProperties().add(new Uid(property.getName() + "-" + property.getId() + booking.getId()));
-            vEvent.getProperties().add(new Organizer("mailto:" + booking.getUser().getEmail()));
+            VEvent vEvent = new VEvent();
+            vEvent.getProperties().add(new DtEnd(new net.fortuna.ical4j.model.Date(endDate)));
+            vEvent.getProperties().add(new DtStart(new net.fortuna.ical4j.model.Date(startDate)));
+            vEvent.getProperties().add(new Uid(property.getId() + "-" + booking.getId()));
+            vEvent.getProperties().add(new Summary(booking.getDescription()));
+
             calendar.getComponents().add(vEvent);
 
             booking.setUid(vEvent.getUid().getValue());
