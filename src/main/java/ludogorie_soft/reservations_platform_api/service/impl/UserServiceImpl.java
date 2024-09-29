@@ -40,15 +40,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntity(registerDto);
         Set<Role> roles = new HashSet<>();
         Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"));
-        Role userRole;
         if (optionalUserRole.isPresent()) {
-            userRole = optionalUserRole.get();
-        } else {
-            userRole = new Role();
-            userRole.setName("ROLE_USER");
-            roleRepository.save(userRole);
+            roles.add(optionalUserRole.get());
         }
-        roles.add(userRole);
+      
         user.setRoles(roles);
         userRepository.save(user);
         return "User Registered Successfully!";
