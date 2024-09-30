@@ -69,4 +69,11 @@ public class UserServiceImpl implements UserService {
         }
         return "Login successful";
     }
+
+    @Override
+    public User getUserByEmailOrUsername(String email, String username) {
+        return userRepository
+                .findByUsernameOrEmail(email, username)
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "User with this username or email not found!"));
+    }
 }

@@ -6,9 +6,9 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
-import ludogorie_soft.reservations_platform_api.repository.UserRepository;
-import ludogorie_soft.reservations_platform_api.service.CalendarSyncService;
+import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
+import ludogorie_soft.reservations_platform_api.service.UserService;
 import net.fortuna.ical4j.data.ParserException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +27,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertyService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PropertyRepository propertyRepository;
     private final ModelMapper modelMapper;
-    private final CalendarSyncService calendarSyncService;
+    private final CalendarService calendarService;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
@@ -41,8 +41,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto) {
 
-        User user = userRepository.findByUsernameOrEmail(propertyRequestDto.getOwnersEmail(), propertyRequestDto.getOwnersEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        User user = userService.getUserByEmailOrUsername(propertyRequestDto.getOwnersEmail(), propertyRequestDto.getOwnersEmail());
 
         Property property = new Property();
         property.setName(propertyRequestDto.getName());
@@ -84,7 +83,7 @@ public class PropertyServiceImpl implements PropertyService {
         return property.getSyncUrl();
     }
 
-    @Scheduled(fixedRate = 10000) //TODO: from 10000 to 3600000
+    @Scheduled(fixedRate = 3600000)
     public void syncPropertiesWithAirBnbUrls() {
         List<Property> properties = propertyRepository.findAll();
 
@@ -92,7 +91,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .filter(property -> property.getAirBnbUrl() != null && !property.getAirBnbUrl().trim().isEmpty())
                 .forEach(property -> {
                     try {
-                        calendarSyncService.syncAirBnbCalendar(property.getId());
+                        calendarService.syncAirBnbCalendar(property.getId());
                     } catch (ParserException | IOException | ParseException | URISyntaxException e) {
                         throw new RuntimeException(e);
                     }

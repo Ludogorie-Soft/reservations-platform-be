@@ -6,15 +6,13 @@ import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
-import ludogorie_soft.reservations_platform_api.exception.APIException;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
-import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
-import ludogorie_soft.reservations_platform_api.service.CalendarSyncService;
+import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
+import ludogorie_soft.reservations_platform_api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,11 +23,11 @@ import java.net.URISyntaxException;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final BookingRepository bookingRepository;
     private final ModelMapper modelMapper;
     private final PropertyService propertyService;
-    private final CalendarSyncService calendarSyncService;
+    private final CalendarService calendarService;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
@@ -40,9 +38,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws URISyntaxException, IOException {
 
-        User user = userRepository
-                .findByUsernameOrEmail(bookingRequestDto.getEmail(), bookingRequestDto.getEmail())
-                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "User with this username or email not found!"));
+        User user = userService.getUserByEmailOrUsername(bookingRequestDto.getEmail(), bookingRequestDto.getEmail());
 
         Property property = propertyService.findById(bookingRequestDto.getPropertyId());
 
@@ -50,12 +46,12 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Start date must be before the end date!");
         }
 
-        boolean checkMyCal = calendarSyncService.syncForAvailableDates(
+        boolean checkMyCal = calendarService.syncForAvailableDates(
                 icsMyCal + File.separator + property.getId() + ".ics",
                 bookingRequestDto.getStartDate(),
                 bookingRequestDto.getEndDate());
 
-        boolean checkAirBnbCal = calendarSyncService.syncForAvailableDates(
+        boolean checkAirBnbCal = calendarService.syncForAvailableDates(
                 icsAirBnbDirectory + File.separator + "airBnbCalendar-" + property.getId() + ".ics",
                 bookingRequestDto.getStartDate(),
                 bookingRequestDto.getEndDate());
@@ -70,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
 
             Booking createdBooking = bookingRepository.save(booking);
 
-            calendarSyncService.createMyCalendar(property.getId(), bookingRequestDto);
+            calendarService.createMyCalendar(property.getId(), bookingRequestDto);
 
             return modelMapper.map(createdBooking, BookingResponseDto.class);
         } else {

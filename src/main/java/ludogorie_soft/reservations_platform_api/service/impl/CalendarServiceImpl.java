@@ -6,7 +6,7 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
-import ludogorie_soft.reservations_platform_api.service.CalendarSyncService;
+import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -16,10 +16,13 @@ import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
@@ -27,7 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CalendarSyncServiceImpl implements CalendarSyncService {
+public class CalendarServiceImpl implements CalendarService {
 
     private final PropertyRepository propertyRepository;
     private final BookingRepository bookingRepository;
@@ -46,25 +49,17 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
         List<Booking> bookings = bookingRepository.findByPropertyId(propertyId);
 
         Calendar calendar = new Calendar();
-        ProdId prodId = new ProdId("X-RICAL-TZSOURCE=TZINFO:-//Reservation Platform//Hosting Calendar 1.0//EN");
+        ProdId prodId = new ProdId("//Reservation Platform//Hosting Calendar 1.0//EN");
 
         calendar.getProperties().add(prodId);
         calendar.getProperties().add(CalScale.GREGORIAN);
         calendar.getProperties().add(Version.VERSION_2_0);
 
         for (Booking booking : bookings) {
-            java.util.Calendar startCal = java.util.Calendar.getInstance();
-            startCal.setTime(booking.getStartDate());
-
-            java.util.Calendar endCal = java.util.Calendar.getInstance();
-            endCal.setTime(booking.getEndDate());
-
-            Date startDate = startCal.getTime();
-            Date endDate = endCal.getTime();
 
             VEvent vEvent = new VEvent();
-            vEvent.getProperties().add(new DtEnd(new net.fortuna.ical4j.model.Date(endDate)));
-            vEvent.getProperties().add(new DtStart(new net.fortuna.ical4j.model.Date(startDate)));
+            vEvent.getProperties().add(new DtStart(new net.fortuna.ical4j.model.Date(booking.getStartDate())));
+            vEvent.getProperties().add(new DtEnd(new net.fortuna.ical4j.model.Date(booking.getEndDate())));
             vEvent.getProperties().add(new Uid(property.getId() + "-" + booking.getId()));
             vEvent.getProperties().add(new Summary(booking.getDescription()));
 
@@ -143,11 +138,6 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
                     java.util.Date startDate = vEvent.getStartDate().getDate();
                     java.util.Date endDate = vEvent.getEndDate().getDate();
 
-                    if (startDateRequest.equals(startDate) &&
-                            startDate.equals(endDate)) {
-                        return false;
-                    }
-
                     if (startDateRequest.before(endDate) && endDateRequest.after(startDate)) {
                         return false;
                     }
@@ -157,6 +147,29 @@ public class CalendarSyncServiceImpl implements CalendarSyncService {
             e.printStackTrace();
         }
         return true;
+    }
+
+    @Override
+    public ResponseEntity<FileSystemResource> getIcsFile(String filename) {
+        try {
+
+            File file = new File(icsMyCalDirectory + File.separator + filename);
+
+            if (file.exists()) {
+                FileSystemResource resource = new FileSystemResource(file);
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     private Property getProperty(Long propertyId) {
