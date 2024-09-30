@@ -14,6 +14,4 @@ public interface PropertyService {
     PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException;
 
     Property findById(Long id);
-
-    String getPropertySyncUrl(Long id);
 }

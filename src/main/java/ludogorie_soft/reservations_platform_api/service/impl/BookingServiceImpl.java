@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +36,7 @@ public class BookingServiceImpl implements BookingService {
     private String icsMyCal;
 
     @Override
-    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws URISyntaxException, IOException {
-
-        User user = userService.getUserByEmailOrUsername(bookingRequestDto.getEmail(), bookingRequestDto.getEmail());
+    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
 
         Property property = propertyService.findById(bookingRequestDto.getPropertyId());
 
@@ -46,31 +44,31 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Start date must be before the end date!");
         }
 
-        boolean checkMyCal = calendarService.syncForAvailableDates(
-                icsMyCal + File.separator + property.getId() + ".ics",
-                bookingRequestDto.getStartDate(),
-                bookingRequestDto.getEndDate());
+        List<Booking> checkedBookings = bookingRepository.findByStartDateAndEndDate(bookingRequestDto.getStartDate(), bookingRequestDto.getEndDate());
 
         boolean checkAirBnbCal = calendarService.syncForAvailableDates(
                 icsAirBnbDirectory + File.separator + "airBnbCalendar-" + property.getId() + ".ics",
                 bookingRequestDto.getStartDate(),
                 bookingRequestDto.getEndDate());
 
-        if (checkMyCal && checkAirBnbCal) {
-            Booking booking = new Booking();
-            booking.setProperty(property);
-            booking.setUser(user);
-            booking.setStartDate(bookingRequestDto.getStartDate());
-            booking.setEndDate(bookingRequestDto.getEndDate());
-            booking.setDescription(bookingRequestDto.getDescription());
-
-            Booking createdBooking = bookingRepository.save(booking);
-
-            calendarService.createMyCalendar(property.getId(), bookingRequestDto);
-
+        if (checkedBookings.isEmpty() && checkAirBnbCal) {
+            Booking createdBooking = createBookingModel(bookingRequestDto);
             return modelMapper.map(createdBooking, BookingResponseDto.class);
         } else {
             throw new IllegalArgumentException("These dates are not available!");
         }
+    }
+
+    private Booking createBookingModel(BookingRequestDto bookingRequestDto) {
+        User user = userService.getUserByEmailOrUsername(bookingRequestDto.getEmail(), bookingRequestDto.getEmail());
+        Property property = propertyService.findById(bookingRequestDto.getPropertyId());
+        Booking booking = new Booking();
+        booking.setProperty(property);
+        booking.setUser(user);
+        booking.setStartDate(bookingRequestDto.getStartDate());
+        booking.setEndDate(bookingRequestDto.getEndDate());
+        booking.setDescription(bookingRequestDto.getDescription());
+        booking.setUid(property.getId() + "-" + UUID.randomUUID());
+        return bookingRepository.save(booking);
     }
 }

@@ -77,12 +77,6 @@ public class PropertyServiceImpl implements PropertyService {
         );
     }
 
-    @Override
-    public String getPropertySyncUrl(Long id) {
-        Property property = findById(id);
-        return property.getSyncUrl();
-    }
-
     @Scheduled(fixedRate = 3600000)
     public void syncPropertiesWithAirBnbUrls() {
         List<Property> properties = propertyRepository.findAll();

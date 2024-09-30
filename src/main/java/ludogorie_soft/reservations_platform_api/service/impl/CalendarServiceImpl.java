@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
@@ -23,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +41,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Value("${booking.ics.myCal.directory}")
     private String icsMyCalDirectory;
 
-    public String createMyCalendar(Long propertyId, BookingRequestDto requestDto) throws IOException, URISyntaxException {
+    public String getMyCalendar(Long propertyId) throws IOException {
 
         Property property = getProperty(propertyId);
         List<Booking> bookings = bookingRepository.findByPropertyId(propertyId);
@@ -55,32 +53,27 @@ public class CalendarServiceImpl implements CalendarService {
         calendar.getProperties().add(CalScale.GREGORIAN);
         calendar.getProperties().add(Version.VERSION_2_0);
 
-        for (Booking booking : bookings) {
+        bookings.forEach(booking -> {
+            VEvent vEvent = new VEvent(
+                    new net.fortuna.ical4j.model.DateTime(booking.getStartDate()),
+                    new net.fortuna.ical4j.model.DateTime(booking.getEndDate()),
+                    booking.getDescription()
+            );
 
-            VEvent vEvent = new VEvent();
-            vEvent.getProperties().add(new DtStart(new net.fortuna.ical4j.model.Date(booking.getStartDate())));
-            vEvent.getProperties().add(new DtEnd(new net.fortuna.ical4j.model.Date(booking.getEndDate())));
-            vEvent.getProperties().add(new Uid(property.getId() + "-" + booking.getId()));
-            vEvent.getProperties().add(new Summary(booking.getDescription()));
-
+            vEvent.getProperties().add(new Uid(booking.getUid()));
             calendar.getComponents().add(vEvent);
 
             booking.setUid(vEvent.getUid().getValue());
             bookingRepository.save(booking);
-        }
+        });
 
-        File directory = new File(icsMyCalDirectory);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
+        createDirectoryIfNotExists(icsMyCalDirectory);
 
         String filename = propertyId + ".ics";
         String filePath = icsMyCalDirectory + File.separator + filename;
         String url = BASE_URL + filename;
 
-        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-        CalendarOutputter calendarOutputter = new CalendarOutputter();
-        calendarOutputter.output(calendar, fileOutputStream);
+        createCalendarOutput(filePath, calendar);
 
         property.setSyncUrl(url);
         propertyRepository.save(property);
@@ -103,17 +96,12 @@ public class CalendarServiceImpl implements CalendarService {
                     .filter(vEvent -> vEvent.getProperty(DtStamp.DTSTAMP) == null)
                     .forEach(vEvent -> vEvent.getProperties().add(new DtStamp()));
 
-            File directory = new File(icsAirBnbDirectory);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
+            createDirectoryIfNotExists(icsAirBnbDirectory);
 
             String filename = "airBnbCalendar-" + property.getId() + ".ics";
             String filePath = icsAirBnbDirectory + File.separator + filename;
 
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            CalendarOutputter calendarOutputter = new CalendarOutputter();
-            calendarOutputter.output(calendar, fileOutputStream);
+            createCalendarOutput(filePath, calendar);
         }
     }
 
@@ -135,10 +123,8 @@ public class CalendarServiceImpl implements CalendarService {
                 if (component instanceof VEvent) {
                     VEvent vEvent = (VEvent) component;
 
-                    java.util.Date startDate = vEvent.getStartDate().getDate();
-                    java.util.Date endDate = vEvent.getEndDate().getDate();
-
-                    if (startDateRequest.before(endDate) && endDateRequest.after(startDate)) {
+                    if (startDateRequest.before(vEvent.getEndDate().getDate())
+                            && endDateRequest.after(vEvent.getStartDate().getDate())) {
                         return false;
                     }
                 }
@@ -150,7 +136,10 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public ResponseEntity<FileSystemResource> getIcsFile(String filename) {
+    public ResponseEntity<FileSystemResource> getIcsFile(Long propertyId) throws IOException {
+
+        String filename = getMyCalendar(propertyId);
+
         try {
 
             File file = new File(icsMyCalDirectory + File.separator + filename);
@@ -176,6 +165,19 @@ public class CalendarServiceImpl implements CalendarService {
         return propertyRepository.findById(propertyId).orElseThrow(
                 () -> new IllegalArgumentException("Property not found!")
         );
+    }
+
+    private static void createCalendarOutput(String filePath, Calendar calendar) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+        CalendarOutputter calendarOutputter = new CalendarOutputter();
+        calendarOutputter.output(calendar, fileOutputStream);
+    }
+
+    private void createDirectoryIfNotExists(String icsMyCalDirectory) {
+        File directory = new File(icsMyCalDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
     }
 }
 

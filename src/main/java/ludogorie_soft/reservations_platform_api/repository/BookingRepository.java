@@ -12,12 +12,9 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    boolean existsByUid(String uid);
-    Booking findByUid(String uid);
-
     List<Booking> findByPropertyId(Long id);
 
-    @Query("SELECT b FROM Booking b WHERE b.startDate >= :startDate AND b.endDate <= :endDate")
-    Booking findByStartDateAndEndDate(@Param("startDate") Date startDate,
+    @Query("SELECT b FROM Booking b WHERE b.startDate < :endDate AND b.endDate > :startDate")
+    List<Booking> findByStartDateAndEndDate(@Param("startDate") Date startDate,
                                             @Param("endDate") Date endDate);
 }
