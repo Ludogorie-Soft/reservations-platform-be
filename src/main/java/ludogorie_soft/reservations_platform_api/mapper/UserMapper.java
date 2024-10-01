@@ -1,6 +1,5 @@
 package ludogorie_soft.reservations_platform_api.mapper;
 
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.User;
@@ -25,6 +24,7 @@ public class UserMapper {
             }
         });
     }
+
     public User toEntity(RegisterDto registerDto) {
         if (registerDto == null) {
             return null;
