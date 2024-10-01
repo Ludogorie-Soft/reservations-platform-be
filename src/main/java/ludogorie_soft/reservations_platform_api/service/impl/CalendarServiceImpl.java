@@ -3,6 +3,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
+import ludogorie_soft.reservations_platform_api.exception.APIException;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
@@ -130,7 +131,7 @@ public class CalendarServiceImpl implements CalendarService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new APIException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
         return true;
     }
