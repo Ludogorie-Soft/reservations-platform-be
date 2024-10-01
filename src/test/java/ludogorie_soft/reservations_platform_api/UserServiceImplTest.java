@@ -71,9 +71,10 @@ class UserServiceImplTest {
     @Test
     void register_WhenEmailExists_ThrowsAPIException() {
         RegisterDto registerDto = new RegisterDto();
+        registerDto.setEmail("existingEmail@test.com");
         registerDto.setPassword("password");
         registerDto.setRepeatPassword("password");
-        registerDto.setEmail("existingEmail@test.com");
+
         when(userRepository.existsByEmail("existingEmail@test.com")).thenReturn(true);
 
         APIException exception = assertThrows(APIException.class, () -> userService.register(registerDto));
