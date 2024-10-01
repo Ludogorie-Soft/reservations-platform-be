@@ -9,5 +9,7 @@ import java.util.Set;
 public interface UserService {
     public String register(RegisterDto registerDto);
     public String login(LoginDto loginDto);
+
     User getUserByEmailOrUsername(String email, String username);
+
 }
