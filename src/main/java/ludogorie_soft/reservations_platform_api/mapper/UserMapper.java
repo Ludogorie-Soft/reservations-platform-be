@@ -15,16 +15,6 @@ public class UserMapper {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    private void configureMappings() {
-        modelMapper.addMappings(new PropertyMap<RegisterDto, User>() {
-            @Override
-            protected void configure() {
-                skip(destination.getPassword());
-                skip(destination.getId());
-            }
-        });
-    }
-
     public User toEntity(RegisterDto registerDto) {
         if (registerDto == null) {
             return null;

@@ -75,6 +75,8 @@ class AuthControllerIntegrationTest extends IntegrationTestBase {
         ResponseEntity<String> response = testRestTemplate
                 .postForEntity(getRegisterUrl(), registerDto, String.class);
 
+        //TODO:
+//        assertEquals(HttpStatus.BAD_REQUEST, createUserWithSameEmail.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
