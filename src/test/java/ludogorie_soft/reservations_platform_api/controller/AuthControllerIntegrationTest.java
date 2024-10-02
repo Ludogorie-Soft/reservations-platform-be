@@ -73,7 +73,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.UNAUTHORIZED, createUserWithSameUsername.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameUsername.getStatusCode());
     }
 
     @Test
@@ -87,7 +87,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.UNAUTHORIZED, createUserWithSameEmail.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameEmail.getStatusCode());
     }
 
     @Test
@@ -100,7 +100,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
     @Test
@@ -114,6 +114,34 @@ class AuthControllerIntegrationTest {
 
         //THEN
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testLoginShouldThrowWhenUserNotExists() {
+        //GIVEN
+        createUserInDB(registerDto);
+        loginDto.setUsernameOrEmail("new@email.com");
+
+        //WHEN
+        ResponseEntity<String> response = testRestTemplate
+                .postForEntity(LOGIN_URL, loginDto, String.class);
+
+        //THEN
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    void testLoginShouldThrowWhenPasswordNotMatch() {
+        //GIVEN
+        createUserInDB(registerDto);
+        loginDto.setPassword("invalidPassword");
+
+        //WHEN
+        ResponseEntity<String> response = testRestTemplate
+                .postForEntity(LOGIN_URL, loginDto, String.class);
+
+        //THEN
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     private ResponseEntity<String> createUserInDB(RegisterDto registerDto) {

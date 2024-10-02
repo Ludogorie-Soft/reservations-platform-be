@@ -36,6 +36,9 @@ public class SecurityConfig {
                     authorize.requestMatchers("/auth/login").permitAll();
                     authorize.requestMatchers("/bookings").permitAll();
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.PUT, "/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
 
