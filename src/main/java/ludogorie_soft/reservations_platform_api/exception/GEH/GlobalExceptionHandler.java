@@ -1,4 +1,4 @@
-package ludogorie_soft.reservations_platform_api.GEH;
+package ludogorie_soft.reservations_platform_api.exception.GEH;
 
 import ludogorie_soft.reservations_platform_api.exception.APIException;
 import org.springframework.http.HttpStatus;
