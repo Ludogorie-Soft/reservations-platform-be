@@ -20,10 +20,10 @@ public class Property {
     private String name;
     private String type;
 
-    private String airBnbUrl;
-    private String bookingUrl;
+    private String airBnbICalUrl;
+    private String bookingICalUrl;
 
-    private String syncUrl;
+    private String iCalSyncUrl;
 
     @OneToMany(mappedBy = "property")
     private List<Booking> bookings;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileNotFoundException;
 
 @RestController
-@RequestMapping("/api/property")
+@RequestMapping("/api/properties")
 @RequiredArgsConstructor
 public class PropertyController {
 

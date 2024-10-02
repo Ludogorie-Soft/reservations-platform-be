@@ -55,7 +55,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException {
         Property property = findById(id);
-        property.setAirBnbUrl(url);
+        property.setAirBnbICalUrl(url);
         Property updatedProperty = propertyRepository.save(property);
         createIcsFile("airBnbCalendar-" + property.getId() + ".ics", icsAirBnbDirectory);
         return modelMapper.map(updatedProperty, PropertyResponseDto.class);
@@ -64,7 +64,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException {
         Property property = findById(id);
-        property.setBookingUrl(url);
+        property.setBookingICalUrl(url);
         Property updatedProperty = propertyRepository.save(property);
         createIcsFile("bookingCalendar-" + property.getId() + ".ics", icsBookingDirectory);
         return modelMapper.map(updatedProperty, PropertyResponseDto.class);
@@ -82,7 +82,7 @@ public class PropertyServiceImpl implements PropertyService {
         List<Property> properties = propertyRepository.findAll();
 
         properties.stream()
-                .filter(property -> property.getAirBnbUrl() != null && !property.getAirBnbUrl().trim().isEmpty())
+                .filter(property -> property.getAirBnbICalUrl() != null && !property.getAirBnbICalUrl().trim().isEmpty())
                 .forEach(property -> {
                     try {
                         calendarService.syncAirBnbCalendar(property.getId());

@@ -76,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
 
         createCalendarOutput(filePath, calendar);
 
-        property.setSyncUrl(url);
+        property.setICalSyncUrl(url);
         propertyRepository.save(property);
 
         return filename;
@@ -85,8 +85,8 @@ public class CalendarServiceImpl implements CalendarService {
     public void syncAirBnbCalendar(Long propertyId) throws IOException, ParserException {
         Property property = getProperty(propertyId);
 
-        if (property.getAirBnbUrl() != null || property.getAirBnbUrl().trim().isEmpty()) {
-            URL url = new URL(property.getAirBnbUrl());
+        if (property.getAirBnbICalUrl() != null || property.getAirBnbICalUrl().trim().isEmpty()) {
+            URL url = new URL(property.getAirBnbICalUrl());
             InputStream inputStream = url.openStream();
 
             CalendarBuilder calendarBuilder = new CalendarBuilder();

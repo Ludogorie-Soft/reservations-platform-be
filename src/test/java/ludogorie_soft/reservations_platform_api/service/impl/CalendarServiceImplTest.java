@@ -51,9 +51,9 @@ class CalendarServiceImplTest {
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
         propertyId = 1L;
-        ReflectionTestUtils.setField(calendarService, "icsMyCalDirectory", "testDirectory");
-        ReflectionTestUtils.setField(calendarService, "icsAirBnbDirectory", "testAirBnbDirectory");
-        testFilePath = "testCalendar.ics";
+        ReflectionTestUtils.setField(calendarService, "icsMyCalDirectory", "my-calendar");
+        ReflectionTestUtils.setField(calendarService, "icsAirBnbDirectory", "air-bnb-calendar");
+        testFilePath = "my-calendar.ics";
         createTestIcsFile(testFilePath);
     }
 
@@ -62,6 +62,14 @@ class CalendarServiceImplTest {
         File testFile = new File(testFilePath);
         if (testFile.exists()) {
             testFile.delete();
+        }
+        File icsMyCalDirectory = new File("my-calendar");
+        if (icsMyCalDirectory.exists()) {
+            deleteDirectory(icsMyCalDirectory);
+        }
+        File icsAirBnbDirectory = new File("air-bnb-calendar");
+        if (icsAirBnbDirectory.exists()) {
+            deleteDirectory(icsAirBnbDirectory);
         }
     }
 
@@ -95,7 +103,7 @@ class CalendarServiceImplTest {
     void testSyncAirBnbCalendarSuccessfully() throws IOException, ParserException {
         Property property = new Property();
         property.setId(propertyId);
-        property.setAirBnbUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
+        property.setAirBnbICalUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
@@ -164,5 +172,19 @@ class CalendarServiceImplTest {
             CalendarOutputter outputter = new CalendarOutputter();
             outputter.output(calendar, outputStream);
         }
+    }
+
+    private void deleteDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        directory.delete();
     }
 }
