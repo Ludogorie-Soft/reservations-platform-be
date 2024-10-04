@@ -14,20 +14,20 @@ public class DataLoader {
         this.roleRepository = roleRepository;
     }
 
-    @PostConstruct
-    public void loadRoles() {
-        if (roleRepository.findByName("ADMIN") == null) {
-            Role adminRole = new Role();
-            adminRole.setName("ADMIN");
-            roleRepository.save(adminRole);
-        }
-
-        if (roleRepository.findByName("USER") == null) {
-            Role userRole = new Role();
-            userRole.setName("USER");
-            roleRepository.save(userRole);
-        }
-    }
+//    @PostConstruct
+//    public void loadRoles() {
+//        if (roleRepository.findByName("ADMIN") == null) {
+//            Role adminRole = new Role();
+//            adminRole.setName("ADMIN");
+//            roleRepository.save(adminRole);
+//        }
+//
+//        if (roleRepository.findByName("USER") == null) {
+//            Role userRole = new Role();
+//            userRole.setName("USER");
+//            roleRepository.save(userRole);
+//        }
+//    }
 }
 
 

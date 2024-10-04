@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataLoaderConfig {
 
-    @Bean
-    CommandLineRunner loadInitialRoles(DataLoader dataLoader) {
-        return args -> {
-            dataLoader.loadRoles();
-        };
-    }
+//    @Bean
+//    CommandLineRunner loadInitialRoles(DataLoader dataLoader) {
+//        return args -> {
+//            dataLoader.loadRoles();
+//        };
+//    }
 }

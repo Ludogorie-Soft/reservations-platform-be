@@ -8,16 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  value: 3
-              - column:
-                  name: name
-                  value: ROLE_OWNER
-        - insert:
-            tableName: roles
-            columns:
-              - column:
-                  name: id
-                  value: 4
+                  value: 1
               - column:
                   name: name
                   value: ROLE_ADMIN
@@ -26,7 +17,16 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  value: 5
+                  value: 2
               - column:
                   name: name
                   value: ROLE_MANAGER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: 3
+              - column:
+                  name: name
+                  value: ROLE_OWNER
