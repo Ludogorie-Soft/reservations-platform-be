@@ -100,7 +100,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponseDto updateProperty(Long id, PropertyRequestDto oldProperty) {
+    public Property updateProperty(Long id, PropertyRequestDto oldProperty) {
         Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found"));
 
         updatedProperty.setName(oldProperty.getName());
@@ -111,8 +111,7 @@ public class PropertyServiceImpl implements PropertyService {
         updatedProperty.setPetRules(oldProperty.getPetRules());
         updatedProperty.setPrice(oldProperty.getPrice());
 
-        propertyRepository.save(updatedProperty);
-        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
+        return propertyRepository.save(updatedProperty);
     }
 
 
