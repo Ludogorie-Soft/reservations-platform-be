@@ -5,6 +5,8 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 
 import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.Optional;
 
 public interface PropertyService {
     PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto);
@@ -14,4 +16,12 @@ public interface PropertyService {
     PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException;
 
     Property findById(Long id);
+
+    List<Property> getAllProperties();
+
+    void deleteProperty(Long id);
+
+    Optional<Property> getPropertyById(Long id);
+
+    PropertyResponseDto updateProperty(Long id, PropertyRequestDto propertyDetails);
 }

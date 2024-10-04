@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +48,11 @@ public class PropertyServiceImpl implements PropertyService {
         property.setName(propertyRequestDto.getName());
         property.setType(propertyRequestDto.getType());
         property.setOwner(user);
+        property.setWebsiteUrl(propertyRequestDto.getWebsiteUrl());
+        property.setCapacity(propertyRequestDto.getCapacity());
+        property.setPetAllowed(propertyRequestDto.isPetAllowed());
+        property.setPetRules(propertyRequestDto.getPetRules());
+        property.setPrice(propertyRequestDto.getPrice());
 
         Property createdProperty = propertyRepository.save(property);
         return modelMapper.map(createdProperty, PropertyResponseDto.class);
@@ -76,6 +82,39 @@ public class PropertyServiceImpl implements PropertyService {
                 () -> new IllegalArgumentException("Property not found!")
         );
     }
+
+    @Override
+    public List<Property> getAllProperties() {
+        List<Property> properties = propertyRepository.findAll();
+        return properties;
+    }
+
+    @Override
+    public void deleteProperty(Long id) {
+        propertyRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Property> getPropertyById(Long id) {
+        return propertyRepository.findById(id);
+    }
+
+    @Override
+    public PropertyResponseDto updateProperty(Long id, PropertyRequestDto oldProperty) {
+        Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found"));
+
+        updatedProperty.setName(oldProperty.getName());
+        updatedProperty.setType(oldProperty.getType());
+        updatedProperty.setWebsiteUrl(oldProperty.getWebsiteUrl());
+        updatedProperty.setCapacity(oldProperty.getCapacity());
+        updatedProperty.setPetAllowed(oldProperty.isPetAllowed());
+        updatedProperty.setPetRules(oldProperty.getPetRules());
+        updatedProperty.setPrice(oldProperty.getPrice());
+
+        propertyRepository.save(updatedProperty);
+        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
+    }
+
 
     @Scheduled(fixedRate = 3600000)
     public void syncPropertiesWithAirBnbUrls() {

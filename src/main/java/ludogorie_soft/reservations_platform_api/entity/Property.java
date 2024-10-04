@@ -7,6 +7,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "properties")
 public class Property {
 
     @Id
@@ -28,5 +29,9 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<Booking> bookings;
 
-
+    private String websiteUrl;
+    private int capacity;
+    private boolean isPetAllowed;
+    private String petRules;
+    private int price;
 }
