@@ -49,19 +49,24 @@ public class UserServiceImpl implements UserService {
         return "User Registered Successfully!";
     }
 
-    //change after JWT token is added
     @Override
     public String login(LoginDto loginDto) {
         String usernameOrEmail = loginDto.getUsernameOrEmail();
         String password = loginDto.getPassword();
         Optional<User> userOptional = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+
         if (!userOptional.isPresent()) {
-            return "Invalid username or email";
+            throw new APIException(HttpStatus.UNAUTHORIZED, "Invalid username or email");
         }
+
         User user = userOptional.get();
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return "Invalid password";
+            throw new APIException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
+
+
         return "Login successful";
     }
+
 }
