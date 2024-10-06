@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,24 +85,31 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public List<Property> getAllProperties() {
+    public List<PropertyResponseDto> getAllProperties() {
         List<Property> properties = propertyRepository.findAll();
-        return properties;
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyResponseDto.class))
+                .toList();
+    }
+
+    @Override
+    public Optional<PropertyResponseDto> getPropertyById(Long id) {
+        return Optional.ofNullable(propertyRepository.findById(id)
+                .map(property -> modelMapper.map(property, PropertyResponseDto.class))
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + id)));
     }
 
     @Override
     public void deleteProperty(Long id) {
+        propertyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
+
         propertyRepository.deleteById(id);
     }
 
     @Override
-    public Optional<Property> getPropertyById(Long id) {
-        return propertyRepository.findById(id);
-    }
-
-    @Override
-    public Property updateProperty(Long id, PropertyRequestDto oldProperty) {
-        Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found"));
+    public PropertyResponseDto updateProperty(Long id, PropertyRequestDto oldProperty) {
+        Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
 
         updatedProperty.setName(oldProperty.getName());
         updatedProperty.setType(oldProperty.getType());

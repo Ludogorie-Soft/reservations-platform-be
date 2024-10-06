@@ -14,12 +14,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Collections;
+import java.util.List;
 
 
 @Configuration
 @EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfig {
+
+    public static final String BASE_URL = "http://localhost:3000";
 
     private UserDetailsService userDetailsService;
 
@@ -40,8 +49,10 @@ public class SecurityConfig {
                     authorize.requestMatchers(HttpMethod.POST, "/**").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/**").permitAll();
                     authorize.requestMatchers(HttpMethod.PUT, "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.DELETE, "/**").permitAll();
                 })
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(configurationSource()));
 
         return http.build();
     }
@@ -49,5 +60,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    private CorsConfigurationSource configurationSource() {
+        return request -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(List.of(BASE_URL));
+            corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+            corsConfiguration.setMaxAge(3600L);
+            return corsConfiguration;
+        };
     }
 }

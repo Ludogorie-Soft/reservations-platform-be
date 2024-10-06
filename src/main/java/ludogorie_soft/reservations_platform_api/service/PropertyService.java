@@ -17,11 +17,11 @@ public interface PropertyService {
 
     Property findById(Long id);
 
-    List<Property> getAllProperties();
+    List<PropertyResponseDto> getAllProperties();
 
     void deleteProperty(Long id);
 
-    Optional<Property> getPropertyById(Long id);
+    Optional<PropertyResponseDto> getPropertyById(Long id);
 
     Property updateProperty(Long id, PropertyRequestDto propertyDetails);
 }
