@@ -119,8 +119,7 @@ public class PropertyServiceImpl implements PropertyService {
         updatedProperty.setPetRules(oldProperty.getPetRules());
         updatedProperty.setPrice(oldProperty.getPrice());
 
-        propertyRepository.save(updatedProperty);
-        return modelMapper.map(updatedProperty, PropertyResponseDto.class);
+        return propertyRepository.save(updatedProperty);
     }
 
 
