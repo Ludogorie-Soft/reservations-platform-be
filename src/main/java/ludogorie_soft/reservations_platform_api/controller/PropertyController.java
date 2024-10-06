@@ -57,8 +57,8 @@ public class PropertyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Property> updateProperty(@PathVariable Long id, @RequestBody PropertyRequestDto propertyRequestDto) {
-        Property updatedProperty = propertyService.updateProperty(id, propertyRequestDto);
+    public ResponseEntity<PropertyResponseDto> updateProperty(@PathVariable Long id, @RequestBody PropertyRequestDto propertyRequestDto) {
+        PropertyResponseDto updatedProperty = propertyService.updateProperty(id, propertyRequestDto);
         return ResponseEntity.ok(updatedProperty);
     }
 }

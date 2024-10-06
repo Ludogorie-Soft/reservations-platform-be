@@ -23,5 +23,5 @@ public interface PropertyService {
 
     Optional<PropertyResponseDto> getPropertyById(Long id);
 
-    Property updateProperty(Long id, PropertyRequestDto propertyDetails);
+    PropertyResponseDto updateProperty(Long id, PropertyRequestDto propertyDetails);
 }
