@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Start date must be before the end date!");
         }
 
-        List<Booking> checkedBookings = bookingRepository.findByStartDateAndEndDate(bookingRequestDto.getStartDate(), bookingRequestDto.getEndDate());
+        List<Booking> checkedBookings = bookingRepository.findBookingsByPropertyIdAndDateRange(property.getId(), bookingRequestDto.getStartDate(), bookingRequestDto.getEndDate());
 
         boolean checkAirBnbCal = calendarService.syncForAvailableDates(
                 icsAirBnbDirectory + File.separator + "airBnbCalendar-" + property.getId() + ".ics",
