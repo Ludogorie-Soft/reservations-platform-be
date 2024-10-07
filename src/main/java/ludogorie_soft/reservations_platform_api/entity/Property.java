@@ -25,7 +25,7 @@ public class Property {
 
     private String iCalSyncUrl;
 
-    @OneToMany(mappedBy = "property")
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings;
 
 
