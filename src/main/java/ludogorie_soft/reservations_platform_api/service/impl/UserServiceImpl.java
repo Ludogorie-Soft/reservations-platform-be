@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toEntity(registerDto);
         Set<Role> roles = new HashSet<>();
-      
+
         Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"));
         if (optionalUserRole.isPresent()) {
             roles.add(optionalUserRole.get());
