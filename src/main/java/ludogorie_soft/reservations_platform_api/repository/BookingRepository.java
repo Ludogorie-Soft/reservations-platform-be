@@ -14,7 +14,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByPropertyId(Long id);
 
-    @Query("SELECT b FROM Booking b WHERE b.startDate < :endDate AND b.endDate > :startDate")
-    List<Booking> findByStartDateAndEndDate(@Param("startDate") Date startDate,
-                                            @Param("endDate") Date endDate);
+    @Query("SELECT b FROM Booking b JOIN FETCH b.property p " +
+            "WHERE p.id = :propertyId " +
+            "AND b.startDate < :endDate " +
+            "AND b.endDate > :startDate")
+    List<Booking> findBookingsByPropertyIdAndDateRange(@Param("propertyId") Long propertyId,
+                                                       @Param("startDate") Date startDate,
+                                                       @Param("endDate") Date endDate);
 }

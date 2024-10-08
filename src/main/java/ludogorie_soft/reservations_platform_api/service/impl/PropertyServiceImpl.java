@@ -46,8 +46,8 @@ public class PropertyServiceImpl implements PropertyService {
         User user = userService.getUserByEmailOrUsername(propertyRequestDto.getOwnersEmail(), propertyRequestDto.getOwnersEmail());
 
         Property property = new Property();
-        property.setName(propertyRequestDto.getName());
-        property.setType(propertyRequestDto.getType());
+//        property.setName(propertyRequestDto.getName());
+//        property.setType(propertyRequestDto.getType());
         property.setOwner(user);
         property.setWebsiteUrl(propertyRequestDto.getWebsiteUrl());
         property.setCapacity(propertyRequestDto.getCapacity());
@@ -111,8 +111,8 @@ public class PropertyServiceImpl implements PropertyService {
     public PropertyResponseDto updateProperty(Long id, PropertyRequestDto oldProperty) {
         Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
 
-        updatedProperty.setName(oldProperty.getName());
-        updatedProperty.setType(oldProperty.getType());
+//        updatedProperty.setName(oldProperty.getName());
+//        updatedProperty.setType(oldProperty.getType());
         updatedProperty.setWebsiteUrl(oldProperty.getWebsiteUrl());
         updatedProperty.setCapacity(oldProperty.getCapacity());
         updatedProperty.setPetAllowed(oldProperty.isPetAllowed());

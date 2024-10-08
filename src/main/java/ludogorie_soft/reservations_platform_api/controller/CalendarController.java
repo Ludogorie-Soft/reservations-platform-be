@@ -18,9 +18,13 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    // Download .ics file
     @GetMapping("/{propertyId}")
     public ResponseEntity<FileSystemResource> getIcsFile(@PathVariable("propertyId") Long propertyId) throws IOException {
         return calendarService.getIcsFile(propertyId);
+    }
+
+    @GetMapping("/air-bnb/{propertyId}")
+    public ResponseEntity<FileSystemResource> getAirBnbIcsFile(@PathVariable("propertyId") Long propertyId) {
+        return calendarService.getAirBnbIcsFile(propertyId);
     }
 }

@@ -14,7 +14,11 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.*;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.DtStamp;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +26,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -144,6 +152,32 @@ public class CalendarServiceImpl implements CalendarService {
         try {
 
             File file = new File(icsMyCalDirectory + File.separator + filename);
+
+            if (file.exists()) {
+                FileSystemResource resource = new FileSystemResource(file);
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<FileSystemResource> getAirBnbIcsFile(Long propertyId) {
+
+        String filename = "airBnbCalendar-" + propertyId + ".ics";
+
+        try {
+
+            File file = new File(icsAirBnbDirectory + File.separator + filename);
 
             if (file.exists()) {
                 FileSystemResource resource = new FileSystemResource(file);
