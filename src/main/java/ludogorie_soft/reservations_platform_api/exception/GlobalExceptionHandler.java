@@ -1,6 +1,7 @@
-package ludogorie_soft.reservations_platform_api.exception.GEH;
+package ludogorie_soft.reservations_platform_api.exception;
 
 import ludogorie_soft.reservations_platform_api.exception.APIException;
+import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
