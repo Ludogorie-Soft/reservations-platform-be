@@ -25,7 +25,7 @@ public class CalendarController {
     }
 
     @GetMapping("/air-bnb/{propertyId}")
-    public ResponseEntity<FileSystemResource> getAirBnbIcsFile(@PathVariable("propertyId") Long propertyId) {
+    public ResponseEntity<FileSystemResource> getAirBnbIcsFile(@PathVariable("propertyId") UUID propertyId) {
         return calendarService.getAirBnbIcsFile(propertyId);
     }
 }
