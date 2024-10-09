@@ -18,4 +18,6 @@ public interface CalendarService {
     boolean syncForAvailableDates(String filePath, Date startDateRequest, Date endDateRequest);
 
     ResponseEntity<FileSystemResource> getIcsFile(UUID propertyId) throws IOException;
+
+    ResponseEntity<FileSystemResource> getAirBnbIcsFile(UUID propertyId);
 }

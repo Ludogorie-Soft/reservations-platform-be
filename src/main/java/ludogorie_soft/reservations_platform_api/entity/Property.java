@@ -19,15 +19,15 @@ public class Property {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    private String name;
-    private String type;
+//    private String name;
+//    private String type;
 
     private String airBnbICalUrl;
     private String bookingICalUrl;
 
     private String iCalSyncUrl;
 
-    @OneToMany(mappedBy = "property")
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings;
 
     private String websiteUrl;

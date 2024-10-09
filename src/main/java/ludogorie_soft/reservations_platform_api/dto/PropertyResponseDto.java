@@ -10,8 +10,8 @@ public class PropertyResponseDto {
 
     private UUID id;
     private UserResponseDto owner;
-    private String name;
-    private String type;
+//    private String name;
+//    private String type;
     private String airBnbUrl;
     private String bookingUrl;
     private List<BookingResponseDto> bookings;

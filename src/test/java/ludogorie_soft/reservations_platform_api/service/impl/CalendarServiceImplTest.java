@@ -31,8 +31,15 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CalendarServiceImplTest {
 
@@ -47,6 +54,7 @@ class CalendarServiceImplTest {
 
     private UUID propertyId;
     private String testFilePath;
+    private String testAirBnbFilePath;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -55,7 +63,10 @@ class CalendarServiceImplTest {
         ReflectionTestUtils.setField(calendarService, "icsMyCalDirectory", "my-calendar");
         ReflectionTestUtils.setField(calendarService, "icsAirBnbDirectory", "air-bnb-calendar");
         testFilePath = "my-calendar.ics";
+        testAirBnbFilePath = "airBnbCalendar-1.ics";
+
         createTestIcsFile(testFilePath);
+        createTestIcsFile(testAirBnbFilePath);
     }
 
     @AfterEach
@@ -63,6 +74,10 @@ class CalendarServiceImplTest {
         File testFile = new File(testFilePath);
         if (testFile.exists()) {
             testFile.delete();
+        }
+        File testAirBnbFile = new File(testAirBnbFilePath);
+        if (testAirBnbFile.exists()) {
+            testAirBnbFile.delete();
         }
         File icsMyCalDirectory = new File("my-calendar");
         if (icsMyCalDirectory.exists()) {
@@ -156,7 +171,29 @@ class CalendarServiceImplTest {
         assertNotNull(response.getBody());
     }
 
+    @Test
+    void testGetAirBnbIcsSuccessfully() throws IOException {
+        Property property = new Property();
+        property.setId(propertyId);
+        property.setAirBnbICalUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
+
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+
+        createTestIcsFile("air-bnb-calendar" + File.separator + "airBnbCalendar-" + propertyId + ".ics");
+
+        ResponseEntity<FileSystemResource> response = calendarService.getAirBnbIcsFile(propertyId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
     private void createTestIcsFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        File directory = file.getParentFile();
+
+        if (directory != null && !directory.exists()) {
+            directory.mkdirs();
+        }
+
         Calendar calendar = new Calendar();
         ProdId prodId = new ProdId("//Reservation Platform//Hosting Calendar 1.0//EN");
         calendar.getProperties().add(prodId);
