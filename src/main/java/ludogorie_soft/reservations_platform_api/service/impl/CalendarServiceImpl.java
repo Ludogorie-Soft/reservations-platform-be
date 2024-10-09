@@ -26,6 +26,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Value("${booking.ics.myCal.directory}")
     private String icsMyCalDirectory;
 
-    public String getMyCalendar(Long propertyId) throws IOException {
+    public String getMyCalendar(UUID propertyId) throws IOException {
 
         Property property = getProperty(propertyId);
         List<Booking> bookings = bookingRepository.findByPropertyId(propertyId);
@@ -82,7 +83,7 @@ public class CalendarServiceImpl implements CalendarService {
         return filename;
     }
 
-    public void syncAirBnbCalendar(Long propertyId) throws IOException, ParserException {
+    public void syncAirBnbCalendar(UUID propertyId) throws IOException, ParserException {
         Property property = getProperty(propertyId);
 
         if (property.getAirBnbICalUrl() != null || property.getAirBnbICalUrl().trim().isEmpty()) {
@@ -137,7 +138,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public ResponseEntity<FileSystemResource> getIcsFile(Long propertyId) throws IOException {
+    public ResponseEntity<FileSystemResource> getIcsFile(UUID propertyId) throws IOException {
 
         String filename = getMyCalendar(propertyId);
 
@@ -162,7 +163,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
     }
 
-    private Property getProperty(Long propertyId) {
+    private Property getProperty(UUID propertyId) {
         return propertyRepository.findById(propertyId).orElseThrow(
                 () -> new IllegalArgumentException("Property not found!")
         );

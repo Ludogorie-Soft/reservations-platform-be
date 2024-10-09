@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +61,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException {
+    public PropertyResponseDto updateAirBnbUrlOfProperty(UUID id, String url) throws FileNotFoundException {
         Property property = findById(id);
         property.setAirBnbICalUrl(url);
         Property updatedProperty = propertyRepository.save(property);
@@ -69,7 +70,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException {
+    public PropertyResponseDto updateBookingUrlOfProperty(UUID id, String url) throws FileNotFoundException {
         Property property = findById(id);
         property.setBookingICalUrl(url);
         Property updatedProperty = propertyRepository.save(property);
@@ -78,7 +79,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Property findById(Long id) {
+    public Property findById(UUID id) {
         return propertyRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Property not found!")
         );
@@ -93,14 +94,14 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Optional<PropertyResponseDto> getPropertyById(Long id) {
+    public Optional<PropertyResponseDto> getPropertyById(UUID id) {
         return Optional.ofNullable(propertyRepository.findById(id)
                 .map(property -> modelMapper.map(property, PropertyResponseDto.class))
                 .orElseThrow(() -> new RuntimeException("Property not found with id: " + id)));
     }
 
     @Override
-    public void deleteProperty(Long id) {
+    public void deleteProperty(UUID id) {
         propertyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
 
@@ -108,7 +109,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponseDto updateProperty(Long id, PropertyRequestDto oldProperty) {
+    public PropertyResponseDto updateProperty(UUID id, PropertyRequestDto oldProperty) {
         Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
 
         updatedProperty.setName(oldProperty.getName());

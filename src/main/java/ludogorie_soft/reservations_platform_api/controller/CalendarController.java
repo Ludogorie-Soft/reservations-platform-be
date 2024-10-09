@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/calendar/ical")
@@ -20,7 +21,7 @@ public class CalendarController {
 
     // Download .ics file
     @GetMapping("/{propertyId}")
-    public ResponseEntity<FileSystemResource> getIcsFile(@PathVariable("propertyId") Long propertyId) throws IOException {
+    public ResponseEntity<FileSystemResource> getIcsFile(@PathVariable("propertyId") UUID propertyId) throws IOException {
         return calendarService.getIcsFile(propertyId);
     }
 }

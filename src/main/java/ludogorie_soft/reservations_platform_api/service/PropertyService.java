@@ -7,21 +7,22 @@ import ludogorie_soft.reservations_platform_api.entity.Property;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface PropertyService {
     PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto);
 
-    PropertyResponseDto updateAirBnbUrlOfProperty(Long id, String url) throws FileNotFoundException;
+    PropertyResponseDto updateAirBnbUrlOfProperty(UUID id, String url) throws FileNotFoundException;
 
-    PropertyResponseDto updateBookingUrlOfProperty(Long id, String url) throws FileNotFoundException;
+    PropertyResponseDto updateBookingUrlOfProperty(UUID id, String url) throws FileNotFoundException;
 
-    Property findById(Long id);
+    Property findById(UUID id);
 
     List<PropertyResponseDto> getAllProperties();
 
-    void deleteProperty(Long id);
+    void deleteProperty(UUID id);
 
-    Optional<PropertyResponseDto> getPropertyById(Long id);
+    Optional<PropertyResponseDto> getPropertyById(UUID id);
 
-    PropertyResponseDto updateProperty(Long id, PropertyRequestDto propertyDetails);
+    PropertyResponseDto updateProperty(UUID id, PropertyRequestDto propertyDetails);
 }

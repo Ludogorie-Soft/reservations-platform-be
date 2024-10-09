@@ -8,11 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByPropertyId(Long id);
+    List<Booking> findByPropertyId(UUID id);
 
     @Query("SELECT b FROM Booking b WHERE b.startDate < :endDate AND b.endDate > :startDate")
     List<Booking> findByStartDateAndEndDate(@Param("startDate") Date startDate,

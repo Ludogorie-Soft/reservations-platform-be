@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
 
 public interface CalendarService {
-    String getMyCalendar(Long propertyId) throws IOException;
+    String getMyCalendar(UUID propertyId) throws IOException;
 
-    void syncAirBnbCalendar(Long propertyId) throws URISyntaxException, IOException, ParserException, ParseException;
+    void syncAirBnbCalendar(UUID propertyId) throws URISyntaxException, IOException, ParserException, ParseException;
 
     boolean syncForAvailableDates(String filePath, Date startDateRequest, Date endDateRequest);
 
-    ResponseEntity<FileSystemResource> getIcsFile(Long propertyId) throws IOException;
+    ResponseEntity<FileSystemResource> getIcsFile(UUID propertyId) throws IOException;
 }

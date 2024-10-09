@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -44,13 +45,13 @@ class CalendarServiceImplTest {
     @InjectMocks
     private CalendarServiceImpl calendarService;
 
-    private Long propertyId;
+    private UUID propertyId;
     private String testFilePath;
 
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
-        propertyId = 1L;
+        propertyId = UUID.randomUUID();
         ReflectionTestUtils.setField(calendarService, "icsMyCalDirectory", "my-calendar");
         ReflectionTestUtils.setField(calendarService, "icsAirBnbDirectory", "air-bnb-calendar");
         testFilePath = "my-calendar.ics";

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/properties")
@@ -27,13 +28,13 @@ public class PropertyController {
     }
 
     @PutMapping("/air-bnb/{id}")
-    public ResponseEntity<PropertyResponseDto> updateAirBnbUrl(@PathVariable("id") Long id, @RequestParam("url") String url) throws FileNotFoundException {
+    public ResponseEntity<PropertyResponseDto> updateAirBnbUrl(@PathVariable("id") UUID id, @RequestParam("url") String url) throws FileNotFoundException {
         PropertyResponseDto responseDto = propertyService.updateAirBnbUrlOfProperty(id, url);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/booking/{id}")
-    public ResponseEntity<PropertyResponseDto> updateBookingUrl(@PathVariable("id") Long id, @RequestParam("url") String url) throws FileNotFoundException {
+    public ResponseEntity<PropertyResponseDto> updateBookingUrl(@PathVariable("id") UUID id, @RequestParam("url") String url) throws FileNotFoundException {
         PropertyResponseDto responseDto = propertyService.updateBookingUrlOfProperty(id, url);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -45,19 +46,19 @@ public class PropertyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PropertyResponseDto> getPropertyById(@PathVariable Long id) {
+    public ResponseEntity<PropertyResponseDto> getPropertyById(@PathVariable UUID id) {
         Optional<PropertyResponseDto> property = propertyService.getPropertyById(id);
         return property.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProperty(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProperty(@PathVariable UUID id) {
         propertyService.deleteProperty(id);
         return ResponseEntity.ok("Property deleted successfully");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PropertyResponseDto> updateProperty(@PathVariable Long id, @RequestBody PropertyRequestDto propertyRequestDto) {
+    public ResponseEntity<PropertyResponseDto> updateProperty(@PathVariable UUID id, @RequestBody PropertyRequestDto propertyRequestDto) {
         PropertyResponseDto updatedProperty = propertyService.updateProperty(id, propertyRequestDto);
         return ResponseEntity.ok(updatedProperty);
     }

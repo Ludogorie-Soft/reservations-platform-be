@@ -3,11 +3,12 @@ package ludogorie_soft.reservations_platform_api.dto;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class PropertyResponseDto {
 
-    private Long id;
+    private UUID id;
     private UserResponseDto owner;
     private String name;
     private String type;
