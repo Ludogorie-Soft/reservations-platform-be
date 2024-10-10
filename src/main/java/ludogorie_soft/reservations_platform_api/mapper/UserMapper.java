@@ -1,6 +1,5 @@
 package ludogorie_soft.reservations_platform_api.mapper;
 
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.User;
@@ -16,15 +15,6 @@ public class UserMapper {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    private void configureMappings() {
-        modelMapper.addMappings(new PropertyMap<RegisterDto, User>() {
-            @Override
-            protected void configure() {
-                skip(destination.getPassword());
-                skip(destination.getId());
-            }
-        });
-    }
     public User toEntity(RegisterDto registerDto) {
         if (registerDto == null) {
             return null;
