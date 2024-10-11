@@ -2,12 +2,16 @@ package ludogorie_soft.reservations_platform_api.controller;
 
 import ludogorie_soft.reservations_platform_api.dto.LoginDto;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
+import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
+import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,10 +55,8 @@ class AuthControllerIntegrationTest {
 
     @Test
     void testRegisterUserSuccessfully() {
-        //GIVEN
-        ResponseEntity<String> response = createUserInDB(registerDto);
-
         //WHEN
+        ResponseEntity<String> response = createUserInDB(registerDto);
         String responseMessage = response.getBody();
 
         //THEN
@@ -73,7 +76,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameUsername.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, createUserWithSameUsername.getStatusCode());
     }
 
     @Test
@@ -87,7 +90,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameEmail.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, createUserWithSameEmail.getStatusCode());
     }
 
     @Test
@@ -100,7 +103,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test

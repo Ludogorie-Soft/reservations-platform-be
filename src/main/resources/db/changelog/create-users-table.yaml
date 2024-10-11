@@ -9,10 +9,10 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
-                    autoIncrement: true
               - column:
                   name: name
                   type: VARCHAR(255)
