@@ -86,7 +86,7 @@ class CalendarServiceImplTest {
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));
 
-        String result = calendarService.getMyCalendar(propertyId);
+        String result = calendarService.generateCalendarFile(propertyId);
 
         assertEquals(propertyId + ".ics", result);
         verify(propertyRepository, times(1)).save(property);
@@ -96,7 +96,7 @@ class CalendarServiceImplTest {
     void testGetMyCalendarShouldThrowWhenPropertyNotFound() {
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> calendarService.getMyCalendar(propertyId));
+        assertThrows(IllegalArgumentException.class, () -> calendarService.generateCalendarFile(propertyId));
     }
 
     @Test

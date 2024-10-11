@@ -10,7 +10,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 public interface CalendarService {
-    String getMyCalendar(Long propertyId) throws IOException;
+    String generateCalendarFile(Long propertyId) throws IOException;
 
     void syncAirBnbCalendar(Long propertyId) throws URISyntaxException, IOException, ParserException, ParseException;
 

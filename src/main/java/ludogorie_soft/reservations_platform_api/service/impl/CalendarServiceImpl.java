@@ -42,7 +42,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Value("${booking.ics.myCal.directory}")
     private String icsMyCalDirectory;
 
-    public String getMyCalendar(Long propertyId) throws IOException {
+    public String generateCalendarFile(Long propertyId) throws IOException {
 
         Property property = getProperty(propertyId);
         List<Booking> bookings = bookingRepository.findByPropertyId(propertyId);
@@ -139,7 +139,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public ResponseEntity<FileSystemResource> getIcsFile(Long propertyId) throws IOException {
 
-        String filename = getMyCalendar(propertyId);
+        String filename = generateCalendarFile(propertyId);
 
         try {
 
