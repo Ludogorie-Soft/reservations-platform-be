@@ -102,10 +102,11 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void deleteProperty(UUID id) {
-        propertyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
-
-        propertyRepository.deleteById(id);
+        try  {
+            propertyRepository.deleteById(id);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Property not found with id: " + id);
+        }
     }
 
     @Override
