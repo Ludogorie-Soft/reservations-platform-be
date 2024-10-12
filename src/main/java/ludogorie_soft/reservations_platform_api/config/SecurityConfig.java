@@ -48,8 +48,8 @@ public class SecurityConfig {
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     authorize.requestMatchers(HttpMethod.POST, "/**").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/**").permitAll();
-                    authorize.requestMatchers(HttpMethod.PUT, "/**").permitAll();
                     authorize.requestMatchers(HttpMethod.DELETE, "/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.PUT, "/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults())
                 .cors(cors -> cors.configurationSource(configurationSource()));

@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
         if (!registerDto.getPassword().equals(registerDto.getRepeatPassword())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Passwords do not match!");
         }
-        if (userRepository.existsByUsername(registerDto.getName())) {
+        if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
         }
         if (userRepository.existsByEmail(registerDto.getEmail())) {
@@ -39,8 +39,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toEntity(registerDto);
         Set<Role> roles = new HashSet<>();
-      
-        Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"));
+        Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_OWNER"));
         if (optionalUserRole.isPresent()) {
             roles.add(optionalUserRole.get());
         }
