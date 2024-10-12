@@ -53,7 +53,7 @@ class CustomUserDetailsServiceTest {
         assertEquals(TEST_EMAIL, userDetails.getUsername());
         assertEquals(TEST_PASSWORD, userDetails.getPassword());
         assertTrue(userDetails.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_USER")));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_OWNER")));
 
         verify(userRepository, times(1)).findByUsernameOrEmail(TEST_EMAIL, TEST_EMAIL);
     }

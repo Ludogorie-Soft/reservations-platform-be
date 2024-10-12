@@ -50,10 +50,8 @@ class AuthControllerIntegrationTest {
 
     @Test
     void testRegisterUserSuccessfully() {
-        //GIVEN
-        ResponseEntity<String> response = createUserInDB(registerDto);
-
         //WHEN
+        ResponseEntity<String> response = createUserInDB(registerDto);
         String responseMessage = response.getBody();
 
         //THEN
@@ -73,7 +71,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameUsername.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, createUserWithSameUsername.getStatusCode());
     }
 
     @Test
@@ -87,7 +85,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, createUserWithSameEmail.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, createUserWithSameEmail.getStatusCode());
     }
 
     @Test
@@ -100,7 +98,7 @@ class AuthControllerIntegrationTest {
                 .postForEntity(REGISTER_URL, registerDto, String.class);
 
         //THEN
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
