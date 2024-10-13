@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
         if (!registerDto.getPassword().equals(registerDto.getRepeatPassword())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Passwords do not match!");
         }
-        if (userRepository.existsByUsername(registerDto.getName())) {
+        if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
         }
         if (userRepository.existsByEmail(registerDto.getEmail())) {
