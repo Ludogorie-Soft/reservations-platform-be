@@ -5,6 +5,7 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
+import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
@@ -21,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,8 +47,6 @@ public class PropertyServiceImpl implements PropertyService {
         User user = userService.getUserByEmailOrUsername(propertyRequestDto.getOwnersEmail(), propertyRequestDto.getOwnersEmail());
 
         Property property = new Property();
-//        property.setName(propertyRequestDto.getName());
-//        property.setType(propertyRequestDto.getType());
         property.setOwner(user);
         property.setWebsiteUrl(propertyRequestDto.getWebsiteUrl());
         property.setCapacity(propertyRequestDto.getCapacity());
@@ -97,7 +95,7 @@ public class PropertyServiceImpl implements PropertyService {
     public Optional<PropertyResponseDto> getPropertyById(UUID id) {
         return Optional.ofNullable(propertyRepository.findById(id)
                 .map(property -> modelMapper.map(property, PropertyResponseDto.class))
-                .orElseThrow(() -> new RuntimeException("Property not found with id: " + id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + id)));
     }
 
     @Override
@@ -105,16 +103,14 @@ public class PropertyServiceImpl implements PropertyService {
         try  {
             propertyRepository.deleteById(id);
         } catch (RuntimeException e) {
-            throw new RuntimeException("Property not found with id: " + id);
+            throw new ResourceNotFoundException("Property not found with id: " + id);
         }
     }
 
     @Override
     public PropertyResponseDto updateProperty(UUID id, PropertyRequestDto oldProperty) {
-        Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
+        Property updatedProperty = propertyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + id));
 
-//        updatedProperty.setName(oldProperty.getName());
-//        updatedProperty.setType(oldProperty.getType());
         updatedProperty.setWebsiteUrl(oldProperty.getWebsiteUrl());
         updatedProperty.setCapacity(oldProperty.getCapacity());
         updatedProperty.setPetAllowed(oldProperty.isPetAllowed());
