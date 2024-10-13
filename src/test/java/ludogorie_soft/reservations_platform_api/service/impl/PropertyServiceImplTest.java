@@ -97,6 +97,30 @@ public class PropertyServiceImplTest {
     }
 
     @Test
+    void testGetPropertyById() {
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
+
+        Optional<PropertyResponseDto> result = propertyService.getPropertyById(propertyId);
+
+        assertTrue(result.isPresent(), "The property response should be present");
+        assertEquals(propertyResponseDto, result.get(), "The property response should match the expected DTO");
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(modelMapper, times(1)).map(property, PropertyResponseDto.class);
+    }
+
+    @Test
+    void testGetPropertyByIdNotFound() {
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> propertyService.getPropertyById(propertyId), "Expected getPropertyById to throw ResourceNotFoundException, but it didn't");
+
+        assertEquals("Property not found with id: " + propertyId, exception.getMessage(), "Exception message should match");
+        verify(propertyRepository, times(1)).findById(propertyId);
+    }
+
+    @Test
     void testGetAllProperties() {
         List<Property> properties = List.of(property);
         when(propertyRepository.findAll()).thenReturn(properties);
@@ -123,5 +147,56 @@ public class PropertyServiceImplTest {
         doThrow(new RuntimeException()).when(propertyRepository).deleteById(propertyId);
 
         assertThrows(ResourceNotFoundException.class, () -> propertyService.deleteProperty(propertyId));
+    }
+
+    @Test
+    void testUpdateProperty() {
+        PropertyRequestDto updatedRequestDto = new PropertyRequestDto();
+        updatedRequestDto.setWebsiteUrl("http://newexample.com");
+        updatedRequestDto.setCapacity(6);
+        updatedRequestDto.setPetAllowed(false);
+        updatedRequestDto.setPetRules("No pets allowed");
+        updatedRequestDto.setPrice(200);
+
+        Property existingProperty = new Property();
+        existingProperty.setId(propertyId);
+        existingProperty.setWebsiteUrl("http://example.com");
+        existingProperty.setCapacity(4);
+        existingProperty.setPetAllowed(true);
+        existingProperty.setPetRules("No large dogs");
+        existingProperty.setPrice(150);
+
+        Property updatedProperty = new Property();
+        updatedProperty.setId(propertyId);
+        updatedProperty.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
+        updatedProperty.setCapacity(updatedRequestDto.getCapacity());
+        updatedProperty.setPetAllowed(updatedRequestDto.isPetAllowed());
+        updatedProperty.setPetRules(updatedRequestDto.getPetRules());
+        updatedProperty.setPrice(updatedRequestDto.getPrice());
+
+        PropertyResponseDto updatedResponseDto = new PropertyResponseDto();
+        updatedResponseDto.setId(propertyId);
+        updatedResponseDto.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
+        updatedResponseDto.setCapacity(updatedRequestDto.getCapacity());
+        updatedResponseDto.setPetAllowed(updatedRequestDto.isPetAllowed());
+        updatedResponseDto.setPetRules(updatedRequestDto.getPetRules());
+        updatedResponseDto.setPrice(updatedRequestDto.getPrice());
+
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(existingProperty));
+        when(propertyRepository.save(any(Property.class))).thenReturn(updatedProperty);
+        when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(updatedResponseDto);
+
+        PropertyResponseDto result = propertyService.updateProperty(propertyId, updatedRequestDto);
+
+        assertNotNull(result, "The updated property response should not be null");
+        assertEquals(updatedRequestDto.getWebsiteUrl(), result.getWebsiteUrl(), "Website URL should be updated");
+        assertEquals(updatedRequestDto.getCapacity(), result.getCapacity(), "Capacity should be updated");
+        assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed(), "Pet allowed flag should be updated");
+        assertEquals(updatedRequestDto.getPetRules(), result.getPetRules(), "Pet rules should be updated");
+        assertEquals(updatedRequestDto.getPrice(), result.getPrice(), "Price should be updated");
+
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(propertyRepository, times(1)).save(existingProperty);
+        verify(modelMapper, times(1)).map(updatedProperty, PropertyResponseDto.class);
     }
 }
