@@ -1,9 +1,23 @@
-FROM postgres:16.4
+FROM gradle:jdk21 AS build
 
-ARG POSTGRES_DB
-ARG POSTGRES_USER
-ARG POSTGRES_PASSWORD
+WORKDIR /App
 
-ENV POSTGRES_DB=${POSTGRES_DB}
-ENV POSTGRES_USER=${POSTGRES_USER}
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle gradle
+
+RUN gradle wrapper
+
+COPY src src
+
+RUN chmod +x gradlew && ./gradlew clean bootJar
+
+# Stage 2: Run the application
+FROM amazoncorretto:21
+
+WORKDIR /App
+
+COPY --from=build /App/build/libs/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
