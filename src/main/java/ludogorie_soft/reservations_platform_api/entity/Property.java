@@ -19,9 +19,6 @@ public class Property {
     @JoinColumn(name = "user_id")
     private User owner;
 
-//    private String name;
-//    private String type;
-
     private String airBnbICalUrl;
     private String bookingICalUrl;
 
@@ -35,4 +32,5 @@ public class Property {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
+
 }

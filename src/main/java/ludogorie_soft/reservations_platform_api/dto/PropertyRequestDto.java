@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 public class PropertyRequestDto {
 
-//    private String name;
-//    private String type;
     private String ownersEmail;
     private String websiteUrl;
     private int capacity;

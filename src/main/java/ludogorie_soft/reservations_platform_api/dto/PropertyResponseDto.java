@@ -10,8 +10,6 @@ public class PropertyResponseDto {
 
     private UUID id;
     private UserResponseDto owner;
-//    private String name;
-//    private String type;
     private String airBnbUrl;
     private String bookingUrl;
     private List<BookingResponseDto> bookings;
@@ -21,4 +19,5 @@ public class PropertyResponseDto {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
+
 }
