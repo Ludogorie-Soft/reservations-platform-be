@@ -3,7 +3,6 @@ package ludogorie_soft.reservations_platform_api.controller;
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
-import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

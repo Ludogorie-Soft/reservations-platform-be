@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
