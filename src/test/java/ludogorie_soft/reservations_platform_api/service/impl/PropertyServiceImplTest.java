@@ -8,6 +8,7 @@ import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundExcept
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.UserService;
+import net.fortuna.ical4j.data.ParserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -199,4 +204,19 @@ public class PropertyServiceImplTest {
         verify(propertyRepository, times(1)).save(existingProperty);
         verify(modelMapper, times(1)).map(updatedProperty, PropertyResponseDto.class);
     }
+
+    @Test
+    void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
+        property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
+        List<Property> properties = List.of(property);
+        when(propertyRepository.findAll()).thenReturn(properties);
+        doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
+
+        propertyService.syncPropertiesWithAirBnbUrls();
+
+        verify(propertyRepository, times(1)).findAll();
+        verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
+    }
+
+
 }
