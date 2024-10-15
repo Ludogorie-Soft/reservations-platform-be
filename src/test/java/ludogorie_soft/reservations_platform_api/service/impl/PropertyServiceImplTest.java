@@ -81,68 +81,82 @@ public class PropertyServiceImplTest {
 
     @Test
     void testCreateProperty() {
+        // GIVEN
         when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(user);
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
+        // WHEN
         PropertyResponseDto result = propertyService.createProperty(propertyRequestDto);
 
+        // THEN
         assertNotNull(result);
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
     }
 
-
     @Test
     void testFindById() {
+        // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
+        // WHEN
         Property result = propertyService.findById(propertyId);
 
+        // THEN
         assertNotNull(result);
         verify(propertyRepository).findById(propertyId);
     }
 
     @Test
     void testFindByIdNotFound() {
+        // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
+        // WHEN & THEN
         assertThrows(IllegalArgumentException.class, () -> propertyService.findById(propertyId));
     }
 
     @Test
     void testGetPropertyById() {
+        // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
+        // WHEN
         Optional<PropertyResponseDto> result = propertyService.getPropertyById(propertyId);
 
-        assertTrue(result.isPresent(), "The property response should be present");
-        assertEquals(propertyResponseDto, result.get(), "The property response should match the expected DTO");
+        // THEN
+        assertTrue(result.isPresent());
+        assertEquals(propertyResponseDto, result.get());
         verify(propertyRepository, times(1)).findById(propertyId);
         verify(modelMapper, times(1)).map(property, PropertyResponseDto.class);
     }
 
     @Test
     void testGetPropertyByIdNotFound() {
+        // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
+        // WHEN & THEN
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-                () -> propertyService.getPropertyById(propertyId), "Expected getPropertyById to throw ResourceNotFoundException, but it didn't");
-
-        assertEquals("Property not found with id: " + propertyId, exception.getMessage(), "Exception message should match");
+                () -> propertyService.getPropertyById(propertyId));
+        assertEquals("Property not found with id: " + propertyId, exception.getMessage());
         verify(propertyRepository, times(1)).findById(propertyId);
     }
 
     @Test
     void testGetAllProperties() {
+        // GIVEN
         List<Property> properties = List.of(property);
         when(propertyRepository.findAll()).thenReturn(properties);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
+        // WHEN
         List<PropertyResponseDto> result = propertyService.getAllProperties();
 
+        // THEN
         assertNotNull(result);
         assertFalse(result.isEmpty());
         verify(propertyRepository).findAll();
@@ -150,26 +164,31 @@ public class PropertyServiceImplTest {
 
     @Test
     void deleteProperty_ShouldCallRepository_WhenPropertyExists() {
+        // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(true);
 
+        // WHEN
         propertyService.deleteProperty(propertyId);
 
+        // THEN
         verify(propertyRepository, times(1)).existsById(propertyId);
         verify(propertyRepository, times(1)).deleteById(propertyId);
     }
 
     @Test
     void deleteProperty_ShouldThrowResourceNotFoundException_WhenPropertyDoesNotExist() {
+        // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(false);
 
+        // WHEN & THEN
         assertThrows(ResourceNotFoundException.class, () -> propertyService.deleteProperty(propertyId));
-
         verify(propertyRepository, times(1)).existsById(propertyId);
         verify(propertyRepository, never()).deleteById(propertyId);
     }
 
     @Test
     void testUpdateProperty() {
+        // GIVEN
         PropertyRequestDto updatedRequestDto = new PropertyRequestDto();
         updatedRequestDto.setWebsiteUrl("http://newexample.com");
         updatedRequestDto.setCapacity(6);
@@ -205,14 +224,16 @@ public class PropertyServiceImplTest {
         when(propertyRepository.save(any(Property.class))).thenReturn(updatedProperty);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(updatedResponseDto);
 
+        // WHEN
         PropertyResponseDto result = propertyService.updateProperty(propertyId, updatedRequestDto);
 
-        assertNotNull(result, "The updated property response should not be null");
-        assertEquals(updatedRequestDto.getWebsiteUrl(), result.getWebsiteUrl(), "Website URL should be updated");
-        assertEquals(updatedRequestDto.getCapacity(), result.getCapacity(), "Capacity should be updated");
-        assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed(), "Pet allowed flag should be updated");
-        assertEquals(updatedRequestDto.getPetRules(), result.getPetRules(), "Pet rules should be updated");
-        assertEquals(updatedRequestDto.getPrice(), result.getPrice(), "Price should be updated");
+        // THEN
+        assertNotNull(result);
+        assertEquals(updatedRequestDto.getWebsiteUrl(), result.getWebsiteUrl());
+        assertEquals(updatedRequestDto.getCapacity(), result.getCapacity());
+        assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed());
+        assertEquals(updatedRequestDto.getPetRules(), result.getPetRules());
+        assertEquals(updatedRequestDto.getPrice(), result.getPrice());
 
         verify(propertyRepository, times(1)).findById(propertyId);
         verify(propertyRepository, times(1)).save(existingProperty);
@@ -221,16 +242,17 @@ public class PropertyServiceImplTest {
 
     @Test
     void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
+        // GIVEN
         property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
         List<Property> properties = List.of(property);
         when(propertyRepository.findAll()).thenReturn(properties);
         doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
 
+        // WHEN
         propertyService.syncPropertiesWithAirBnbUrls();
 
+        // THEN
         verify(propertyRepository, times(1)).findAll();
         verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
     }
-
-
 }
