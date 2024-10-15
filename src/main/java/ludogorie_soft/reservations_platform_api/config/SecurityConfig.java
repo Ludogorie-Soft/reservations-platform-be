@@ -1,6 +1,7 @@
 package ludogorie_soft.reservations_platform_api.config;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,7 +26,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig {
 
-    public static final String BASE_URL = "http://localhost:3000";
+    @Value("${base.url}")
+    public static String BASE_URL;
 
     private UserDetailsService userDetailsService;
 
