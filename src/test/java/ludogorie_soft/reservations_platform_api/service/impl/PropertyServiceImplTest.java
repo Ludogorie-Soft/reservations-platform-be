@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -149,19 +150,23 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testDeleteProperty() {
-        doNothing().when(propertyRepository).deleteById(propertyId);
+    void deleteProperty_ShouldCallRepository_WhenPropertyExists() {
+        when(propertyRepository.existsById(propertyId)).thenReturn(true);
 
         propertyService.deleteProperty(propertyId);
 
-        verify(propertyRepository).deleteById(propertyId);
+        verify(propertyRepository, times(1)).existsById(propertyId);
+        verify(propertyRepository, times(1)).deleteById(propertyId);
     }
 
     @Test
-    void testDeletePropertyNotFound() {
-        doThrow(new RuntimeException()).when(propertyRepository).deleteById(propertyId);
+    void deleteProperty_ShouldThrowResourceNotFoundException_WhenPropertyDoesNotExist() {
+        when(propertyRepository.existsById(propertyId)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> propertyService.deleteProperty(propertyId));
+
+        verify(propertyRepository, times(1)).existsById(propertyId);
+        verify(propertyRepository, never()).deleteById(propertyId);
     }
 
     @Test
