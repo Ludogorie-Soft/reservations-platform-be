@@ -74,7 +74,7 @@ public class PropertyServiceImplTest {
         property.setOwner(user);
 
         propertyRequestDto = new PropertyRequestDto();
-        propertyRequestDto.setOwnersEmail("ownerEmailTest@test.com");
+        propertyRequestDto.setOwnerEmail("ownerEmailTest@test.com");
 
         propertyResponseDto = new PropertyResponseDto();
     }

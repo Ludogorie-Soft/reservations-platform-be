@@ -44,7 +44,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertyResponseDto createProperty(PropertyRequestDto propertyRequestDto) {
 
-        User user = userService.getUserByEmailOrUsername(propertyRequestDto.getOwnersEmail(), propertyRequestDto.getOwnersEmail());
+        User user = userService.getUserByEmailOrUsername(propertyRequestDto.getOwnerEmail(), propertyRequestDto.getOwnerEmail());
 
         Property property = new Property();
         property.setOwner(user);
@@ -100,11 +100,10 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void deleteProperty(UUID id) {
-        try  {
-            propertyRepository.deleteById(id);
-        } catch (RuntimeException e) {
+        if (!propertyRepository.existsById(id)) {
             throw new ResourceNotFoundException("Property not found with id: " + id);
         }
+        propertyRepository.deleteById(id);
     }
 
     @Override
