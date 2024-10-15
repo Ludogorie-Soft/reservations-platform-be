@@ -26,8 +26,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig {
 
-    @Value("${base.url}")
-    public static String BASE_URL;
+    @Value("${cors.allowedOrigins}")
+    private String[] allowedOrigins;
 
     private UserDetailsService userDetailsService;
 
@@ -64,7 +64,7 @@ public class SecurityConfig {
     private CorsConfigurationSource configurationSource() {
         return request -> {
             CorsConfiguration corsConfiguration = new CorsConfiguration();
-            corsConfiguration.setAllowedOrigins(List.of(BASE_URL));
+            corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
             corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
             corsConfiguration.setAllowCredentials(true);
             corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
