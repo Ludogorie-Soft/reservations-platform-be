@@ -29,6 +29,9 @@ DATABASE_PASSWORD=password
    ```
    DATABASE_NAME=reservations_db;DATABASE_USER=user;DATABASE_PASSWORD=password
    ```
+3. Setup IntelliJ local VM (to load liquibase users for local runs)
+- Run->Edit Configuration, the Modify options button Add VM Options 
+- in the new field enter following: -Dspring.profiles.active=local
 
 ### Start the project
 
