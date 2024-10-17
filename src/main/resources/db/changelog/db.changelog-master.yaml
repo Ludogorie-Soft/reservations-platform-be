@@ -1,9 +1,31 @@
 databaseChangeLog:
   - include:
       file: /db/changelog/create-roles-table.yaml
+      context: deployment
   - include:
       file: /db/changelog/data/insert-initial-roles-data.yaml
+      context: deployment
   - include:
       file: /db/changelog/create-users-table.yaml
+      context: deployment
   - include:
       file: /db/changelog/create-users-roles-table.yaml
+      context: deployment
+  - include:
+      file: /db/changelog/data/add-user-admin.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-admin-role.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-manager.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-manager-role.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-owner.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-owner-role.yaml
+      context: local
