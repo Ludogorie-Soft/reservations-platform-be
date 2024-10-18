@@ -9,16 +9,16 @@ import net.fortuna.ical4j.data.ParserException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -30,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CalendarServiceImplTest {
 
     @Mock
@@ -52,7 +52,6 @@ class CalendarServiceImplTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.openMocks(this);
         propertyId = UUID.randomUUID();
         ReflectionTestUtils.setField(calendarService, "icsMyCalDirectory", "my-calendar");
         ReflectionTestUtils.setField(calendarService, "icsAirBnbDirectory", "air-bnb-calendar");
@@ -137,9 +136,6 @@ class CalendarServiceImplTest {
         Date startDateRequest = new Date();
         Date endDateRequest = new Date();
 
-        File file = mock(File.class);
-        when(file.exists()).thenReturn(true);
-
         //WHEN
         boolean result = calendarService.syncForAvailableDates(filePath, startDateRequest, endDateRequest);
 
@@ -205,7 +201,6 @@ class CalendarServiceImplTest {
         property.setId(propertyId);
         property.setAirBnbICalUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
 
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         CalendarTestHelper.createTestIcsFile("air-bnb-calendar" + File.separator + "airBnbCalendar-" + propertyId + ".ics");
 
         //WHEN
@@ -214,52 +209,5 @@ class CalendarServiceImplTest {
         //THEN
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-    }
-
-        createTestIcsFile("air-bnb-calendar" + File.separator + "airBnbCalendar-" + propertyId + ".ics");
-
-        ResponseEntity<FileSystemResource> response = calendarService.getAirBnbIcsFile(propertyId);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-    }
-
-    private void createTestIcsFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        File directory = file.getParentFile();
-
-        if (directory != null && !directory.exists()) {
-            directory.mkdirs();
-        }
-
-        Calendar calendar = new Calendar();
-        ProdId prodId = new ProdId("//Reservation Platform//Hosting Calendar 1.0//EN");
-        calendar.getProperties().add(prodId);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-        calendar.getProperties().add(Version.VERSION_2_0);
-
-        VEvent event = new VEvent(new net.fortuna.ical4j.model.DateTime(new Date()),
-                new net.fortuna.ical4j.model.DateTime(new Date(System.currentTimeMillis() + 3600000)),
-                "Sample Event");
-        event.getProperties().add(new Uid());
-        calendar.getComponents().add(event);
-
-        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-            CalendarOutputter outputter = new CalendarOutputter();
-            outputter.output(calendar, outputStream);
-        }
-    }
-
-    private void deleteDirectory(File directory) {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-        }
-        directory.delete();
     }
 }
