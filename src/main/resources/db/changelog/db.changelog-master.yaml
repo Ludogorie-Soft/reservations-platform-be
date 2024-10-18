@@ -12,20 +12,8 @@ databaseChangeLog:
       file: /db/changelog/create-users-roles-table.yaml
       context: deployment
   - include:
-      file: /db/changelog/data/add-user-admin.yaml
+      file: /db/changelog/data/add-users.yaml
       context: local
   - include:
-      file: /db/changelog/data/add-user-admin-role.yaml
-      context: local
-  - include:
-      file: /db/changelog/data/add-user-manager.yaml
-      context: local
-  - include:
-      file: /db/changelog/data/add-user-manager-role.yaml
-      context: local
-  - include:
-      file: /db/changelog/data/add-user-owner.yaml
-      context: local
-  - include:
-      file: /db/changelog/data/add-user-owner-role.yaml
+      file: /db/changelog/data/add-user-roles.yaml
       context: local
