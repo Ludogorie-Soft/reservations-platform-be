@@ -123,7 +123,6 @@ public class CalendarServiceImpl implements CalendarService {
             return true;
         }
 
-
         FileInputStream fileInputStream = new FileInputStream(filePath);
 
         CalendarBuilder builder = new CalendarBuilder();

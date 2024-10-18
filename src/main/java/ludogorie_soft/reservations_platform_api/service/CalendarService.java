@@ -3,7 +3,6 @@ package ludogorie_soft.reservations_platform_api.service;
 import net.fortuna.ical4j.data.ParserException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
