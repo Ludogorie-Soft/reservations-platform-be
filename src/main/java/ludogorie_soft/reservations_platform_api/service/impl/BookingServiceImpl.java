@@ -11,11 +11,13 @@ import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
 import ludogorie_soft.reservations_platform_api.service.UserService;
+import net.fortuna.ical4j.data.ParserException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
     private String icsMyCal;
 
     @Override
-    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
+    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws ParserException, IOException {
 
         Property property = propertyService.findById(bookingRequestDto.getPropertyId());
 

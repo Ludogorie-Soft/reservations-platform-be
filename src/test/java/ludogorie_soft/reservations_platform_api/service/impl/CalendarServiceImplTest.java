@@ -2,16 +2,10 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
+import ludogorie_soft.reservations_platform_api.helper.CalendarTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -65,8 +58,8 @@ class CalendarServiceImplTest {
         testFilePath = "my-calendar.ics";
         testAirBnbFilePath = "airBnbCalendar-1.ics";
 
-        createTestIcsFile(testFilePath);
-        createTestIcsFile(testAirBnbFilePath);
+        CalendarTestHelper.createTestIcsFile(testFilePath);
+        CalendarTestHelper.createTestIcsFile(testAirBnbFilePath);
     }
 
     @AfterEach
@@ -81,16 +74,17 @@ class CalendarServiceImplTest {
         }
         File icsMyCalDirectory = new File("my-calendar");
         if (icsMyCalDirectory.exists()) {
-            deleteDirectory(icsMyCalDirectory);
+            CalendarTestHelper.deleteDirectory(icsMyCalDirectory);
         }
         File icsAirBnbDirectory = new File("air-bnb-calendar");
         if (icsAirBnbDirectory.exists()) {
-            deleteDirectory(icsAirBnbDirectory);
+            CalendarTestHelper.deleteDirectory(icsAirBnbDirectory);
         }
     }
 
     @Test
     void testGetMyCalendarReturnsFileNameSuccessfully() throws IOException {
+        //GIVEN
         Property property = new Property();
         property.setId(propertyId);
 
@@ -102,34 +96,42 @@ class CalendarServiceImplTest {
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));
 
+        //WHEN
         String result = calendarService.getMyCalendar(propertyId);
 
+        //THEN
         assertEquals(propertyId + ".ics", result);
         verify(propertyRepository, times(1)).save(property);
     }
 
     @Test
     void testGetMyCalendarShouldThrowWhenPropertyNotFound() {
+        //WHEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
+        //THEN
         assertThrows(IllegalArgumentException.class, () -> calendarService.getMyCalendar(propertyId));
     }
 
     @Test
     void testSyncAirBnbCalendarSuccessfully() throws IOException, ParserException {
+        //GIVEN
         Property property = new Property();
         property.setId(propertyId);
         property.setAirBnbICalUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
+        //WHEN
         calendarService.syncAirBnbCalendar(propertyId);
 
+        //THEN
         verify(propertyRepository, times(1)).findById(propertyId);
     }
 
     @Test
-    void testSyncForAvailableDatesReturnsTrue() {
+    void testSyncForAvailableDatesReturnsTrueWhenFileExists() throws ParserException, IOException {
+        //GIVEN
         String filePath = "test.ics";
         Date startDateRequest = new Date();
         Date endDateRequest = new Date();
@@ -137,23 +139,45 @@ class CalendarServiceImplTest {
         File file = mock(File.class);
         when(file.exists()).thenReturn(true);
 
+        //WHEN
         boolean result = calendarService.syncForAvailableDates(filePath, startDateRequest, endDateRequest);
 
+        //THEN
         assertTrue(result);
     }
 
     @Test
-    void testSyncForAvailableDatesReturnFalse() {
+    void testSyncForAvailableDatesReturnsTrueWhenNoEventsOverlap() throws ParserException, IOException {
+        //GIVEN
+        Date startDateRequest = new Date(System.currentTimeMillis() + 86400000 * 10);
+        Date endDateRequest = new Date(System.currentTimeMillis() + 86400000 * 15);
+
+        File file = new File(testFilePath);
+        assertTrue(file.exists());
+
+        //WHEN
+        boolean result = calendarService.syncForAvailableDates(testFilePath, startDateRequest, endDateRequest);
+
+        //THEN
+        assertTrue(result);
+    }
+
+    @Test
+    void testSyncForAvailableDatesReturnFalse() throws ParserException, IOException {
+        //GIVEN
         Date startDateRequest = new Date();
         Date endDateRequest = new Date();
 
+        //WHEN
         boolean result = calendarService.syncForAvailableDates(testFilePath, startDateRequest, endDateRequest);
 
+        //THEN
         assertFalse(result);
     }
 
     @Test
     void testGetIcsFileSuccessfully() throws IOException {
+        //GIVEN
         Property property = new Property();
         property.setId(propertyId);
         Booking booking = new Booking();
@@ -165,64 +189,29 @@ class CalendarServiceImplTest {
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));
 
+        //WHEN
         ResponseEntity<FileSystemResource> response = calendarService.getIcsFile(propertyId);
 
+        //THEN
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
     }
 
     @Test
     void testGetAirBnbIcsSuccessfully() throws IOException {
+        //GIVEN
         Property property = new Property();
         property.setId(propertyId);
         property.setAirBnbICalUrl("https://bg.airbnb.com/calendar/ical/1247739757393025285.ics?s=743aa2e810329f14445dd5f53a6279f8");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        CalendarTestHelper.createTestIcsFile("air-bnb-calendar" + File.separator + "airBnbCalendar-" + propertyId + ".ics");
 
-        createTestIcsFile("air-bnb-calendar" + File.separator + "airBnbCalendar-" + propertyId + ".ics");
-
+        //WHEN
         ResponseEntity<FileSystemResource> response = calendarService.getAirBnbIcsFile(propertyId);
+
+        //THEN
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-    }
-
-    private void createTestIcsFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        File directory = file.getParentFile();
-
-        if (directory != null && !directory.exists()) {
-            directory.mkdirs();
-        }
-
-        Calendar calendar = new Calendar();
-        ProdId prodId = new ProdId("//Reservation Platform//Hosting Calendar 1.0//EN");
-        calendar.getProperties().add(prodId);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-        calendar.getProperties().add(Version.VERSION_2_0);
-
-        VEvent event = new VEvent(new net.fortuna.ical4j.model.DateTime(new Date()),
-                new net.fortuna.ical4j.model.DateTime(new Date(System.currentTimeMillis() + 3600000)),
-                "Sample Event");
-        event.getProperties().add(new Uid());
-        calendar.getComponents().add(event);
-
-        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-            CalendarOutputter outputter = new CalendarOutputter();
-            outputter.output(calendar, outputStream);
-        }
-    }
-
-    private void deleteDirectory(File directory) {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-        }
-        directory.delete();
     }
 }
