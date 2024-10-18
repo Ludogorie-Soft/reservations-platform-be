@@ -39,11 +39,11 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toEntity(registerDto);
         Set<Role> roles = new HashSet<>();
-
         Optional<Role> optionalUserRole = Optional.ofNullable(roleRepository.findByName("ROLE_OWNER"));
         if (optionalUserRole.isPresent()) {
             roles.add(optionalUserRole.get());
         }
+      
         user.setRoles(roles);
         userRepository.save(user);
         return "User Registered Successfully!";
@@ -63,5 +63,12 @@ public class UserServiceImpl implements UserService {
             return "Invalid password";
         }
         return "Login successful";
+    }
+
+    @Override
+    public User getUserByEmailOrUsername(String email, String username) {
+        return userRepository
+                .findByUsernameOrEmail(email, username)
+                .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "User with this username or email not found!"));
     }
 }
