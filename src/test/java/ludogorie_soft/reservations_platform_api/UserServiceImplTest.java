@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api;
 
 import ludogorie_soft.reservations_platform_api.dto.LoginDto;
-
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
@@ -68,12 +67,14 @@ class UserServiceImplTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertEquals("Username already exists!", exception.getMessage());
     }
+
     @Test
     void register_WhenEmailExists_ThrowsAPIException() {
         RegisterDto registerDto = new RegisterDto();
         registerDto.setEmail("existingEmail@test.com");
         registerDto.setPassword("password");
         registerDto.setRepeatPassword("password");
+
         when(userRepository.existsByEmail("existingEmail@test.com")).thenReturn(true);
 
         APIException exception = assertThrows(APIException.class, () -> userService.register(registerDto));
