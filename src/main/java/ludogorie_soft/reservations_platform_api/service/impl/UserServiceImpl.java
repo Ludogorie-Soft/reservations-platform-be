@@ -6,6 +6,9 @@ import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.APIException;
+import ludogorie_soft.reservations_platform_api.exception.UserAlreadyExistsException;
+import ludogorie_soft.reservations_platform_api.exception.UserNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.WrongPasswordException;
 import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
@@ -26,17 +29,21 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Override
     public String register(RegisterDto registerDto) {
         if (!registerDto.getPassword().equals(registerDto.getRepeatPassword())) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Passwords do not match!");
         }
+
         if (userRepository.existsByUsername(registerDto.getName())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Username already exists!");
+            throw new UserAlreadyExistsException("Username already exists!");
         }
+
         if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new APIException(HttpStatus.BAD_REQUEST, "Email already exists!");
+            throw new UserAlreadyExistsException("Email already exists!");
         }
+
         User user = userMapper.toEntity(registerDto);
         Set<Role> roles = new HashSet<>();
 
@@ -44,6 +51,7 @@ public class UserServiceImpl implements UserService {
         if (optionalUserRole.isPresent()) {
             roles.add(optionalUserRole.get());
         }
+
         user.setRoles(roles);
         userRepository.save(user);
         return "User Registered Successfully!";
@@ -53,20 +61,18 @@ public class UserServiceImpl implements UserService {
     public String login(LoginDto loginDto) {
         String usernameOrEmail = loginDto.getUsernameOrEmail();
         String password = loginDto.getPassword();
-        Optional<User> userOptional = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
 
+        Optional<User> userOptional = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
         if (!userOptional.isPresent()) {
-            throw new APIException(HttpStatus.UNAUTHORIZED, "Invalid username or email");
+            throw new UserNotFoundException("Invalid username or email");
         }
 
         User user = userOptional.get();
-
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new APIException(HttpStatus.UNAUTHORIZED, "Invalid password");
+            throw new WrongPasswordException("Invalid password");
         }
 
 
         return "Login successful";
     }
-
 }

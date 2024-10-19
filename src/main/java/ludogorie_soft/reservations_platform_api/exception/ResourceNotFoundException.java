@@ -1,4 +1,4 @@
-package ludogorie_soft.reservations_platform_api.exception.GEH;
+package ludogorie_soft.reservations_platform_api.exception;
 
 
 
