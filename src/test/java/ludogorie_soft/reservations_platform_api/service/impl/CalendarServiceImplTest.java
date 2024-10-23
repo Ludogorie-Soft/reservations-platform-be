@@ -181,7 +181,6 @@ class CalendarServiceImplTest {
         booking.setStartDate(new Date());
         booking.setEndDate(new Date());
         booking.setDescription("Test Booking");
-        booking.setUid("test-booking-uid");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));

@@ -51,12 +51,8 @@ public class BookingServiceImpl implements BookingService {
         checkDatesAreInPast(bookingRequestDto);
         checkStartDateIsBeforeEndDate(bookingRequestDto);
 
-        int peopleInRequest = (bookingRequestDto.getAdultCount() + bookingRequestDto.getChildrenCount());
-        checkCapacity(peopleInRequest, property);
-
         if (checkCalendarsForAvailableDates(property, bookingRequestDto)) {
-            Booking booking = new Booking();
-            Booking createdBooking = createBookingModel(bookingRequestDto, property, peopleInRequest);
+            Booking createdBooking = createBookingModel(bookingRequestDto, property);
             return modelMapper.map(createdBooking, BookingResponseDto.class);
         } else {
             throw new NotAvailableDatesException("These dates are not available!");
@@ -82,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (areDatesAvailable) {
-            setBookingFields(request, booking.getProperty(), peopleInRequest, booking);
+            setBookingFields(request, booking.getProperty(), booking);
             bookingRepository.save(booking);
             return modelMapper.map(booking, BookingResponseDto.class);
         } else {
@@ -120,13 +116,13 @@ public class BookingServiceImpl implements BookingService {
         return modelMapper.map(booking, BookingResponseDto.class);
     }
 
-    private Booking createBookingModel(BookingRequestDto bookingRequestDto, Property property, int peopleInRequest) {
+    private Booking createBookingModel(BookingRequestDto bookingRequestDto, Property property) {
         Booking booking = new Booking();
-        setBookingFields(bookingRequestDto, property, peopleInRequest, booking);
+        setBookingFields(bookingRequestDto, property, booking);
         return bookingRepository.save(booking);
     }
 
-    private void setBookingFields(BookingRequestDto bookingRequestDto, Property property, int peopleInRequest, Booking booking) {
+    private void setBookingFields(BookingRequestDto bookingRequestDto, Property property, Booking booking) {
         booking.setProperty(property);
         booking.setStartDate(bookingRequestDto.getStartDate());
         booking.setEndDate(bookingRequestDto.getEndDate());
@@ -134,10 +130,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
-        booking.setTotalPrice(BigDecimal.valueOf(calculatePriceOfBookedNights(
-                bookingRequestDto,
-                peopleInRequest,
-                property)));
+        double totalPrice = property.getPrice();
+        if (bookingRequestDto.isPetContent()) {
+            //TODO:
+            totalPrice = property.getPrice() + 20.0;
+        }
+        booking.setTotalPrice(BigDecimal.valueOf(totalPrice));
+
     }
 
     private boolean checkCalendarsForAvailableDates(Property property, BookingRequestDto bookingRequestDto) throws ParserException, IOException {

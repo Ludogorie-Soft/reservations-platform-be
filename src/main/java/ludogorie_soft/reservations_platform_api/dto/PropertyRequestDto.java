@@ -11,5 +11,6 @@ public class PropertyRequestDto {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
+    private int minimumStay;
 
 }
