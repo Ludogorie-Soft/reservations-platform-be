@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +39,6 @@ public class BookingServiceImpl implements BookingService {
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
 
-    @Value("${booking.ics.myCal.directory}")
-    private String icsMyCal;
-
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws ParserException, IOException {
 
@@ -50,6 +46,8 @@ public class BookingServiceImpl implements BookingService {
 
         checkDatesAreInPast(bookingRequestDto);
         checkStartDateIsBeforeEndDate(bookingRequestDto);
+        int peopleInRequest = (bookingRequestDto.getAdultCount() + bookingRequestDto.getChildrenCount());
+        checkCapacity(peopleInRequest, property);
 
         if (checkCalendarsForAvailableDates(property, bookingRequestDto)) {
             Booking createdBooking = createBookingModel(bookingRequestDto, property);
@@ -130,13 +128,11 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
-        double totalPrice = property.getPrice();
+        int totalPrice = property.getPrice();
         if (bookingRequestDto.isPetContent()) {
-            //TODO:
-            totalPrice = property.getPrice() + 20.0;
+            totalPrice = property.getPrice() + property.getPetPrice();
         }
         booking.setTotalPrice(BigDecimal.valueOf(totalPrice));
-
     }
 
     private boolean checkCalendarsForAvailableDates(Property property, BookingRequestDto bookingRequestDto) throws ParserException, IOException {
@@ -149,13 +145,6 @@ public class BookingServiceImpl implements BookingService {
         return checkedBookings.isEmpty() && checkAirBnbCal;
     }
 
-    private long calculateBookedDays(Date startDate, Date endDate) {
-        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        return ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-    }
-
     private boolean isDateInPast(Date date) {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.isBefore(LocalDate.now());
@@ -165,11 +154,6 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findById(id).orElseThrow(
                 () -> new BookingNotFoundException("Booking with id + " + id + " not found!")
         );
-    }
-
-    private long calculatePriceOfBookedNights(BookingRequestDto request, int peopleInRequest, Property booking) {
-        long bookedNights = calculateBookedDays(request.getStartDate(), request.getEndDate());
-        return bookedNights * peopleInRequest * booking.getPrice();
     }
 
     private static void checkStartDateIsBeforeEndDate(BookingRequestDto bookingRequestDto) {
