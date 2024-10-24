@@ -3,7 +3,9 @@ package ludogorie_soft.reservations_platform_api.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -11,16 +13,12 @@ import java.util.Date;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "property_id")
     private Property property;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -29,6 +27,11 @@ public class Booking {
     private Date endDate;
 
     private String description;
+    int adultCount;
+    int childrenCount;
+    int babiesCount;
 
-    private String uid;
+    boolean petContent;
+
+    BigDecimal totalPrice;
 }
