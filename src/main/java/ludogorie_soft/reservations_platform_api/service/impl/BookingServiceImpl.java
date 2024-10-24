@@ -7,7 +7,7 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
-import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestExceptionException;
+import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
@@ -158,13 +158,13 @@ public class BookingServiceImpl implements BookingService {
 
     private static void checkStartDateIsBeforeEndDate(BookingRequestDto bookingRequestDto) {
         if (bookingRequestDto.getEndDate().before(bookingRequestDto.getStartDate())) {
-            throw new InvalidDateRequestExceptionException("Start date must be before the end date!");
+            throw new InvalidDateRequestException("Start date must be before the end date!");
         }
     }
 
     private void checkDatesAreInPast(BookingRequestDto bookingRequestDto) {
         if (isDateInPast(bookingRequestDto.getStartDate()) || isDateInPast(bookingRequestDto.getEndDate())) {
-            throw new InvalidDateRequestExceptionException("Booking dates cannot be in the past!");
+            throw new InvalidDateRequestException("Booking dates cannot be in the past!");
         }
     }
 
