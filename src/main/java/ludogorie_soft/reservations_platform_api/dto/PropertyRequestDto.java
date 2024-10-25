@@ -1,5 +1,6 @@
 package ludogorie_soft.reservations_platform_api.dto;
 
+import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Data
@@ -11,5 +12,6 @@ public class PropertyRequestDto {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
-
+    @Lob
+    private String propertyRules;
 }

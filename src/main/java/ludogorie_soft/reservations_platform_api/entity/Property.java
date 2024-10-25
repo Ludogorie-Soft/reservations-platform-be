@@ -32,7 +32,6 @@ public class Property {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
-
     @Lob
     private String propertyRules;
 

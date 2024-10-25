@@ -72,11 +72,14 @@ public class PropertyServiceImplTest {
         property = new Property();
         property.setId(propertyId);
         property.setOwner(user);
+        property.setPropertyRules("No smoking allowed");
 
         propertyRequestDto = new PropertyRequestDto();
         propertyRequestDto.setOwnerEmail("ownerEmailTest@test.com");
+        propertyRequestDto.setPropertyRules("No smoking allowed");
 
         propertyResponseDto = new PropertyResponseDto();
+        propertyResponseDto.setPropertyRules("No smoking allowed");
     }
 
     @Test
@@ -91,6 +94,7 @@ public class PropertyServiceImplTest {
 
         // THEN
         assertNotNull(result);
+        assertEquals("No smoking allowed", result.getPropertyRules());
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
@@ -187,38 +191,28 @@ public class PropertyServiceImplTest {
     }
 
     @Test
+    void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
+        // GIVEN
+        property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
+        List<Property> properties = List.of(property);
+        when(propertyRepository.findAll()).thenReturn(properties);
+        doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
+
+        // WHEN
+        propertyService.syncPropertiesWithAirBnbUrls();
+
+        // THEN
+        verify(propertyRepository, times(1)).findAll();
+        verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
+    }
+
+    @Test
     void testUpdateProperty() {
         // GIVEN
-        PropertyRequestDto updatedRequestDto = new PropertyRequestDto();
-        updatedRequestDto.setWebsiteUrl("http://newexample.com");
-        updatedRequestDto.setCapacity(6);
-        updatedRequestDto.setPetAllowed(false);
-        updatedRequestDto.setPetRules("No pets allowed");
-        updatedRequestDto.setPrice(200);
-
-        Property existingProperty = new Property();
-        existingProperty.setId(propertyId);
-        existingProperty.setWebsiteUrl("http://example.com");
-        existingProperty.setCapacity(4);
-        existingProperty.setPetAllowed(true);
-        existingProperty.setPetRules("No large dogs");
-        existingProperty.setPrice(150);
-
-        Property updatedProperty = new Property();
-        updatedProperty.setId(propertyId);
-        updatedProperty.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
-        updatedProperty.setCapacity(updatedRequestDto.getCapacity());
-        updatedProperty.setPetAllowed(updatedRequestDto.isPetAllowed());
-        updatedProperty.setPetRules(updatedRequestDto.getPetRules());
-        updatedProperty.setPrice(updatedRequestDto.getPrice());
-
-        PropertyResponseDto updatedResponseDto = new PropertyResponseDto();
-        updatedResponseDto.setId(propertyId);
-        updatedResponseDto.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
-        updatedResponseDto.setCapacity(updatedRequestDto.getCapacity());
-        updatedResponseDto.setPetAllowed(updatedRequestDto.isPetAllowed());
-        updatedResponseDto.setPetRules(updatedRequestDto.getPetRules());
-        updatedResponseDto.setPrice(updatedRequestDto.getPrice());
+        final var updatedRequestDto = getExistingPropertyRequestDto();
+        final var existingProperty = getExistingProperty();
+        final var updatedProperty = getUpdatedProperty(updatedRequestDto);
+        final var updatedResponseDto = getUpdatedPropertyResponseDto(updatedRequestDto);
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(existingProperty));
         when(propertyRepository.save(any(Property.class))).thenReturn(updatedProperty);
@@ -233,6 +227,7 @@ public class PropertyServiceImplTest {
         assertEquals(updatedRequestDto.getCapacity(), result.getCapacity());
         assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed());
         assertEquals(updatedRequestDto.getPetRules(), result.getPetRules());
+        assertEquals(updatedRequestDto.getPropertyRules(), result.getPropertyRules());
         assertEquals(updatedRequestDto.getPrice(), result.getPrice());
 
         verify(propertyRepository, times(1)).findById(propertyId);
@@ -240,19 +235,50 @@ public class PropertyServiceImplTest {
         verify(modelMapper, times(1)).map(updatedProperty, PropertyResponseDto.class);
     }
 
-    @Test
-    void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
-        // GIVEN
-        property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
-        List<Property> properties = List.of(property);
-        when(propertyRepository.findAll()).thenReturn(properties);
-        doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
+    private static PropertyRequestDto getExistingPropertyRequestDto() {
+        PropertyRequestDto updatedRequestDto = new PropertyRequestDto();
+        updatedRequestDto.setWebsiteUrl("http://newexample.com");
+        updatedRequestDto.setCapacity(6);
+        updatedRequestDto.setPetAllowed(false);
+        updatedRequestDto.setPetRules("No pets allowed");
+        updatedRequestDto.setPropertyRules("Guests must be quiet after 10 PM");
+        updatedRequestDto.setPrice(200);
+        return updatedRequestDto;
+    }
 
-        // WHEN
-        propertyService.syncPropertiesWithAirBnbUrls();
+    private Property getExistingProperty() {
+        Property existingProperty = new Property();
+        existingProperty.setId(propertyId);
+        existingProperty.setWebsiteUrl("http://example.com");
+        existingProperty.setCapacity(4);
+        existingProperty.setPetAllowed(true);
+        existingProperty.setPetRules("No large dogs");
+        existingProperty.setPropertyRules("No smoking allowed");
+        existingProperty.setPrice(150);
+        return existingProperty;
+    }
 
-        // THEN
-        verify(propertyRepository, times(1)).findAll();
-        verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
+    private PropertyResponseDto getUpdatedPropertyResponseDto(PropertyRequestDto updatedRequestDto) {
+        PropertyResponseDto updatedResponseDto = new PropertyResponseDto();
+        updatedResponseDto.setId(propertyId);
+        updatedResponseDto.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
+        updatedResponseDto.setCapacity(updatedRequestDto.getCapacity());
+        updatedResponseDto.setPetAllowed(updatedRequestDto.isPetAllowed());
+        updatedResponseDto.setPetRules(updatedRequestDto.getPetRules());
+        updatedResponseDto.setPropertyRules(updatedRequestDto.getPropertyRules());
+        updatedResponseDto.setPrice(updatedRequestDto.getPrice());
+        return updatedResponseDto;
+    }
+
+    private Property getUpdatedProperty(PropertyRequestDto updatedRequestDto) {
+        Property updatedProperty = new Property();
+        updatedProperty.setId(propertyId);
+        updatedProperty.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
+        updatedProperty.setCapacity(updatedRequestDto.getCapacity());
+        updatedProperty.setPetAllowed(updatedRequestDto.isPetAllowed());
+        updatedProperty.setPetRules(updatedRequestDto.getPetRules());
+        updatedProperty.setPropertyRules(updatedRequestDto.getPropertyRules());
+        updatedProperty.setPrice(updatedRequestDto.getPrice());
+        return updatedProperty;
     }
 }

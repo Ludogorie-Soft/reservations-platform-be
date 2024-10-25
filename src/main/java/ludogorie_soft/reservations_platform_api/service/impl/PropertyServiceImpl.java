@@ -53,6 +53,7 @@ public class PropertyServiceImpl implements PropertyService {
         property.setPetAllowed(propertyRequestDto.isPetAllowed());
         property.setPetRules(propertyRequestDto.getPetRules());
         property.setPrice(propertyRequestDto.getPrice());
+        property.setPropertyRules(propertyRequestDto.getPropertyRules());
 
         Property createdProperty = propertyRepository.save(property);
         return modelMapper.map(createdProperty, PropertyResponseDto.class);
@@ -115,6 +116,7 @@ public class PropertyServiceImpl implements PropertyService {
         updatedProperty.setPetAllowed(oldProperty.isPetAllowed());
         updatedProperty.setPetRules(oldProperty.getPetRules());
         updatedProperty.setPrice(oldProperty.getPrice());
+        updatedProperty.setPropertyRules(oldProperty.getPropertyRules());
 
         propertyRepository.save(updatedProperty);
         return modelMapper.map(updatedProperty, PropertyResponseDto.class);

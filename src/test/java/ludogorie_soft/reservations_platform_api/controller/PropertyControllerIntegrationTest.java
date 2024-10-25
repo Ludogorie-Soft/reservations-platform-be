@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -66,6 +64,7 @@ class PropertyControllerIntegrationTest {
         property.setPetAllowed(true);
         property.setPetRules("Cats only");
         property.setPrice(200);
+        property.setPropertyRules("No loud noises after 10 PM");
         savedProperty = propertyRepository.save(property);
     }
 
@@ -78,6 +77,7 @@ class PropertyControllerIntegrationTest {
         requestDto.setPetAllowed(false);
         requestDto.setPrice(150);
         requestDto.setPetRules("No pets allowed");
+        requestDto.setPropertyRules("Guests should maintain cleanliness");
 
         mockMvc.perform(post("/api/properties/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +87,8 @@ class PropertyControllerIntegrationTest {
                 .andExpect(jsonPath("$.capacity").value(2))
                 .andExpect(jsonPath("$.petAllowed").value(false))
                 .andExpect(jsonPath("$.petRules").value("No pets allowed"))
-                .andExpect(jsonPath("$.price").value(150));
+                .andExpect(jsonPath("$.price").value(150))
+                .andExpect(jsonPath("$.propertyRules").value("Guests should maintain cleanliness"));
     }
 
     @Test
@@ -96,7 +97,8 @@ class PropertyControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.websiteUrl").value("http://testproperty.com"))
-                .andExpect(jsonPath("$.capacity").value(4));
+                .andExpect(jsonPath("$.capacity").value(4))
+                .andExpect(jsonPath("$.propertyRules").value("No loud noises after 10 PM"));
     }
 
     @Test
@@ -114,7 +116,8 @@ class PropertyControllerIntegrationTest {
         mockMvc.perform(get("/api/properties/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].websiteUrl").value("http://testproperty.com"));
+                .andExpect(jsonPath("$[0].websiteUrl").value("http://testproperty.com"))
+                .andExpect(jsonPath("$[0].propertyRules").value("No loud noises after 10 PM"));
     }
 
     @Test
@@ -148,17 +151,20 @@ class PropertyControllerIntegrationTest {
         requestDto.setPetAllowed(true);
         requestDto.setPrice(300);
         requestDto.setPetRules("Pets allowed with prior approval");
+        requestDto.setPropertyRules("Quiet hours after 9 PM");
 
         mockMvc.perform(put("/api/properties/" + savedProperty.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.websiteUrl").value("http://updatedproperty.com"))
-                .andExpect(jsonPath("$.capacity").value(6));
+                .andExpect(jsonPath("$.capacity").value(6))
+                .andExpect(jsonPath("$.propertyRules").value("Quiet hours after 9 PM"));
 
         Property updatedProperty = propertyRepository.findById(savedProperty.getId()).get();
         assertThat(updatedProperty.getWebsiteUrl()).isEqualTo("http://updatedproperty.com");
         assertThat(updatedProperty.getCapacity()).isEqualTo(6);
+        assertThat(updatedProperty.getPropertyRules()).isEqualTo("Quiet hours after 9 PM");
     }
 
     @Test
@@ -171,6 +177,7 @@ class PropertyControllerIntegrationTest {
         requestDto.setPetAllowed(true);
         requestDto.setPrice(300);
         requestDto.setPetRules("Pets allowed with prior approval");
+        requestDto.setPropertyRules("Quiet hours after 9 PM");
 
         mockMvc.perform(put("/api/properties/" + nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
