@@ -33,4 +33,7 @@ public class Property {
     private String petRules;
     private int price;
 
+    @Lob
+    private String propertyRules;
+
 }
