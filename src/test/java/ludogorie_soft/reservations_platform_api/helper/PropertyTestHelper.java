@@ -93,15 +93,15 @@ public class PropertyTestHelper {
         return property;
     }
 
-    public static PropertyResponseDto createUpdatedPropertyResponseDto(PropertyRequestDto dto) {
+    public static PropertyResponseDto createUpdatedPropertyResponseDto(Property updatedProperty) {
         PropertyResponseDto response = new PropertyResponseDto();
-        response.setId(UPDATED_PROPERTY_ID);
-        response.setWebsiteUrl(dto.getWebsiteUrl());
-        response.setCapacity(dto.getCapacity());
-        response.setPetAllowed(dto.isPetAllowed());
-        response.setPetRules(dto.getPetRules());
-        response.setPropertyRules(dto.getPropertyRules());
-        response.setPrice(dto.getPrice());
+        response.setId(updatedProperty.getId());
+        response.setWebsiteUrl(updatedProperty.getWebsiteUrl());
+        response.setCapacity(updatedProperty.getCapacity());
+        response.setPetAllowed(updatedProperty.isPetAllowed());
+        response.setPetRules(updatedProperty.getPetRules());
+        response.setPropertyRules(updatedProperty.getPropertyRules());
+        response.setPrice(updatedProperty.getPrice());
         return response;
     }
 }

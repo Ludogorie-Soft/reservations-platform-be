@@ -198,7 +198,7 @@ public class PropertyServiceImplTest {
         // GIVEN
         PropertyRequestDto updatedRequestDto = PropertyTestHelper.createUpdatedPropertyRequestDto();
         Property updatedProperty = PropertyTestHelper.createUpdatedProperty(updatedRequestDto);
-        PropertyResponseDto updatedResponseDto = PropertyTestHelper.createUpdatedPropertyResponseDto(updatedRequestDto);
+        PropertyResponseDto updatedResponseDto = PropertyTestHelper.createUpdatedPropertyResponseDto(updatedProperty);
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(propertyRepository.save(any(Property.class))).thenReturn(updatedProperty);
