@@ -37,6 +37,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CalendarServiceImplTest {
 
+    private static final int ONE_DAY_IN_MILLISECONDS = 86400000;
+
     @Mock
     private PropertyRepository propertyRepository;
 
@@ -146,8 +148,8 @@ class CalendarServiceImplTest {
     @Test
     void testSyncForAvailableDatesReturnsTrueWhenNoEventsOverlap() throws ParserException, IOException {
         //GIVEN
-        Date startDateRequest = new Date(System.currentTimeMillis() + 86400000 * 10);
-        Date endDateRequest = new Date(System.currentTimeMillis() + 86400000 * 15);
+        Date startDateRequest = new Date(System.currentTimeMillis() + ONE_DAY_IN_MILLISECONDS * 10);
+        Date endDateRequest = new Date(System.currentTimeMillis() + ONE_DAY_IN_MILLISECONDS * 15);
 
         File file = new File(testFilePath);
         assertTrue(file.exists());
