@@ -70,7 +70,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testCreateProperty() {
+    void createProperty_whenValidRequest_returnsPropertyResponseDto() {
         // GIVEN
         when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(PropertyTestHelper.createDefaultUser());
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
@@ -88,7 +88,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testFindById() {
+    void findById_whenPropertyExists_returnsProperty() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
@@ -101,7 +101,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testFindByIdNotFound() {
+    void findById_whenPropertyDoesNotExist_throwsIllegalArgumentException() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
@@ -110,7 +110,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetPropertyById() {
+    void getPropertyById_whenPropertyExists_returnsPropertyResponseDto() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
@@ -126,7 +126,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetPropertyByIdNotFound() {
+    void getPropertyById_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
@@ -138,7 +138,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetAllProperties() {
+    void getAllProperties_whenCalled_returnsListOfPropertyResponseDto() {
         // GIVEN
         List<Property> properties = List.of(property);
         when(propertyRepository.findAll()).thenReturn(properties);
@@ -154,7 +154,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void deleteProperty_ShouldCallRepository_WhenPropertyExists() {
+    void deleteProperty_whenPropertyExists_callsRepositoryMethods() {
         // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(true);
 
@@ -167,7 +167,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void deleteProperty_ShouldThrowResourceNotFoundException_WhenPropertyDoesNotExist() {
+    void deleteProperty_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(false);
 
@@ -178,7 +178,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
+    void syncPropertiesWithAirBnbUrls_whenValidUrl_syncsCalendar() throws ParserException, IOException, ParseException, URISyntaxException {
         // GIVEN
         property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
         List<Property> properties = List.of(property);
@@ -194,7 +194,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testUpdateProperty() {
+    void updateProperty_whenValidRequest_updatesAndReturnsPropertyResponseDto() {
         // GIVEN
         PropertyRequestDto updatedRequestDto = PropertyTestHelper.createUpdatedPropertyRequestDto();
         Property updatedProperty = PropertyTestHelper.createUpdatedProperty(updatedRequestDto);
@@ -217,7 +217,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void givenNonexistentId_whenUpdateProperty_thenThrowsResourceNotFoundException() {
+    void updateProperty_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
         PropertyRequestDto updatedPropertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
 
