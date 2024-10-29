@@ -15,4 +15,4 @@ public interface BookingService {
     List<BookingResponseDto> getAllBookingsOfProperty(UUID id);
     BookingResponseDto editBooking(UUID id, BookingRequestDto bookingRequestDto) throws ParserException, IOException;
     BookingResponseDto deleteBooking(UUID id);
-}
+

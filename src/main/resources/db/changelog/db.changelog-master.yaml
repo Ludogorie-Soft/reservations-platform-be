@@ -1,9 +1,19 @@
 databaseChangeLog:
   - include:
       file: /db/changelog/create-roles-table.yaml
+      context: deployment
   - include:
       file: /db/changelog/data/insert-initial-roles-data.yaml
+      context: deployment
   - include:
       file: /db/changelog/create-users-table.yaml
+      context: deployment
   - include:
       file: /db/changelog/create-users-roles-table.yaml
+      context: deployment
+  - include:
+      file: /db/changelog/data/add-users.yaml
+      context: local
+  - include:
+      file: /db/changelog/data/add-user-roles.yaml
+      context: local
