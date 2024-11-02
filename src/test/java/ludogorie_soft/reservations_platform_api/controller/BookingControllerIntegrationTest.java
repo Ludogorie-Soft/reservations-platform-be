@@ -67,7 +67,7 @@ class BookingControllerIntegrationTest {
     void setup() {
         registerDto = UserTestHelper.createRegisterDto();
         bookingRequestDto = BookingTestHelper.createBookingRequest();
-        propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
+        propertyRequestDto = PropertyTestHelper.createPropertyRequest();
     }
 
     @AfterEach
