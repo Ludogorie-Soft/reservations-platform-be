@@ -148,8 +148,9 @@ class CalendarServiceImplTest {
     @Test
     void testSyncForAvailableDatesReturnsTrueWhenNoEventsOverlap() throws ParserException, IOException {
         //GIVEN
-        Date startDateRequest = new Date(System.currentTimeMillis() + ONE_DAY_IN_MILLISECONDS * 10);
-        Date endDateRequest = new Date(System.currentTimeMillis() + ONE_DAY_IN_MILLISECONDS * 15);
+
+        Date startDateRequest = new Date(System.currentTimeMillis() + 86400000 * 10);
+        Date endDateRequest = new Date(System.currentTimeMillis() + 86400000 * 15);
 
         File file = new File(testFilePath);
         assertTrue(file.exists());
@@ -183,7 +184,6 @@ class CalendarServiceImplTest {
         booking.setStartDate(new Date());
         booking.setEndDate(new Date());
         booking.setDescription("Test Booking");
-        booking.setUid("test-booking-uid");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));

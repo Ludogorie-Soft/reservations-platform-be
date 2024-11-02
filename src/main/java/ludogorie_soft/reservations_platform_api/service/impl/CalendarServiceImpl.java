@@ -70,11 +70,8 @@ public class CalendarServiceImpl implements CalendarService {
                     booking.getDescription()
             );
 
-            vEvent.getProperties().add(new Uid(booking.getUid()));
+            vEvent.getProperties().add(new Uid(String.valueOf(booking.getId())));
             calendar.getComponents().add(vEvent);
-
-            booking.setUid(vEvent.getUid().getValue());
-            bookingRepository.save(booking);
         });
 
         createDirectoryIfNotExists(icsMyCalDirectory);

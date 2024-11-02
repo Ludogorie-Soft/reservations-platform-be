@@ -16,7 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -77,6 +79,9 @@ public class PropertyServiceImplTest {
         propertyRequestDto.setOwnerEmail("ownerEmailTest@test.com");
 
         propertyResponseDto = new PropertyResponseDto();
+
+        ReflectionTestUtils.setField(propertyService, "icsAirBnbDirectory", "air-bnb-calendar");
+        ReflectionTestUtils.setField(propertyService, "icsBookingDirectory", "booking-calendar");
     }
 
     @Test
@@ -254,5 +259,35 @@ public class PropertyServiceImplTest {
         // THEN
         verify(propertyRepository, times(1)).findAll();
         verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
+    }
+
+    @Test
+    void testUpdateAirBnbUrlOfPropertySuccessfully() throws FileNotFoundException {
+        //GIVEN
+        String airBnbUrl = "https://airbnb.com/calendar.ics";
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(propertyRepository.save(any(Property.class))).thenReturn(property);
+
+        //WHEN
+        propertyService.updateAirBnbUrlOfProperty(propertyId, airBnbUrl);
+
+        //THEN
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(propertyRepository, times(1)).save(property);
+    }
+
+    @Test
+    void testUpdateBookingUrlOfPropertySuccessfully() throws FileNotFoundException {
+        //GIVEN
+        String bookingUrl = "https://booking.com/calendar.ics";
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(propertyRepository.save(any(Property.class))).thenReturn(property);
+
+        //WHEN
+        propertyService.updateBookingUrlOfProperty(propertyId, bookingUrl);
+
+        //THEN
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(propertyRepository, times(1)).save(property);
     }
 }
