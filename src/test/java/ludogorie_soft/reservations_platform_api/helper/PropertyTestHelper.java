@@ -10,25 +10,53 @@ public class PropertyTestHelper {
 
     public static final String DEFAULT_USER_EMAIL = "userEmailTest@test.com";
 
-    private static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
-    private static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
-    private static final String DEFAULT_WEBSITE_URL = "http://example.com";
-    private static final int DEFAULT_CAPACITY = 4;
-    private static final boolean DEFAULT_PET_ALLOWED = true;
-    private static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
-    private static final int DEFAULT_PRICE = 100;
-    private static final int DEFAULT_PET_PRICE = 10;
-    private static final int DEFAULT_MINIMUM_STAY = 1;
+    public static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
+    public static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
+    public static final String DEFAULT_WEBSITE_URL = "http://example.com";
+    public static final int DEFAULT_CAPACITY = 4;
+    public static final boolean DEFAULT_PET_ALLOWED = true;
+    public static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
+    public static final int DEFAULT_PRICE = 100;
+    public static final int DEFAULT_PET_PRICE = 10;
+    public static final int DEFAULT_MINIMUM_STAY = 1;
 
-    private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
-    private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
-    private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
-    private static final int UPDATED_CAPACITY = 6;
-    private static final boolean UPDATED_PET_ALLOWED = false;
-    private static final String UPDATED_PET_RULES = "No pets";
-    private static final int UPDATED_PRICE = 200;
-    private static final int UPDATED_PET_PRICE = 20;
-    private static final int UPDATED_MINIMUM_STAY = 2;
+    public static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
+    public static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
+    public static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
+    public static final int UPDATED_CAPACITY = 6;
+    public static final boolean UPDATED_PET_ALLOWED = false;
+    public static final String UPDATED_PET_RULES = "No pets";
+    public static final int UPDATED_PRICE = 200;
+    public static final int UPDATED_PET_PRICE = 20;
+    public static final int UPDATED_MINIMUM_STAY = 2;
+
+    private static final String TEST_EMAIL = "test@email.com";
+    private static final String TEST_WEBSITE_URL = "www.test.com";
+    private static final int TEST_PROPERTY_PRICE = 20;
+    private static final int TEST_PROPERTY_CAPACITY = 6;
+    private static final int TEST_MINIMUM_STAY = 1;
+
+
+    public static Property createProperty() {
+        Property property = new Property();
+        property.setId(UUID.randomUUID());
+        property.setOwner(UserTestHelper.createTestUser());
+        property.setWebsiteUrl(TEST_WEBSITE_URL);
+        property.setCapacity(TEST_PROPERTY_CAPACITY);
+        property.setPrice(TEST_PROPERTY_PRICE);
+        property.setMinimumStay(TEST_MINIMUM_STAY);
+        return property;
+    }
+
+    public static PropertyRequestDto createPropertyRequest() {
+        PropertyRequestDto propertyRequestDto = new PropertyRequestDto();
+        propertyRequestDto.setOwnerEmail(TEST_EMAIL);
+        propertyRequestDto.setWebsiteUrl(TEST_WEBSITE_URL);
+        propertyRequestDto.setPrice(TEST_PROPERTY_PRICE);
+        propertyRequestDto.setCapacity(TEST_PROPERTY_CAPACITY);
+        propertyRequestDto.setMinimumStay(TEST_MINIMUM_STAY);
+        return propertyRequestDto;
+    }
 
     public static Property createDefaultProperty() {
         Property property = new Property();

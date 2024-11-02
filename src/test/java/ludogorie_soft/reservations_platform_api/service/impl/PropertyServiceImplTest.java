@@ -3,9 +3,9 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
-import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.UserService;
@@ -60,31 +60,25 @@ public class PropertyServiceImplTest {
     private PropertyServiceImpl propertyService;
 
     private Property property;
-    private User user;
     private UUID propertyId;
     private PropertyRequestDto propertyRequestDto;
     private PropertyResponseDto propertyResponseDto;
 
     @BeforeEach
     void setUp() {
-        //TODO replace instances of user with UserHelper
-        user = new User();
-        user.setEmail("userEmailTest@test.com");
-
-        propertyId = UUID.randomUUID(); //PropertyTestHelper.DEFAULT_PROPERTY_ID;
+        propertyId = PropertyTestHelper.DEFAULT_PROPERTY_ID;
         property = PropertyTestHelper.createDefaultProperty();
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
         propertyResponseDto = PropertyTestHelper.createDefaultPropertyResponseDto();
 
         ReflectionTestUtils.setField(propertyService, "icsAirBnbDirectory", "air-bnb-calendar");
         ReflectionTestUtils.setField(propertyService, "icsBookingDirectory", "booking-calendar");
-
     }
 
     @Test
     void createProperty_whenValidRequest_returnsPropertyResponseDto() {
         // GIVEN
-        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(user); //.thenReturn(PropertyTestHelper.createDefaultUser());
+        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(UserTestHelper.createTestUser());
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
@@ -93,7 +87,7 @@ public class PropertyServiceImplTest {
 
         // THEN
         assertNotNull(result);
-        //assertEquals(PropertyTestHelper.DEFAULT_PROPERTY_RULES, result.getPropertyRules());
+        assertEquals(PropertyTestHelper.DEFAULT_PROPERTY_RULES, result.getPropertyRules());
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));

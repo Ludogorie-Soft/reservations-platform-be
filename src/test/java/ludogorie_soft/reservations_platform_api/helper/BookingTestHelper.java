@@ -40,7 +40,7 @@ public class BookingTestHelper {
 
     public static Booking createBooking() {
         Booking booking = new Booking();
-        Property property = PropertyTestHelper.createProperty();
+        Property property = PropertyTestHelper.createDefaultProperty();
 
         LocalDate startLocalDate = LocalDate.now().plusDays(2);
         LocalDate endLocalDate = startLocalDate.plusDays(7);
