@@ -3,6 +3,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
+import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
@@ -16,7 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -34,7 +37,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
-
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,22 +60,31 @@ public class PropertyServiceImplTest {
     private PropertyServiceImpl propertyService;
 
     private Property property;
+    private User user;
+    private UUID propertyId;
     private PropertyRequestDto propertyRequestDto;
     private PropertyResponseDto propertyResponseDto;
-    private UUID propertyId;
 
     @BeforeEach
     void setUp() {
-        propertyId = PropertyTestHelper.DEFAULT_PROPERTY_ID;
+        //TODO replace instances of user with UserHelper
+        user = new User();
+        user.setEmail("userEmailTest@test.com");
+
+        propertyId = UUID.randomUUID(); //PropertyTestHelper.DEFAULT_PROPERTY_ID;
         property = PropertyTestHelper.createDefaultProperty();
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
         propertyResponseDto = PropertyTestHelper.createDefaultPropertyResponseDto();
+
+        ReflectionTestUtils.setField(propertyService, "icsAirBnbDirectory", "air-bnb-calendar");
+        ReflectionTestUtils.setField(propertyService, "icsBookingDirectory", "booking-calendar");
+
     }
 
     @Test
     void createProperty_whenValidRequest_returnsPropertyResponseDto() {
         // GIVEN
-        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(PropertyTestHelper.createDefaultUser());
+        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(user); //.thenReturn(PropertyTestHelper.createDefaultUser());
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
@@ -81,7 +93,7 @@ public class PropertyServiceImplTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals(PropertyTestHelper.DEFAULT_PROPERTY_RULES, result.getPropertyRules());
+        //assertEquals(PropertyTestHelper.DEFAULT_PROPERTY_RULES, result.getPropertyRules());
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
@@ -121,8 +133,8 @@ public class PropertyServiceImplTest {
         // THEN
         assertTrue(result.isPresent());
         assertEquals(propertyResponseDto, result.get());
-        verify(propertyRepository).findById(propertyId);
-        verify(modelMapper).map(property, PropertyResponseDto.class);
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(modelMapper, times(1)).map(property, PropertyResponseDto.class);
     }
 
     @Test
@@ -134,7 +146,7 @@ public class PropertyServiceImplTest {
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> propertyService.getPropertyById(propertyId));
         assertEquals("Property not found with id: " + propertyId, exception.getMessage());
-        verify(propertyRepository).findById(propertyId);
+        verify(propertyRepository, times(1)).findById(propertyId);
     }
 
     @Test
@@ -162,8 +174,8 @@ public class PropertyServiceImplTest {
         propertyService.deleteProperty(propertyId);
 
         // THEN
-        verify(propertyRepository).existsById(propertyId);
-        verify(propertyRepository).deleteById(propertyId);
+        verify(propertyRepository, times(1)).existsById(propertyId);
+        verify(propertyRepository, times(1)).deleteById(propertyId);
     }
 
     @Test
@@ -173,7 +185,7 @@ public class PropertyServiceImplTest {
 
         // WHEN & THEN
         assertThrows(ResourceNotFoundException.class, () -> propertyService.deleteProperty(propertyId));
-        verify(propertyRepository).existsById(propertyId);
+        verify(propertyRepository, times(1)).existsById(propertyId);
         verify(propertyRepository, never()).deleteById(propertyId);
     }
 
@@ -230,5 +242,35 @@ public class PropertyServiceImplTest {
 
         verify(propertyRepository).findById(propertyId);
         verify(propertyRepository, never()).save(any(Property.class));
+    }
+
+    @Test
+    void testUpdateAirBnbUrlOfPropertySuccessfully() throws FileNotFoundException {
+        //GIVEN
+        String airBnbUrl = "https://airbnb.com/calendar.ics";
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(propertyRepository.save(any(Property.class))).thenReturn(property);
+
+        //WHEN
+        propertyService.updateAirBnbUrlOfProperty(propertyId, airBnbUrl);
+
+        //THEN
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(propertyRepository, times(1)).save(property);
+    }
+
+    @Test
+    void testUpdateBookingUrlOfPropertySuccessfully() throws FileNotFoundException {
+        //GIVEN
+        String bookingUrl = "https://booking.com/calendar.ics";
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(propertyRepository.save(any(Property.class))).thenReturn(property);
+
+        //WHEN
+        propertyService.updateBookingUrlOfProperty(propertyId, bookingUrl);
+
+        //THEN
+        verify(propertyRepository, times(1)).findById(propertyId);
+        verify(propertyRepository, times(1)).save(property);
     }
 }

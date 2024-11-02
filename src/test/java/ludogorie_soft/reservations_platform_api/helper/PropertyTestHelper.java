@@ -3,7 +3,6 @@ package ludogorie_soft.reservations_platform_api.helper;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
-import ludogorie_soft.reservations_platform_api.entity.User;
 
 import java.util.UUID;
 
@@ -11,39 +10,38 @@ public class PropertyTestHelper {
 
     public static final String DEFAULT_USER_EMAIL = "userEmailTest@test.com";
 
-    public static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
-    public static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
-    public static final String DEFAULT_WEBSITE_URL = "http://example.com";
-    public static final int DEFAULT_CAPACITY = 4;
-    public static final boolean DEFAULT_PET_ALLOWED = true;
-    public static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
-    public static final int DEFAULT_PRICE = 100;
+    private static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
+    private static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
+    private static final String DEFAULT_WEBSITE_URL = "http://example.com";
+    private static final int DEFAULT_CAPACITY = 4;
+    private static final boolean DEFAULT_PET_ALLOWED = true;
+    private static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
+    private static final int DEFAULT_PRICE = 100;
+    private static final int DEFAULT_PET_PRICE = 10;
+    private static final int DEFAULT_MINIMUM_STAY = 1;
 
-    public static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
-    public static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
-    public static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
-    public static final int UPDATED_CAPACITY = 6;
-    public static final boolean UPDATED_PET_ALLOWED = false;
-    public static final String UPDATED_PET_RULES = "No pets";
-    public static final int UPDATED_PRICE = 200;
-
-    public static User createDefaultUser() {
-        User user = new User();
-        user.setEmail(DEFAULT_USER_EMAIL);
-        return user;
-    }
+    private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
+    private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
+    private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
+    private static final int UPDATED_CAPACITY = 6;
+    private static final boolean UPDATED_PET_ALLOWED = false;
+    private static final String UPDATED_PET_RULES = "No pets";
+    private static final int UPDATED_PRICE = 200;
+    private static final int UPDATED_PET_PRICE = 20;
+    private static final int UPDATED_MINIMUM_STAY = 2;
 
     public static Property createDefaultProperty() {
         Property property = new Property();
         property.setId(DEFAULT_PROPERTY_ID);
-        property.setOwner(createDefaultUser());
+        property.setOwner(UserTestHelper.createTestUser());
         property.setWebsiteUrl(DEFAULT_WEBSITE_URL);
         property.setCapacity(DEFAULT_CAPACITY);
         property.setPetAllowed(DEFAULT_PET_ALLOWED);
         property.setPetRules(DEFAULT_PET_RULES);
         property.setPrice(DEFAULT_PRICE);
+        property.setMinimumStay(DEFAULT_MINIMUM_STAY);
+        property.setPetPrice(DEFAULT_PET_PRICE);
         property.setPropertyRules(DEFAULT_PROPERTY_RULES);
-
         return property;
     }
 
@@ -55,6 +53,8 @@ public class PropertyTestHelper {
         dto.setPetAllowed(DEFAULT_PET_ALLOWED);
         dto.setPetRules(DEFAULT_PET_RULES);
         dto.setPrice(DEFAULT_PRICE);
+        dto.setMinimumStay(DEFAULT_MINIMUM_STAY);
+        dto.setPetPrice(DEFAULT_PET_PRICE);
         dto.setPropertyRules(DEFAULT_PROPERTY_RULES);
         return dto;
     }
@@ -66,19 +66,23 @@ public class PropertyTestHelper {
         dto.setPetAllowed(DEFAULT_PET_ALLOWED);
         dto.setPetRules(DEFAULT_PET_RULES);
         dto.setPrice(DEFAULT_PRICE);
+        dto.setMinimumStay(DEFAULT_MINIMUM_STAY);
+        dto.setPetPrice(DEFAULT_PET_PRICE);
         dto.setPropertyRules(DEFAULT_PROPERTY_RULES);
         return dto;
     }
 
     public static PropertyRequestDto createUpdatedPropertyRequestDto() {
-        PropertyRequestDto dto = new PropertyRequestDto();
-        dto.setWebsiteUrl(UPDATED_WEBSITE_URL);
-        dto.setCapacity(UPDATED_CAPACITY);
-        dto.setPetAllowed(UPDATED_PET_ALLOWED);
-        dto.setPetRules(UPDATED_PET_RULES);
-        dto.setPropertyRules(UPDATED_PROPERTY_RULES);
-        dto.setPrice(UPDATED_PRICE);
-        return dto;
+        PropertyRequestDto requestDto = new PropertyRequestDto();
+        requestDto.setWebsiteUrl(UPDATED_WEBSITE_URL);
+        requestDto.setCapacity(UPDATED_CAPACITY);
+        requestDto.setPetAllowed(UPDATED_PET_ALLOWED);
+        requestDto.setPetRules(UPDATED_PET_RULES);
+        requestDto.setPrice(UPDATED_PRICE);
+        requestDto.setMinimumStay(UPDATED_MINIMUM_STAY);
+        requestDto.setPetPrice(UPDATED_PET_PRICE);
+        requestDto.setPropertyRules(UPDATED_PROPERTY_RULES);
+        return requestDto;
     }
 
     public static Property createUpdatedProperty(PropertyRequestDto dto) {
@@ -88,8 +92,10 @@ public class PropertyTestHelper {
         property.setCapacity(dto.getCapacity());
         property.setPetAllowed(dto.isPetAllowed());
         property.setPetRules(dto.getPetRules());
-        property.setPropertyRules(dto.getPropertyRules());
         property.setPrice(dto.getPrice());
+        property.setMinimumStay(dto.getMinimumStay());
+        property.setPetPrice(dto.getPetPrice());
+        property.setPropertyRules(dto.getPropertyRules());
         return property;
     }
 
@@ -100,8 +106,10 @@ public class PropertyTestHelper {
         response.setCapacity(updatedProperty.getCapacity());
         response.setPetAllowed(updatedProperty.isPetAllowed());
         response.setPetRules(updatedProperty.getPetRules());
-        response.setPropertyRules(updatedProperty.getPropertyRules());
         response.setPrice(updatedProperty.getPrice());
+        response.setMinimumStay(updatedProperty.getMinimumStay());
+        response.setPetPrice(updatedProperty.getPetPrice());
+        response.setPropertyRules(updatedProperty.getPropertyRules());
         return response;
     }
 }

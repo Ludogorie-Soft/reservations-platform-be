@@ -20,6 +20,9 @@ public class PropertyResponseDto {
     private boolean isPetAllowed;
     private String petRules;
     private int price;
+    private int minimumStay;
+    private int petPrice;
+
     @Lob
     private String propertyRules;
 }
