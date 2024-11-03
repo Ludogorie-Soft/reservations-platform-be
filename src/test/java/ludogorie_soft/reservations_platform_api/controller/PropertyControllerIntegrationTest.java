@@ -79,7 +79,7 @@ class PropertyControllerIntegrationTest {
         requestDto.setPetRules("No pets allowed");
         requestDto.setPropertyRules("Guests should maintain cleanliness");
 
-        mockMvc.perform(post("/api/properties/")
+        mockMvc.perform(post("/api/properties")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
@@ -113,7 +113,7 @@ class PropertyControllerIntegrationTest {
 
     @Test
     void getAllProperties_ShouldReturnListOfProperties() throws Exception {
-        mockMvc.perform(get("/api/properties/")
+        mockMvc.perform(get("/api/properties")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].websiteUrl").value("http://testproperty.com"))
