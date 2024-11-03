@@ -8,27 +8,27 @@ import java.util.UUID;
 
 public class PropertyTestHelper {
 
-    public static final String DEFAULT_USER_EMAIL = "test@email.com";
+    private static final String DEFAULT_USER_EMAIL = "test@email.com";
 
-    public static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
-    public static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
-    public static final String DEFAULT_WEBSITE_URL = "www.test.com";
-    public static final int DEFAULT_CAPACITY = 4;
-    public static final boolean DEFAULT_PET_ALLOWED = true;
-    public static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
-    public static final int DEFAULT_PRICE = 20;
-    public static final int DEFAULT_PET_PRICE = 10;
-    public static final int DEFAULT_MINIMUM_STAY = 1;
+    private static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
+    private static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
+    private static final String DEFAULT_WEBSITE_URL = "www.test.com";
+    private static final int DEFAULT_CAPACITY = 4;
+    private static final boolean DEFAULT_PET_ALLOWED = true;
+    private static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
+    private static final int DEFAULT_PRICE = 20;
+    private static final int DEFAULT_PET_PRICE = 10;
+    private static final int DEFAULT_MINIMUM_STAY = 1;
 
-    public static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
-    public static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
-    public static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
-    public static final int UPDATED_CAPACITY = 6;
-    public static final boolean UPDATED_PET_ALLOWED = false;
-    public static final String UPDATED_PET_RULES = "No pets";
-    public static final int UPDATED_PRICE = 40;
-    public static final int UPDATED_PET_PRICE = 20;
-    public static final int UPDATED_MINIMUM_STAY = 2;
+    private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
+    private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
+    private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
+    private static final int UPDATED_CAPACITY = 6;
+    private static final boolean UPDATED_PET_ALLOWED = false;
+    private static final String UPDATED_PET_RULES = "No pets";
+    private static final int UPDATED_PRICE = 40;
+    private static final int UPDATED_PET_PRICE = 20;
+    private static final int UPDATED_MINIMUM_STAY = 2;
 
 
     public static Property createDefaultProperty() {

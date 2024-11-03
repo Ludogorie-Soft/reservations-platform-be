@@ -66,8 +66,8 @@ public class PropertyServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        propertyId = PropertyTestHelper.DEFAULT_PROPERTY_ID;
         property = PropertyTestHelper.createDefaultProperty();
+        propertyId = property.getId();
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
         propertyResponseDto = PropertyTestHelper.createDefaultPropertyResponseDto();
 
