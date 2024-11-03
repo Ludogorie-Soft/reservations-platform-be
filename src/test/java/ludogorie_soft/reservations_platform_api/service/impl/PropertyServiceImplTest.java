@@ -3,8 +3,9 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.PropertyResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
-import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
+import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.UserService;
@@ -40,7 +41,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 public class PropertyServiceImplTest {
 
@@ -60,49 +60,49 @@ public class PropertyServiceImplTest {
     private PropertyServiceImpl propertyService;
 
     private Property property;
-    private User user;
     private UUID propertyId;
     private PropertyRequestDto propertyRequestDto;
     private PropertyResponseDto propertyResponseDto;
 
     @BeforeEach
     void setUp() {
-        propertyId = UUID.randomUUID();
-        user = new User();
-        user.setEmail("userEmailTest@test.com");
-
-        property = new Property();
-        property.setId(propertyId);
-        property.setOwner(user);
-
-        propertyRequestDto = new PropertyRequestDto();
-        propertyRequestDto.setOwnerEmail("ownerEmailTest@test.com");
-
-        propertyResponseDto = new PropertyResponseDto();
+        property = PropertyTestHelper.createDefaultProperty();
+        propertyId = property.getId();
+        propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
+        propertyResponseDto = PropertyTestHelper.createDefaultPropertyResponseDto();
 
         ReflectionTestUtils.setField(propertyService, "icsAirBnbDirectory", "air-bnb-calendar");
         ReflectionTestUtils.setField(propertyService, "icsBookingDirectory", "booking-calendar");
     }
 
     @Test
-    void testCreateProperty() {
+    void createProperty_whenValidRequest_returnsPropertyResponseDto() {
         // GIVEN
-        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(user);
+        when(userService.getUserByEmailOrUsername(anyString(), anyString())).thenReturn(UserTestHelper.createTestUser());
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
 
         // WHEN
         PropertyResponseDto result = propertyService.createProperty(propertyRequestDto);
 
-        // THEN
         assertNotNull(result);
+        assertEquals(propertyRequestDto.getWebsiteUrl(), result.getWebsiteUrl());
+        assertEquals(propertyRequestDto.getCapacity(), result.getCapacity());
+        assertEquals(propertyRequestDto.isPetAllowed(), result.isPetAllowed());
+        assertEquals(propertyRequestDto.getPetRules(), result.getPetRules());
+        assertEquals(propertyRequestDto.getPrice(), result.getPrice());
+        assertEquals(propertyRequestDto.getMinimumStay(), result.getMinimumStay());
+        assertEquals(propertyRequestDto.getPetPrice(), result.getPetPrice());
+        assertEquals(propertyRequestDto.getPropertyRules(), result.getPropertyRules());
+
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
+
     }
 
     @Test
-    void testFindById() {
+    void findById_whenPropertyExists_returnsProperty() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
@@ -115,7 +115,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testFindByIdNotFound() {
+    void findById_whenPropertyDoesNotExist_throwsIllegalArgumentException() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
@@ -124,7 +124,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetPropertyById() {
+    void getPropertyById_whenPropertyExists_returnsPropertyResponseDto() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(propertyResponseDto);
@@ -140,7 +140,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetPropertyByIdNotFound() {
+    void getPropertyById_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
@@ -152,7 +152,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testGetAllProperties() {
+    void getAllProperties_whenCalled_returnsListOfPropertyResponseDto() {
         // GIVEN
         List<Property> properties = List.of(property);
         when(propertyRepository.findAll()).thenReturn(properties);
@@ -168,7 +168,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void deleteProperty_ShouldCallRepository_WhenPropertyExists() {
+    void deleteProperty_whenPropertyExists_callsRepositoryMethods() {
         // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(true);
 
@@ -181,7 +181,7 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void deleteProperty_ShouldThrowResourceNotFoundException_WhenPropertyDoesNotExist() {
+    void deleteProperty_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
         when(propertyRepository.existsById(propertyId)).thenReturn(false);
 
@@ -192,40 +192,29 @@ public class PropertyServiceImplTest {
     }
 
     @Test
-    void testUpdateProperty() {
+    void syncPropertiesWithAirBnbUrls_whenValidUrl_syncsCalendar() throws ParserException, IOException, ParseException, URISyntaxException {
         // GIVEN
-        PropertyRequestDto updatedRequestDto = new PropertyRequestDto();
-        updatedRequestDto.setWebsiteUrl("http://newexample.com");
-        updatedRequestDto.setCapacity(6);
-        updatedRequestDto.setPetAllowed(false);
-        updatedRequestDto.setPetRules("No pets allowed");
-        updatedRequestDto.setPrice(200);
+        property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
+        List<Property> properties = List.of(property);
+        when(propertyRepository.findAll()).thenReturn(properties);
+        doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
 
-        Property existingProperty = new Property();
-        existingProperty.setId(propertyId);
-        existingProperty.setWebsiteUrl("http://example.com");
-        existingProperty.setCapacity(4);
-        existingProperty.setPetAllowed(true);
-        existingProperty.setPetRules("No large dogs");
-        existingProperty.setPrice(150);
+        // WHEN
+        propertyService.syncPropertiesWithAirBnbUrls();
 
-        Property updatedProperty = new Property();
-        updatedProperty.setId(propertyId);
-        updatedProperty.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
-        updatedProperty.setCapacity(updatedRequestDto.getCapacity());
-        updatedProperty.setPetAllowed(updatedRequestDto.isPetAllowed());
-        updatedProperty.setPetRules(updatedRequestDto.getPetRules());
-        updatedProperty.setPrice(updatedRequestDto.getPrice());
+        // THEN
+        verify(propertyRepository).findAll();
+        verify(calendarService).syncAirBnbCalendar(propertyId);
+    }
 
-        PropertyResponseDto updatedResponseDto = new PropertyResponseDto();
-        updatedResponseDto.setId(propertyId);
-        updatedResponseDto.setWebsiteUrl(updatedRequestDto.getWebsiteUrl());
-        updatedResponseDto.setCapacity(updatedRequestDto.getCapacity());
-        updatedResponseDto.setPetAllowed(updatedRequestDto.isPetAllowed());
-        updatedResponseDto.setPetRules(updatedRequestDto.getPetRules());
-        updatedResponseDto.setPrice(updatedRequestDto.getPrice());
+    @Test
+    void updateProperty_whenValidRequest_updatesAndReturnsPropertyResponseDto() {
+        // GIVEN
+        PropertyRequestDto updatedRequestDto = PropertyTestHelper.createUpdatedPropertyRequestDto();
+        Property updatedProperty = PropertyTestHelper.createUpdatedProperty(updatedRequestDto);
+        PropertyResponseDto updatedResponseDto = PropertyTestHelper.createUpdatedPropertyResponseDto(updatedProperty);
 
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(existingProperty));
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(propertyRepository.save(any(Property.class))).thenReturn(updatedProperty);
         when(modelMapper.map(any(Property.class), eq(PropertyResponseDto.class))).thenReturn(updatedResponseDto);
 
@@ -239,26 +228,29 @@ public class PropertyServiceImplTest {
         assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed());
         assertEquals(updatedRequestDto.getPetRules(), result.getPetRules());
         assertEquals(updatedRequestDto.getPrice(), result.getPrice());
+        assertEquals(updatedRequestDto.getMinimumStay(), result.getMinimumStay());
+        assertEquals(updatedRequestDto.getPetPrice(), result.getPetPrice());
+        assertEquals(updatedRequestDto.getPropertyRules(), result.getPropertyRules());
 
-        verify(propertyRepository, times(1)).findById(propertyId);
-        verify(propertyRepository, times(1)).save(existingProperty);
-        verify(modelMapper, times(1)).map(updatedProperty, PropertyResponseDto.class);
+        verify(propertyRepository).findById(propertyId);
+        verify(propertyRepository).save(property);
+        verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
     }
 
     @Test
-    void testSyncPropertiesWithAirBnbUrls() throws ParserException, IOException, ParseException, URISyntaxException {
+    void updateProperty_whenPropertyDoesNotExist_throwsResourceNotFoundException() {
         // GIVEN
-        property.setAirBnbICalUrl("http://airbnb.com/calendar.ics");
-        List<Property> properties = List.of(property);
-        when(propertyRepository.findAll()).thenReturn(properties);
-        doNothing().when(calendarService).syncAirBnbCalendar(propertyId);
+        PropertyRequestDto updatedPropertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
 
-        // WHEN
-        propertyService.syncPropertiesWithAirBnbUrls();
+        when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
-        // THEN
-        verify(propertyRepository, times(1)).findAll();
-        verify(calendarService, times(1)).syncAirBnbCalendar(propertyId);
+        // WHEN & THEN
+        assertThrows(ResourceNotFoundException.class, () ->
+                propertyService.updateProperty(propertyId, updatedPropertyRequestDto)
+        );
+
+        verify(propertyRepository).findById(propertyId);
+        verify(propertyRepository, never()).save(any(Property.class));
     }
 
     @Test

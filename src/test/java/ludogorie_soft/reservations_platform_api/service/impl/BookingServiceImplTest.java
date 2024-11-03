@@ -63,7 +63,7 @@ class BookingServiceImplTest {
 
     @BeforeEach
     void setup() {
-        property = PropertyTestHelper.createProperty();
+        property = PropertyTestHelper.createDefaultProperty();
         bookingRequestDto = BookingTestHelper.createBookingRequest();
         createdBooking = BookingTestHelper.createBooking();
         bookingResponseDto = BookingTestHelper.createBookingResponse();

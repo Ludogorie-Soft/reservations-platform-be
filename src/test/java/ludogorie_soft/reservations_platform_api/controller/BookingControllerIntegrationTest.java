@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class BookingControllerIntegrationTest {
 
     private static final String BASE_BOOKING_URL = "/api/bookings";
-    private static final String BASE_PROPERTY_URL = "/api/properties/";
+    private static final String BASE_PROPERTY_URL = "/api/properties";
     private static final String REGISTER_URL = "/auth/register";
 
     @Autowired
@@ -67,7 +67,7 @@ class BookingControllerIntegrationTest {
     void setup() {
         registerDto = UserTestHelper.createRegisterDto();
         bookingRequestDto = BookingTestHelper.createBookingRequest();
-        propertyRequestDto = PropertyTestHelper.createPropertyRequest();
+        propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
     }
 
     @AfterEach

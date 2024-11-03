@@ -1,5 +1,6 @@
 package ludogorie_soft.reservations_platform_api.dto;
 
+import jakarta.persistence.Lob;
 import lombok.Data;
 
 import java.util.List;
@@ -21,5 +22,6 @@ public class PropertyResponseDto {
     private int price;
     private int minimumStay;
     private int petPrice;
-
+    @Lob
+    private String propertyRules;
 }

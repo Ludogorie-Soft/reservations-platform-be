@@ -6,7 +6,6 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -40,7 +39,7 @@ public class BookingTestHelper {
 
     public static Booking createBooking() {
         Booking booking = new Booking();
-        Property property = PropertyTestHelper.createProperty();
+        Property property = PropertyTestHelper.createDefaultProperty();
 
         LocalDate startLocalDate = LocalDate.now().plusDays(2);
         LocalDate endLocalDate = startLocalDate.plusDays(7);
