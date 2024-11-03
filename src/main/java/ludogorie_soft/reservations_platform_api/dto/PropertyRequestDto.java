@@ -14,7 +14,6 @@ public class PropertyRequestDto {
     private int price;
     private int minimumStay;
     private int petPrice;
-
     @Lob
     private String propertyRules;
 }

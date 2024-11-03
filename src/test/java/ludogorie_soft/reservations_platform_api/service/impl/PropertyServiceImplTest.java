@@ -85,12 +85,20 @@ public class PropertyServiceImplTest {
         // WHEN
         PropertyResponseDto result = propertyService.createProperty(propertyRequestDto);
 
-        // THEN
         assertNotNull(result);
-        assertEquals(PropertyTestHelper.DEFAULT_PROPERTY_RULES, result.getPropertyRules());
+        assertEquals(propertyRequestDto.getWebsiteUrl(), result.getWebsiteUrl());
+        assertEquals(propertyRequestDto.getCapacity(), result.getCapacity());
+        assertEquals(propertyRequestDto.isPetAllowed(), result.isPetAllowed());
+        assertEquals(propertyRequestDto.getPetRules(), result.getPetRules());
+        assertEquals(propertyRequestDto.getPrice(), result.getPrice());
+        assertEquals(propertyRequestDto.getMinimumStay(), result.getMinimumStay());
+        assertEquals(propertyRequestDto.getPetPrice(), result.getPetPrice());
+        assertEquals(propertyRequestDto.getPropertyRules(), result.getPropertyRules());
+
         verify(userService).getUserByEmailOrUsername(anyString(), anyString());
         verify(propertyRepository).save(any(Property.class));
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
+
     }
 
     @Test
@@ -215,11 +223,18 @@ public class PropertyServiceImplTest {
 
         // THEN
         assertNotNull(result);
+        assertEquals(updatedRequestDto.getWebsiteUrl(), result.getWebsiteUrl());
+        assertEquals(updatedRequestDto.getCapacity(), result.getCapacity());
+        assertEquals(updatedRequestDto.isPetAllowed(), result.isPetAllowed());
+        assertEquals(updatedRequestDto.getPetRules(), result.getPetRules());
+        assertEquals(updatedRequestDto.getPrice(), result.getPrice());
+        assertEquals(updatedRequestDto.getMinimumStay(), result.getMinimumStay());
+        assertEquals(updatedRequestDto.getPetPrice(), result.getPetPrice());
         assertEquals(updatedRequestDto.getPropertyRules(), result.getPropertyRules());
+
         verify(propertyRepository).findById(propertyId);
         verify(propertyRepository).save(property);
         verify(modelMapper).map(any(Property.class), eq(PropertyResponseDto.class));
-
     }
 
     @Test

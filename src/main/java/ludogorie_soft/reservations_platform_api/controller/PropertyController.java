@@ -28,7 +28,7 @@ public class PropertyController {
 
     private final PropertyService propertyService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<PropertyResponseDto> createProperty(@RequestBody PropertyRequestDto request) {
         PropertyResponseDto response = propertyService.createProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -46,7 +46,7 @@ public class PropertyController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<PropertyResponseDto>> getAllProperties() {
         List<PropertyResponseDto> propertyDTOs = propertyService.getAllProperties();
         return ResponseEntity.ok(propertyDTOs);
