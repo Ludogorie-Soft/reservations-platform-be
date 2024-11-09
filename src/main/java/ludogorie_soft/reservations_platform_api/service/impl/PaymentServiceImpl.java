@@ -1,25 +1,30 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
+
 import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentConfirmParams;
 import com.stripe.param.PaymentIntentCreateParams;
-import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.Map;
+
 @Service
 public class PaymentServiceImpl implements PaymentService {
+
     public PaymentServiceImpl() {
-        Stripe.apiKey = System.getenv("STRIPE_SECRET_KEY"); // Retrieve from environment
+        Stripe.apiKey = System.getenv("STRIPE_SECRET_KEY");
     }
 
     @Override
     public Map<String, Object> createPaymentIntent(String itemId) {
-
         int paymentAmount = calculatePrice(itemId);
         Map<String, Object> response = new HashMap<>();
         try {
+            System.out.println("Starting payment intent creation");
+
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount((long) paymentAmount)
                     .setCurrency("usd")
@@ -28,13 +33,50 @@ public class PaymentServiceImpl implements PaymentService {
                                     .setEnabled(true)
                                     .build())
                     .build();
+
             PaymentIntent paymentIntent = PaymentIntent.create(params);
+
+            System.out.println("Created PaymentIntent with ID: " + paymentIntent.getId());
+
+            response.put("paymentIntentId", paymentIntent.getId());
             response.put("clientSecret", paymentIntent.getClientSecret());
         } catch (Exception e) {
-            response.put("error", "Payment failed: " + e.getMessage());
+            System.err.println("Error creating payment intent: " + e.getMessage());
+            response.put("error", "Payment creation failed.");
         }
         return response;
     }
+    //only for testing through POSTMAN
+    @Override
+    public Map<String, Object> confirmPayment(String paymentIntentId) {
+        Map<String, Object> response = new HashMap<>();
+        String successLink = "https://your-website.com/payment/success";
+        String cancelLink = "https://your-website.com/payment/cancel";
+
+        try {
+            PaymentIntentConfirmParams params = PaymentIntentConfirmParams.builder()
+                    //"pm_card_visa" to test successful payment
+                    //"pm_card_chargeDeclined" to test declined payment
+                    .setPaymentMethod("pm_card_visa")
+                    .setReturnUrl(successLink)
+                    .build();
+
+            PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+            paymentIntent = paymentIntent.confirm(params);
+
+            if ("requires_payment_method".equals(paymentIntent.getStatus())) {
+                response.put("error", "Payment was canceled or requires a new payment method.");
+                response.put("redirect", cancelLink);
+            } else {
+                response.put("status", paymentIntent.getStatus());
+            }
+
+        } catch (StripeException e) {
+            response.put("error", "Stripe error: " + e.getMessage());
+        }
+        return response;
+    }
+
     private int calculatePrice(String itemId) {
         Map<String, Integer> prices = new HashMap<>();
         prices.put("item1", 1000);
