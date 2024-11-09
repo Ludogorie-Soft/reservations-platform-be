@@ -1,8 +1,11 @@
 package ludogorie_soft.reservations_platform_api.dto;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Data
 public class BookingResponseWithCustomerDataDto {
 
     private UUID id;
