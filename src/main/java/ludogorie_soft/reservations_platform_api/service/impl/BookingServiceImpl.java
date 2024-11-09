@@ -1,15 +1,19 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
+import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
@@ -36,6 +40,7 @@ public class BookingServiceImpl implements BookingService {
     private final ModelMapper modelMapper;
     private final PropertyService propertyService;
     private final CalendarService calendarService;
+    private final CustomerRepository customerRepository;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
@@ -114,6 +119,27 @@ public class BookingServiceImpl implements BookingService {
         }
         return modelMapper.map(booking, BookingResponseDto.class);
     }
+
+    @Override
+    public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
+        Booking booking = bookingRepository.findById(bookingRequestCustomerDataDto.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+        Customer customer = customerRepository.findByEmail(bookingRequestCustomerDataDto.getEmail())
+                .orElseGet(() -> {
+                    Customer newCustomer = new Customer();
+                    newCustomer.setFirstName(bookingRequestCustomerDataDto.getFirstName());
+                    newCustomer.setLastName(bookingRequestCustomerDataDto.getLastName());
+                    newCustomer.setEmail(bookingRequestCustomerDataDto.getEmail());
+                    newCustomer.setPhoneNumber(bookingRequestCustomerDataDto.getPhoneNumber());
+                    return customerRepository.save(newCustomer);
+                });
+
+        booking.setCustomer(customer);
+        bookingRepository.save(booking);
+
+        return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
+    }
+
 
     private Booking createBookingModel(BookingRequestDto bookingRequestDto, Property property) {
         Booking booking = new Booking();

@@ -1,8 +1,10 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.RequiredArgsConstructor;
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import net.fortuna.ical4j.data.ParserException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,12 @@ public class BookingController {
     @PostMapping
     ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping
+    ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
+        BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

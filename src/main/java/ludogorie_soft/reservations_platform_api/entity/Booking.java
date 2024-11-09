@@ -30,8 +30,10 @@ public class Booking {
     int adultCount;
     int childrenCount;
     int babiesCount;
-
     boolean petContent;
-
     BigDecimal totalPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 }
