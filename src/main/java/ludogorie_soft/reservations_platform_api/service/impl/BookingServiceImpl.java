@@ -43,9 +43,12 @@ public class BookingServiceImpl implements BookingService {
     private final CalendarService calendarService;
     private final CustomerRepository customerRepository;
     private final ConfirmationTokenServiceImpl confirmationTokenService;
+    private final MailServiceImpl mailService;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
+    @Value("${confirmation.url}")
+    private String confirmationURL;
 
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws ParserException, IOException {
@@ -144,6 +147,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setConfirmationToken(confirmationToken);
         booking.setCustomer(customer);
         bookingRepository.save(booking);
+        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), confirmationURL + customer.getEmail());
 
         return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
     }

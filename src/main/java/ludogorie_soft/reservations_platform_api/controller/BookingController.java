@@ -45,13 +45,13 @@ public class BookingController {
     }
 
     @GetMapping("/confirm/{token}")
-    public ResponseEntity<BookingResponseWithCustomerDataDto> confirmReservation(@PathVariable String token) {
+    ResponseEntity<BookingResponseWithCustomerDataDto> confirmReservation(@PathVariable String token) {
         BookingResponseWithCustomerDataDto response = confirmationTokenService.confirmReservation(token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/resend-confirmation/{email}")
-    public ResponseEntity<String> resendConfirmation(@PathVariable String email) {
+    ResponseEntity<String> resendConfirmation(@PathVariable String email) {
         confirmationTokenService.resetConfirmationToken(email);
         return ResponseEntity.ok("Confirmation link resent!");
     }

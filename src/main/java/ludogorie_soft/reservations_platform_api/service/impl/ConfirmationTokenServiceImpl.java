@@ -14,7 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,7 +33,7 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     }
 
     @Override
-    public ConfirmationToken resetConfirmationToken(String email) {
+    public void resetConfirmationToken(String email) {
         Customer customer = customerRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Customer not found with email: " + email));
 
         ConfirmationToken confirmationToken = customer.getBooking().getConfirmationToken();
@@ -44,7 +43,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
         confirmationToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
 
         confirmationTokenRepository.save(confirmationToken);
-        return confirmationToken;
     }
 
 //    @Override

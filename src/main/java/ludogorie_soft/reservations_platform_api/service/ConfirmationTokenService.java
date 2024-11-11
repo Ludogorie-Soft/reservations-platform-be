@@ -7,7 +7,7 @@ public interface ConfirmationTokenService {
 
     ConfirmationToken createConfirmationToken();
 
-    ConfirmationToken resetConfirmationToken(String email);
+    void resetConfirmationToken(String email);
 
     ConfirmationToken getToken(String token);
 
