@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
     private final PropertyService propertyService;
     private final CalendarService calendarService;
     private final CustomerRepository customerRepository;
-    private final ConfirmationTokenServiceImpl confirmationTokenService;;
+    private final ConfirmationTokenServiceImpl confirmationTokenService;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
