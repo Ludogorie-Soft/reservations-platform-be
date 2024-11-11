@@ -1,5 +1,6 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.LoginDto;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
@@ -19,10 +20,11 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
         String response = userService.register(registerDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
