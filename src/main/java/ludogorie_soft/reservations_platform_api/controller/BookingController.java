@@ -38,7 +38,7 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping
+    @PostMapping("/customer-data")
     ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
         return new ResponseEntity<>(response, HttpStatus.OK);

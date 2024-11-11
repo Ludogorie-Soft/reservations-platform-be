@@ -130,10 +130,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         Booking booking = bookingRepository.findById(bookingRequestCustomerDataDto.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-        Customer customer = customerRepository
-                .findByAllFields(bookingRequestCustomerDataDto.getFirstName(), bookingRequestCustomerDataDto.getLastName(),
-                        bookingRequestCustomerDataDto.getEmail(), bookingRequestCustomerDataDto.getPhoneNumber())
-                .orElseGet(() -> {
+        Customer customer = customerRepository.findByEmail(bookingRequestCustomerDataDto.getEmail()).orElseGet(() -> {
                     Customer newCustomer = new Customer();
                     newCustomer.setFirstName(bookingRequestCustomerDataDto.getFirstName());
                     newCustomer.setLastName(bookingRequestCustomerDataDto.getLastName());
@@ -147,7 +144,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setConfirmationToken(confirmationToken);
         booking.setCustomer(customer);
         bookingRepository.save(booking);
-        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), confirmationURL + customer.getEmail());
+        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), generateConfirmationLink(customer));
 
         return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
     }
@@ -215,5 +212,9 @@ public class BookingServiceImpl implements BookingService {
 
     private static boolean checkStartDateAndEndDateAreChangedByEdit(Booking booking, BookingRequestDto request) {
         return request.getStartDate().equals(booking.getStartDate()) && request.getEndDate().equals(booking.getEndDate());
+    }
+
+    private String generateConfirmationLink(Customer customer) {
+        return confirmationURL + customer.getEmail();
     }
 }
