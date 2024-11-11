@@ -45,6 +45,7 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 	implementation 'org.liquibase:liquibase-core:4.29.2'
 	implementation 'org.yaml:snakeyaml:1.33'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

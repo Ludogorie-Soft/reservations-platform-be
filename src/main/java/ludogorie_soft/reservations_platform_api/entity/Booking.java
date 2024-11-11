@@ -33,7 +33,11 @@ public class Booking {
     boolean petContent;
     BigDecimal totalPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToOne
+    @JoinColumn(name = "confirmation_token_id")
+    private ConfirmationToken confirmationToken;
 }

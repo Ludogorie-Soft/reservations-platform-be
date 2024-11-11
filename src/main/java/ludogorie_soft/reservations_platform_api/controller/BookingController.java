@@ -6,6 +6,7 @@ import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
+import ludogorie_soft.reservations_platform_api.service.ConfirmationTokenService;
 import net.fortuna.ical4j.data.ParserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final ConfirmationTokenService confirmationTokenService;
 
     @PostMapping
     ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
@@ -38,7 +41,19 @@ public class BookingController {
     @PostMapping
     ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/confirm/{token}")
+    public ResponseEntity<BookingResponseWithCustomerDataDto> confirmReservation(@PathVariable String token) {
+        BookingResponseWithCustomerDataDto response = confirmationTokenService.confirmReservation(token);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/resend-confirmation/{email}")
+    public ResponseEntity<String> resendConfirmation(@PathVariable String email) {
+        confirmationTokenService.resetConfirmationToken(email);
+        return ResponseEntity.ok("Confirmation link resent!");
     }
 
     @PutMapping("/{id}")

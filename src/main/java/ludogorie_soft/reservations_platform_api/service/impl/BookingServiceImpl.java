@@ -6,6 +6,7 @@ import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
@@ -17,11 +18,11 @@ import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
-import ludogorie_soft.reservations_platform_api.service.UserService;
 import net.fortuna.ical4j.data.ParserException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class BookingServiceImpl implements BookingService {
     private final PropertyService propertyService;
     private final CalendarService calendarService;
     private final CustomerRepository customerRepository;
+    private final ConfirmationTokenServiceImpl confirmationTokenService;;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
@@ -121,10 +123,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         Booking booking = bookingRepository.findById(bookingRequestCustomerDataDto.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-        Customer customer = customerRepository.findByEmail(bookingRequestCustomerDataDto.getEmail())
+        Customer customer = customerRepository
+                .findByAllFields(bookingRequestCustomerDataDto.getFirstName(), bookingRequestCustomerDataDto.getLastName(),
+                        bookingRequestCustomerDataDto.getEmail(), bookingRequestCustomerDataDto.getPhoneNumber())
                 .orElseGet(() -> {
                     Customer newCustomer = new Customer();
                     newCustomer.setFirstName(bookingRequestCustomerDataDto.getFirstName());
@@ -134,6 +139,9 @@ public class BookingServiceImpl implements BookingService {
                     return customerRepository.save(newCustomer);
                 });
 
+        ConfirmationToken confirmationToken = confirmationTokenService.createConfirmationToken();
+
+        booking.setConfirmationToken(confirmationToken);
         booking.setCustomer(customer);
         bookingRepository.save(booking);
 
