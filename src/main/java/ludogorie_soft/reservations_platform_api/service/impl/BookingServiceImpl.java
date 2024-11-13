@@ -48,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
     @Value("${confirmation.url}")
-    private String confirmationURL;
+    private String confirmationUrl;
 
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws ParserException, IOException {
@@ -215,6 +215,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private String generateConfirmationLink(ConfirmationToken confirmationToken) {
-        return confirmationURL + confirmationToken.getToken();
+        return confirmationUrl + confirmationToken.getToken();
     }
 }
