@@ -144,7 +144,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setConfirmationToken(confirmationToken);
         booking.setCustomer(customer);
         bookingRepository.save(booking);
-        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), generateConfirmationLink(customer));
+        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), generateConfirmationLink(confirmationToken));
 
         return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
     }
@@ -214,7 +214,7 @@ public class BookingServiceImpl implements BookingService {
         return request.getStartDate().equals(booking.getStartDate()) && request.getEndDate().equals(booking.getEndDate());
     }
 
-    private String generateConfirmationLink(Customer customer) {
-        return confirmationURL + customer.getEmail();
+    private String generateConfirmationLink(ConfirmationToken confirmationToken) {
+        return confirmationURL + confirmationToken.getToken();
     }
 }
