@@ -33,8 +33,8 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     }
 
     @Override
-    public void resetConfirmationToken(String email) {
-        Customer customer = customerRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Customer not found with email: " + email));
+    public void resetConfirmationToken(UUID customerId) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
 
         ConfirmationToken confirmationToken = customer.getBooking().getConfirmationToken();
 
@@ -44,18 +44,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
         confirmationTokenRepository.save(confirmationToken);
     }
-
-//    @Override
-//    public ConfirmationToken resetConfirmationToken(ConfirmationToken resetConfirmationToken) {
-//        confirmationTokenRepository.findByToken(resetConfirmationToken.getToken()).orElseThrow(() -> new RuntimeException("Token not found!"));
-//
-//        resetConfirmationToken.setToken(UUID.randomUUID().toString());
-//        resetConfirmationToken.setCreatedAt(LocalDateTime.now());
-//        resetConfirmationToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
-//
-//        confirmationTokenRepository.save(resetConfirmationToken);
-//        return resetConfirmationToken;
-//    }
 
     @Override
     public ConfirmationToken getToken(String token) {
