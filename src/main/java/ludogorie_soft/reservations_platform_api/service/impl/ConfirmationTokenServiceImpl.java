@@ -53,7 +53,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     @Override
     public BookingResponseWithCustomerDataDto confirmReservation(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Token not found!"));
-
         Booking booking = bookingRepository.findById(confirmationToken.getBooking().getId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         if (isTokenValid(confirmationToken)) {

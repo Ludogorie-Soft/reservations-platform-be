@@ -127,15 +127,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
-        Booking booking = bookingRepository.findById(bookingRequestCustomerDataDto.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+    public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto customerData) {
+        Booking booking = bookingRepository.findById(customerData.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-        Customer customer = customerRepository.findByEmail(bookingRequestCustomerDataDto.getEmail()).orElseGet(() -> {
+        Customer customer = customerRepository.findByFirstNameAndLastNameAndEmailAndPhoneNumber(customerData.getFirstName(), customerData.getLastName(),customerData.getEmail(), customerData.getPhoneNumber()).orElseGet(() -> {
                     Customer newCustomer = new Customer();
-                    newCustomer.setFirstName(bookingRequestCustomerDataDto.getFirstName());
-                    newCustomer.setLastName(bookingRequestCustomerDataDto.getLastName());
-                    newCustomer.setEmail(bookingRequestCustomerDataDto.getEmail());
-                    newCustomer.setPhoneNumber(bookingRequestCustomerDataDto.getPhoneNumber());
+                    newCustomer.setFirstName(customerData.getFirstName());
+                    newCustomer.setLastName(customerData.getLastName());
+                    newCustomer.setEmail(customerData.getEmail());
+                    newCustomer.setPhoneNumber(customerData.getPhoneNumber());
                     return customerRepository.save(newCustomer);
                 });
 
@@ -144,7 +144,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setConfirmationToken(confirmationToken);
         booking.setCustomer(customer);
         bookingRepository.save(booking);
-        mailService.sendConfirmationEmail(bookingRequestCustomerDataDto.getEmail(), generateConfirmationLink(confirmationToken));
+        mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
 
         return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
     }
