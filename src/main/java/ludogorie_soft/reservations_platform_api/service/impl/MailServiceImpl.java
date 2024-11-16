@@ -4,6 +4,8 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import ludogorie_soft.reservations_platform_api.service.MailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MailServiceImpl implements MailService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailServiceImpl.class);
     private final JavaMailSender mailSender;
 
     public MailServiceImpl(JavaMailSender mailSender) {
@@ -29,10 +32,11 @@ public class MailServiceImpl implements MailService {
             helper.setText("<html><body><p>Thank you for your reservation!</p>" +
                     "<p>Please confirm it by clicking the link below:</p>" +
                     "<p><a href='" + confirmationUrl + "'>Confirm Reservation</a></p></body></html>", true);
-            helper.setFrom("no-reply@yourdomain.com");
+            helper.setFrom("hristoivanovslavchev@gmail.com");
 
             mailSender.send(message);
         } catch (MessagingException e) {
+            LOGGER.error("Error sending message", e);
             throw new RuntimeException("Could not send confirmation email", e);
         }
     }

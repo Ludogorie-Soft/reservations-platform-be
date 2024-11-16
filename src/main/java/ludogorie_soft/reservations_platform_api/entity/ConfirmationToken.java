@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -33,9 +32,4 @@ public class ConfirmationToken {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    public ConfirmationToken() {
-        this.token = UUID.randomUUID().toString();
-        this.createdAt = LocalDateTime.now();
-        this.expiresAt = createdAt.plusMinutes(30);
-    }
 }

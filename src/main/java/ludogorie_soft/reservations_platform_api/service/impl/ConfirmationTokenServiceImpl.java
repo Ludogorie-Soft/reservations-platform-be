@@ -28,6 +28,10 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     @Override
     public ConfirmationToken createConfirmationToken() {
         ConfirmationToken confirmationToken = new ConfirmationToken();
+        confirmationToken.setToken(UUID.randomUUID().toString());
+        confirmationToken.setCreatedAt(LocalDateTime.now());
+        confirmationToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+
         confirmationTokenRepository.save(confirmationToken);
         return confirmationToken;
     }

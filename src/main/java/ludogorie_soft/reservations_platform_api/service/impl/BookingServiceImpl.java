@@ -13,6 +13,7 @@ import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundExcepti
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
+import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
@@ -136,6 +137,7 @@ public class BookingServiceImpl implements BookingService {
                     newCustomer.setLastName(customerData.getLastName());
                     newCustomer.setEmail(customerData.getEmail());
                     newCustomer.setPhoneNumber(customerData.getPhoneNumber());
+                    newCustomer.setBooking(booking);
                     return customerRepository.save(newCustomer);
                 });
 
@@ -146,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
 
-        return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
     }
 
 

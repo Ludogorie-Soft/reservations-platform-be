@@ -50,7 +50,7 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/resend-confirmation/{email}")
+    @PostMapping("/resend-confirmation/{customerId}")
     ResponseEntity<String> resendConfirmation(@PathVariable UUID customerId) {
         confirmationTokenService.resetConfirmationToken(customerId);
         return ResponseEntity.ok("Confirmation link resent!");
