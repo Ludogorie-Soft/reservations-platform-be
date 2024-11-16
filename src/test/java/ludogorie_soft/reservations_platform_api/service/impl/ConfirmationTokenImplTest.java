@@ -63,7 +63,7 @@ public class ConfirmationTokenImplTest {
 
         booking.setCustomer(customer);
         booking.setConfirmationToken(confirmationToken);
-        confirmationToken.setBooking(booking);
+
         customer.setBooking(booking);
     }
 
@@ -171,7 +171,7 @@ public class ConfirmationTokenImplTest {
     void confirmReservation_TokenExpired_ShouldThrowException() {
         // GIVEN
         ConfirmationToken expiredToken = ConfirmationTokenTestHelper.createExpiredConfirmationToken();
-        expiredToken.setBooking(booking);
+        booking.setConfirmationToken(expiredToken);
         when(confirmationTokenRepository.findByToken(expiredToken.getToken())).thenReturn(Optional.of(expiredToken));
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
 
