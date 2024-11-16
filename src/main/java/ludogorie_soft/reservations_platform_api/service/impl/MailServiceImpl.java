@@ -36,7 +36,7 @@ public class MailServiceImpl implements MailService {
             helper.setText("<html><body><p>Thank you for your reservation!</p>" +
                     "<p>Please confirm it by clicking the link below:</p>" +
                     "<p><a href='" + confirmationUrl + "'>Confirm Reservation</a></p></body></html>", true);
-            helper.setFrom(emailAddress);
+            helper.setFrom("no-reply@example.com");
 
             mailSender.send(message);
         } catch (MessagingException e) {
