@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
+import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,45 +48,31 @@ class PropertyControllerIntegrationTest {
 
     private Property savedProperty;
     private User savedUser;
+    private PropertyRequestDto propertyRequestDto;
 
     @BeforeEach
     void setUp() {
-        User user = new User();
-        user.setName("Ivan");
-        user.setUsername("testUser");
-        user.setPassword("testPassword");
-        user.setEmail("testuser@example.com");
-        savedUser = userRepository.save(user);
-
-        Property property = new Property();
-        property.setOwner(savedUser);
-        property.setWebsiteUrl("http://testproperty.com");
-        property.setCapacity(4);
-        property.setPetAllowed(true);
-        property.setPetRules("Cats only");
-        property.setPrice(200);
-        savedProperty = propertyRepository.save(property);
+        savedProperty = PropertyTestHelper.createDefaultProperty();
+        savedUser = userRepository.save(savedProperty.getOwner());
+        savedProperty.setOwner(savedUser);
+        savedProperty = propertyRepository.save(savedProperty);
+        propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
     }
 
     @Test
     void createProperty_ShouldReturnCreatedProperty() throws Exception {
-        PropertyRequestDto requestDto = new PropertyRequestDto();
-        requestDto.setOwnerEmail(savedUser.getEmail());
-        requestDto.setWebsiteUrl("http://newproperty.com");
-        requestDto.setCapacity(2);
-        requestDto.setPetAllowed(false);
-        requestDto.setPrice(150);
-        requestDto.setPetRules("No pets allowed");
-
-        mockMvc.perform(post("/api/properties/")
+        mockMvc.perform(post("/api/properties")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(propertyRequestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.websiteUrl").value("http://newproperty.com"))
-                .andExpect(jsonPath("$.capacity").value(2))
-                .andExpect(jsonPath("$.petAllowed").value(false))
-                .andExpect(jsonPath("$.petRules").value("No pets allowed"))
-                .andExpect(jsonPath("$.price").value(150));
+                .andExpect(jsonPath("$.websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$.capacity").value(4))
+                .andExpect(jsonPath("$.petAllowed").value(true))
+                .andExpect(jsonPath("$.petRules").value("Pets must be supervised at all times"))
+                .andExpect(jsonPath("$.price").value(20))
+                .andExpect(jsonPath("$.minimumStay").value(1))
+                .andExpect(jsonPath("$.petPrice").value(10))
+                .andExpect(jsonPath("$.propertyRules").value("No smoking allowed"));
     }
 
     @Test
@@ -95,8 +80,14 @@ class PropertyControllerIntegrationTest {
         mockMvc.perform(get("/api/properties/" + savedProperty.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.websiteUrl").value("http://testproperty.com"))
-                .andExpect(jsonPath("$.capacity").value(4));
+                .andExpect(jsonPath("$.websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$.capacity").value(4))
+                .andExpect(jsonPath("$.petAllowed").value(true))
+                .andExpect(jsonPath("$.petRules").value("Pets must be supervised at all times"))
+                .andExpect(jsonPath("$.price").value(20))
+                .andExpect(jsonPath("$.minimumStay").value(1))
+                .andExpect(jsonPath("$.petPrice").value(10))
+                .andExpect(jsonPath("$.propertyRules").value("No smoking allowed"));
     }
 
     @Test
@@ -111,10 +102,17 @@ class PropertyControllerIntegrationTest {
 
     @Test
     void getAllProperties_ShouldReturnListOfProperties() throws Exception {
-        mockMvc.perform(get("/api/properties/")
+        mockMvc.perform(get("/api/properties")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].websiteUrl").value("http://testproperty.com"));
+                .andExpect(jsonPath("$[0].websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$[0].capacity").value(4))
+                .andExpect(jsonPath("$[0].petAllowed").value(true))
+                .andExpect(jsonPath("$[0].petRules").value("Pets must be supervised at all times"))
+                .andExpect(jsonPath("$[0].price").value(20))
+                .andExpect(jsonPath("$[0].minimumStay").value(1))
+                .andExpect(jsonPath("$[0].petPrice").value(10))
+                .andExpect(jsonPath("$[0].propertyRules").value("No smoking allowed"));
     }
 
     @Test
@@ -141,40 +139,31 @@ class PropertyControllerIntegrationTest {
 
     @Test
     void updateProperty_ShouldReturnUpdatedProperty() throws Exception {
-        PropertyRequestDto requestDto = new PropertyRequestDto();
-        requestDto.setOwnerEmail(savedUser.getEmail());
-        requestDto.setWebsiteUrl("http://updatedproperty.com");
-        requestDto.setCapacity(6);
-        requestDto.setPetAllowed(true);
-        requestDto.setPrice(300);
-        requestDto.setPetRules("Pets allowed with prior approval");
+        PropertyRequestDto updatedRequestDto = PropertyTestHelper.createUpdatedPropertyRequestDto();
 
         mockMvc.perform(put("/api/properties/" + savedProperty.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(updatedRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.websiteUrl").value("http://updatedproperty.com"))
-                .andExpect(jsonPath("$.capacity").value(6));
-
-        Property updatedProperty = propertyRepository.findById(savedProperty.getId()).get();
-        assertThat(updatedProperty.getWebsiteUrl()).isEqualTo("http://updatedproperty.com");
-        assertThat(updatedProperty.getCapacity()).isEqualTo(6);
+                .andExpect(jsonPath("$.websiteUrl").value("http://example_updated.com"))
+                .andExpect(jsonPath("$.capacity").value(6))
+                .andExpect(jsonPath("$.petAllowed").value(false))
+                .andExpect(jsonPath("$.petRules").value("No pets"))
+                .andExpect(jsonPath("$.price").value(40))
+                .andExpect(jsonPath("$.minimumStay").value(2))
+                .andExpect(jsonPath("$.petPrice").value(20))
+                .andExpect(jsonPath("$.propertyRules").value("Guests must be quiet after 10 PM"));
+        
     }
 
     @Test
     void updateProperty_ShouldReturnNotFound_WhenPropertyDoesNotExist() throws Exception {
         UUID nonExistentId = UUID.randomUUID();
-        PropertyRequestDto requestDto = new PropertyRequestDto();
-        requestDto.setOwnerEmail("nonexistentuser@example.com");
-        requestDto.setWebsiteUrl("http://updatedproperty.com");
-        requestDto.setCapacity(6);
-        requestDto.setPetAllowed(true);
-        requestDto.setPrice(300);
-        requestDto.setPetRules("Pets allowed with prior approval");
+        PropertyRequestDto updatedRequestDto = PropertyTestHelper.createUpdatedPropertyRequestDto();
 
         mockMvc.perform(put("/api/properties/" + nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(updatedRequestDto)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Property not found with id: " + nonExistentId));
     }
