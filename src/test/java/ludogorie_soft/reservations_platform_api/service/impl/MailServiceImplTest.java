@@ -1,5 +1,6 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,13 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -56,7 +62,7 @@ public class MailServiceImplTest {
     }
 
     @Test
-    void testSendConfirmationEmail_MessagingException() {
+    void testSendConfirmationEmail_MailSendException() {
         // GIVEN
         when(mailSender.createMimeMessage()).thenThrow(new MailSendException("Could not send confirmation email"));
 
@@ -64,4 +70,5 @@ public class MailServiceImplTest {
         assertThrows(MailSendException.class, () -> mailService.sendConfirmationEmail(recipientEmail, confirmationUrl));
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
+
 }
