@@ -16,6 +16,7 @@ import ludogorie_soft.reservations_platform_api.repository.ConfirmationTokenRepo
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.ConfirmationTokenService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -53,6 +54,7 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     }
 
     @Override
+    @Transactional
     public BookingResponseWithCustomerDataDto confirmReservation(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found with token: " + token));
         Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId()).orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
