@@ -65,13 +65,13 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testCreateConfirmationToken() {
-        // GIVEN a new confirmation token
+        // GIVEN
         when(confirmationTokenRepository.save(any(ConfirmationToken.class))).thenReturn(confirmationToken);
 
-        // WHEN the createConfirmationToken method is called
+        // WHEN
         ConfirmationToken createdToken = confirmationTokenService.createConfirmationToken();
 
-        // THEN a valid confirmation token should be created and saved
+        // THEN
         assertNotNull(createdToken);
         assertNotNull(createdToken.getToken());
         assertNotNull(createdToken.getCreatedAt());
@@ -81,14 +81,14 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testResetConfirmationToken() {
-        // GIVEN a valid customer and booking
+        // GIVEN
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
         when(bookingRepository.findByCustomerId(customer.getId())).thenReturn(Optional.of(booking));
 
-        // WHEN the resetConfirmationToken method is called
+        // WHEN
         confirmationTokenService.resetConfirmationToken(customer.getId());
 
-        // THEN the token should be updated and saved
+        // THEN
         assertNotNull(confirmationToken.getToken());
         assertNotNull(confirmationToken.getCreatedAt());
         assertNotNull(confirmationToken.getExpiresAt());
@@ -97,28 +97,28 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testResetConfirmationToken_CustomerNotFound() {
-        // GIVEN a non-existing customer ID
+        // GIVEN
         when(customerRepository.findById(any())).thenReturn(Optional.empty());
 
-        // WHEN the resetConfirmationToken method is called
-        // THEN it should throw a ResourceNotFoundException
+        // WHEN
+        // THEN
         assertThrows(ResourceNotFoundException.class, () -> confirmationTokenService.resetConfirmationToken(customer.getId()));
     }
 
     @Test
     void testResetConfirmationToken_BookingNotFound() {
-        // GIVEN a customer with no associated booking
+        // GIVEN
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
         when(bookingRepository.findByCustomerId(customer.getId())).thenReturn(Optional.empty());
 
-        // WHEN the resetConfirmationToken method is called
-        // THEN it should throw a ResourceNotFoundException
+        // WHEN
+        // THEN
         assertThrows(ResourceNotFoundException.class, () -> confirmationTokenService.resetConfirmationToken(customer.getId()));
     }
 
     @Test
     void testConfirmReservation_ValidToken() {
-        // GIVEN a valid confirmation token, booking, and customer
+        // GIVEN
         when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
                 .thenReturn(Optional.of(confirmationToken));
         when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
@@ -126,10 +126,10 @@ public class ConfirmationTokenImplTest {
         when(customerRepository.findById(customer.getId()))
                 .thenReturn(Optional.of(customer));
 
-        // WHEN the confirmReservation method is called
+        // WHEN
         BookingResponseWithCustomerDataDto result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
 
-        // THEN the token is confirmed, saved, and the correct response is returned
+        // THEN
         assertNotNull(result);
         assertEquals(booking.getId(), result.getBookingId());
         assertEquals(customer.getFirstName(), result.getFirstName());
@@ -143,8 +143,8 @@ public class ConfirmationTokenImplTest {
         String invalidToken = "non-existent-token";
         when(confirmationTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
 
-        // WHEN the confirmReservation method is called
-        // THEN a ConfirmationTokenNotFoundException is thrown
+        // WHEN
+        // THEN
         assertThrows(ConfirmationTokenNotFoundException.class, () ->
                 confirmationTokenService.confirmReservation(invalidToken)
         );
@@ -154,7 +154,7 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testConfirmReservation_InvalidToken_Expired() {
-        // GIVEN an expired confirmation token
+        // GIVEN
         ConfirmationToken expiredToken = ConfirmationTokenTestHelper.createExpiredConfirmationToken();
         when(confirmationTokenRepository.findByToken(expiredToken.getToken()))
                 .thenReturn(Optional.of(expiredToken));
@@ -163,8 +163,8 @@ public class ConfirmationTokenImplTest {
         when(customerRepository.findById(booking.getCustomer().getId()))
                 .thenReturn(Optional.of(customer));
 
-        // WHEN the confirmReservation method is called
-        // THEN a ConfirmationTokenNotValidException is thrown
+        // WHEN
+        // THEN
         assertThrows(ConfirmationTokenNotValidException.class, () ->
                 confirmationTokenService.confirmReservation(expiredToken.getToken())
         );
@@ -174,14 +174,14 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testConfirmReservation_BookingNotFound() {
-        // GIVEN a valid confirmation token but no associated booking
+        // GIVEN
         when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
                 .thenReturn(Optional.of(confirmationToken));
         when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
                 .thenReturn(Optional.empty());
 
-        // WHEN the confirmReservation method is called
-        // THEN a BookingNotFoundException is thrown
+        // WHEN
+        // THEN
         assertThrows(BookingNotFoundException.class, () ->
                 confirmationTokenService.confirmReservation(confirmationToken.getToken())
         );
@@ -191,15 +191,15 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testConfirmReservation_CustomerNotFound() {
-        // GIVEN a valid confirmation token and booking but no associated customer
+        // GIVEN
         when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
                 .thenReturn(Optional.of(confirmationToken));
         when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
                 .thenReturn(Optional.of(booking));
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.empty());
 
-        // WHEN the confirmReservation method is called
-        // THEN a CustomerNotFoundException is thrown
+        // WHEN
+        // THEN
         assertThrows(CustomerNotFoundException.class, () ->
                 confirmationTokenService.confirmReservation(confirmationToken.getToken())
         );
