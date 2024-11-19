@@ -71,4 +71,22 @@ public class MailServiceImplTest {
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
 
+    @Test
+    void testSendConfirmationEmail_MessagingException() {
+        // GIVEN
+        doAnswer(invocation -> {
+            throw new jakarta.mail.MessagingException("Mock MessagingException");
+        }).when(mailSender).send(any(MimeMessage.class));
+
+        // WHEN & THEN
+        MailSendException exception = assertThrows(MailSendException.class, () ->
+                mailService.sendConfirmationEmail(recipientEmail, confirmationUrl)
+        );
+
+        assertEquals("Could not send confirmation email", exception.getMessage());
+        assertInstanceOf(MessagingException.class, exception.getCause());
+
+        verify(mailSender, times(1)).createMimeMessage();
+        verify(mailSender, times(1)).send(any(MimeMessage.class));
+    }
 }

@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new MailSendException("Could not send confirmation email");
+            throw new MailSendException("Could not send confirmation email", e);
         }
     }
 
