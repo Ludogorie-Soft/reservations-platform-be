@@ -1,6 +1,5 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,10 +38,13 @@ public class MailServiceImplTest {
 
         mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        String fromEmail = "noreply@example.com";
+        ReflectionTestUtils.setField(mailService, "emailAddress", fromEmail);
     }
 
     @Test
-    void testSendConfirmationEmail_Success() throws MessagingException {
+    void testSendConfirmationEmail_Success() {
         // GIVEN - handled in @BeforeEach
         // WHEN
         mailService.sendConfirmationEmail(recipientEmail, confirmationUrl);
