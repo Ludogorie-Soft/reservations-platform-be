@@ -6,7 +6,8 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
-import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotValidException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenAlreadyConfirmedException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
@@ -60,26 +61,26 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
         Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId()).orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
         Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(() -> new CustomerNotFoundException("Customer not found with booking: " + booking.getId()));
 
-        if (isTokenValid(confirmationToken)) {
-            confirmationToken.setConfirmedAt(LocalDateTime.now());
-            confirmationTokenRepository.save(confirmationToken);
-            return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+        if (isTokenNotExpired(confirmationToken)) {
+            if (isTokenNotConfirmed(confirmationToken)) {
+                confirmationToken.setConfirmedAt(LocalDateTime.now());
+                confirmationTokenRepository.save(confirmationToken);
+                return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+            } else {
+                throw new ConfirmationTokenAlreadyConfirmedException("Token is already confirmed!");
+            }
         } else {
-            throw new ConfirmationTokenNotValidException("Token is expired or already confirmed!");
+            throw new ConfirmationTokenExpiredException("Token is expired");
         }
     }
 
-    private boolean isTokenValid(ConfirmationToken confirmationToken) {
+    private boolean isTokenNotExpired(ConfirmationToken confirmationToken) {
         LocalDateTime now = LocalDateTime.now();
+        return !confirmationToken.getExpiresAt().isBefore(now);
+    }
 
-        if (confirmationToken.getExpiresAt().isBefore(now)) {
-            return false;
-        }
-        if (confirmationToken.getConfirmedAt() != null) {
-            return false;
-        }
-
-        return true;
+    private boolean isTokenNotConfirmed(ConfirmationToken confirmationToken) {
+        return confirmationToken.getConfirmedAt() == null;
     }
 
 }

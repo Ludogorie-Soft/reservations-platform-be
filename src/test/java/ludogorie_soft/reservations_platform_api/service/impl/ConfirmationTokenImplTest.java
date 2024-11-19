@@ -5,8 +5,9 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
-import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotValidException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenAlreadyConfirmedException;
 import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
@@ -139,7 +140,7 @@ public class ConfirmationTokenImplTest {
 
     @Test
     void testConfirmReservation_InvalidToken_NotFound() {
-        // GIVEN a token that does not exist
+        // GIVEN
         String invalidToken = "non-existent-token";
         when(confirmationTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
 
@@ -165,11 +166,31 @@ public class ConfirmationTokenImplTest {
 
         // WHEN
         // THEN
-        assertThrows(ConfirmationTokenNotValidException.class, () ->
+        assertThrows(ConfirmationTokenExpiredException.class, () ->
                 confirmationTokenService.confirmReservation(expiredToken.getToken())
         );
 
         verify(confirmationTokenRepository, never()).save(expiredToken);
+    }
+
+    @Test
+    void testConfirmReservation_InvalidToken_AlreadyConfirmed() {
+        // GIVEN
+        confirmationToken.setConfirmedAt(confirmationToken.getCreatedAt().plusMinutes(5));
+        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
+                .thenReturn(Optional.of(confirmationToken));
+        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
+                .thenReturn(Optional.of(booking));
+        when(customerRepository.findById(booking.getCustomer().getId()))
+                .thenReturn(Optional.of(customer));
+
+        // WHEN
+        // THEN
+        assertThrows(ConfirmationTokenAlreadyConfirmedException.class, () ->
+                confirmationTokenService.confirmReservation(confirmationToken.getToken())
+        );
+
+        verify(confirmationTokenRepository, never()).save(confirmationToken);
     }
 
     @Test
