@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 
 import java.util.Optional;
@@ -45,9 +44,6 @@ public class ConfirmationTokenImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
-
-    @Mock
-    private ModelMapper modelMapper;
 
     @InjectMocks
     private ConfirmationTokenServiceImpl confirmationTokenService;

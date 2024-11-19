@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api.repository;
 
 import ludogorie_soft.reservations_platform_api.entity.Booking;
-import ludogorie_soft.reservations_platform_api.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
