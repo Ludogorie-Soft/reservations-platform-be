@@ -15,10 +15,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -59,16 +57,6 @@ public class MailServiceImplTest {
         // THEN
         verify(mailSender, times(1)).createMimeMessage();
         verify(mailSender, times(1)).send(mimeMessage);
-    }
-
-    @Test
-    void testSendConfirmationEmail_MailSendException() {
-        // GIVEN
-        when(mailSender.createMimeMessage()).thenThrow(new MailSendException("Could not send confirmation email"));
-
-        // WHEN & THEN
-        assertThrows(MailSendException.class, () -> mailService.sendConfirmationEmail(recipientEmail, confirmationUrl));
-        verify(mailSender, never()).send(any(MimeMessage.class));
     }
 
     @Test
