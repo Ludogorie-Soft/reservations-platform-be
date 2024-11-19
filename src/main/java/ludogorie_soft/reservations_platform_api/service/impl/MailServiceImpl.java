@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import ludogorie_soft.reservations_platform_api.service.MailService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -38,7 +39,7 @@ public class MailServiceImpl implements MailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Could not send confirmation email", e);
+            throw new MailSendException("Could not send confirmation email", e);
         }
     }
 

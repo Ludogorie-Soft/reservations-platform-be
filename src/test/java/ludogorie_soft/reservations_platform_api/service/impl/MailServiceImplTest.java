@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -57,10 +58,10 @@ public class MailServiceImplTest {
     @Test
     void testSendConfirmationEmail_MessagingException() {
         // GIVEN
-        when(mailSender.createMimeMessage()).thenThrow(new RuntimeException("Could not send confirmation email"));
+        when(mailSender.createMimeMessage()).thenThrow(new MailSendException("Could not send confirmation email"));
 
         // WHEN & THEN
-        assertThrows(RuntimeException.class, () -> mailService.sendConfirmationEmail(recipientEmail, confirmationUrl));
+        assertThrows(MailSendException.class, () -> mailService.sendConfirmationEmail(recipientEmail, confirmationUrl));
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
 }

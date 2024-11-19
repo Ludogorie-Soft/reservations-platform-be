@@ -1,9 +1,11 @@
 package ludogorie_soft.reservations_platform_api.mapper;
 
+import lombok.NoArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
 
+@NoArgsConstructor
 public class BookingResponseWithCustomerDataMapper {
 
     public static BookingResponseWithCustomerDataDto toBookingWithCustomerDataDto (Booking booking, Customer customer) {
