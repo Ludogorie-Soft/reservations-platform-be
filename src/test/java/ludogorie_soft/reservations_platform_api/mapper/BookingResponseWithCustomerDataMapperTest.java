@@ -20,13 +20,13 @@ public class BookingResponseWithCustomerDataMapperTest {
     private Customer customer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         booking = BookingTestHelper.createBooking();
         customer = CustomerTestHelper.createCustomer();
     }
 
     @Test
-    public void testToBookingWithCustomerDataDto_validData() {
+    void testToBookingWithCustomerDataDto_validData() {
         // GIVEN
         // WHEN
         BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);

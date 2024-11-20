@@ -312,7 +312,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    public void testAddCustomerDataToBooking_CustomerExists() {
+    void testAddCustomerDataToBooking_CustomerExists() {
         // GIVEN
         Booking booking = BookingTestHelper.createBooking();
         Customer existingCustomer = CustomerTestHelper.createCustomer();
@@ -340,7 +340,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    public void testAddCustomerDataToBooking_CustomerDoesNotExist() {
+    void testAddCustomerDataToBooking_CustomerDoesNotExist() {
         // GIVEN
         Booking booking = BookingTestHelper.createBooking();
         Customer newCustomer = CustomerTestHelper.createCustomer();
@@ -370,7 +370,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    public void testAddCustomerDataToBooking_BookingNotFound() {
+    void testAddCustomerDataToBooking_BookingNotFound() {
         // GIVEN
         BookingRequestCustomerDataDto customerData = BookingTestHelper.createBookingRequestWithInvalidBookingId();
 
