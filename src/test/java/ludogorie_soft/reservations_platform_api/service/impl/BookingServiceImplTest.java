@@ -1,16 +1,23 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
+import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.ConfirmationTokenTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.CustomerTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
+import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import net.fortuna.ical4j.data.ParserException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +42,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,8 +63,19 @@ class BookingServiceImplTest {
     @Mock
     private CalendarService calendarService;
 
+    @Mock
+    private CustomerRepository customerRepository;
+
+    @Mock
+    private ConfirmationTokenServiceImpl confirmationTokenService;
+
+    @Mock
+    private MailServiceImpl mailService;
+
     @InjectMocks
     private BookingServiceImpl bookingService;
+
+    private static final String CONFIRMATION_URL = "http://example.com/confirm";
 
     private Property property;
     private BookingRequestDto bookingRequestDto;
@@ -67,7 +88,9 @@ class BookingServiceImplTest {
         bookingRequestDto = BookingTestHelper.createBookingRequest();
         createdBooking = BookingTestHelper.createBooking();
         bookingResponseDto = BookingTestHelper.createBookingResponse();
+
         ReflectionTestUtils.setField(bookingService, "icsAirBnbDirectory", "air-bnb-calendar");
+        ReflectionTestUtils.setField(bookingService, "confirmationUrl", CONFIRMATION_URL);
     }
 
     @Test
@@ -286,6 +309,79 @@ class BookingServiceImplTest {
 
         // WHEN & THEN
         assertThrows(NotAvailableDatesException.class, () -> bookingService.editBooking(createdBooking.getId(), editRequestDto));
+    }
+
+    @Test
+    public void testAddCustomerDataToBooking_CustomerExists() {
+        // GIVEN
+        Booking booking = BookingTestHelper.createBooking();
+        Customer existingCustomer = CustomerTestHelper.createCustomer();
+        ConfirmationToken confirmationToken = ConfirmationTokenTestHelper.createConfirmationToken();
+        BookingRequestCustomerDataDto customerData = BookingTestHelper.createBookingRequestWithCustomerData(booking, existingCustomer);
+
+        when(bookingRepository.findById(customerData.getBookingId())).thenReturn(Optional.of(booking));
+        when(customerRepository.findByFirstNameAndLastNameAndEmailAndPhoneNumber(
+                customerData.getFirstName(), customerData.getLastName(), customerData.getEmail(), customerData.getPhoneNumber()))
+                .thenReturn(Optional.of(existingCustomer));
+        when(confirmationTokenService.createConfirmationToken()).thenReturn(confirmationToken);
+
+        // WHEN
+        BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(customerData);
+
+        // THEN
+        assertNotNull(response);
+        assertEquals(booking.getId(), response.getBookingId());
+        assertEquals(existingCustomer.getFirstName(), response.getFirstName());
+        assertEquals(existingCustomer.getLastName(), response.getLastName());
+        assertEquals(existingCustomer.getEmail(), response.getEmail());
+        assertEquals(existingCustomer.getPhoneNumber(), response.getPhoneNumber());
+        verify(bookingRepository).save(booking);
+        verify(mailService).sendConfirmationEmail(eq(existingCustomer.getEmail()), contains(CONFIRMATION_URL));
+    }
+
+    @Test
+    public void testAddCustomerDataToBooking_CustomerDoesNotExist() {
+        // GIVEN
+        Booking booking = BookingTestHelper.createBooking();
+        Customer newCustomer = CustomerTestHelper.createCustomer();
+        ConfirmationToken confirmationToken = ConfirmationTokenTestHelper.createConfirmationToken();
+        BookingRequestCustomerDataDto customerData = BookingTestHelper.createBookingRequestWithCustomerData(booking, newCustomer);
+
+        when(bookingRepository.findById(customerData.getBookingId())).thenReturn(Optional.of(booking));
+        when(customerRepository.findByFirstNameAndLastNameAndEmailAndPhoneNumber(
+                customerData.getFirstName(), customerData.getLastName(), customerData.getEmail(), customerData.getPhoneNumber()))
+                .thenReturn(Optional.empty());
+        when(customerRepository.save(any(Customer.class))).thenReturn(newCustomer);
+        when(confirmationTokenService.createConfirmationToken()).thenReturn(confirmationToken);
+
+        // WHEN
+        BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(customerData);
+
+        // THEN
+        assertNotNull(response);
+        assertEquals(booking.getId(), response.getBookingId());
+        assertEquals(newCustomer.getFirstName(), response.getFirstName());
+        assertEquals(newCustomer.getLastName(), response.getLastName());
+        assertEquals(newCustomer.getEmail(), response.getEmail());
+        assertEquals(newCustomer.getPhoneNumber(), response.getPhoneNumber());
+        verify(customerRepository).save(any(Customer.class));
+        verify(bookingRepository).save(booking);
+        verify(mailService).sendConfirmationEmail(eq(newCustomer.getEmail()), contains(CONFIRMATION_URL));
+    }
+
+    @Test
+    public void testAddCustomerDataToBooking_BookingNotFound() {
+        // GIVEN
+        BookingRequestCustomerDataDto customerData = BookingTestHelper.createBookingRequestWithInvalidBookingId();
+
+        when(bookingRepository.findById(customerData.getBookingId())).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(BookingNotFoundException.class, () -> {
+            bookingService.addCustomerDataToBooking(customerData);
+        });
+
+        verifyNoInteractions(customerRepository, confirmationTokenService, mailService);
     }
 
 }

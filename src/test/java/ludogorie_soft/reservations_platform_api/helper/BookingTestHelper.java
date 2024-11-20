@@ -1,8 +1,10 @@
 package ludogorie_soft.reservations_platform_api.helper;
 
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 
 import java.math.BigDecimal;
@@ -77,5 +79,29 @@ public class BookingTestHelper {
         bookingResponseDto.setBabiesCount(TEST_BABIES_COUNT);
         bookingResponseDto.setPetContent(false);
         return bookingResponseDto;
+    }
+
+    public static BookingRequestCustomerDataDto createBookingRequestWithCustomerData(Booking booking, Customer customer){
+        BookingRequestCustomerDataDto bookingRequestCustomerDataDto = new BookingRequestCustomerDataDto();
+
+        bookingRequestCustomerDataDto.setBookingId(booking.getId());
+        bookingRequestCustomerDataDto.setFirstName(customer.getFirstName());
+        bookingRequestCustomerDataDto.setLastName(customer.getLastName());
+        bookingRequestCustomerDataDto.setEmail(customer.getEmail());
+        bookingRequestCustomerDataDto.setPhoneNumber(customer.getPhoneNumber());
+
+        return bookingRequestCustomerDataDto;
+    }
+
+    public static BookingRequestCustomerDataDto createBookingRequestWithInvalidBookingId(){
+        BookingRequestCustomerDataDto bookingRequestCustomerDataDto = new BookingRequestCustomerDataDto();
+
+        bookingRequestCustomerDataDto.setBookingId(UUID.randomUUID());
+        bookingRequestCustomerDataDto.setFirstName("John");
+        bookingRequestCustomerDataDto.setLastName("Doe");
+        bookingRequestCustomerDataDto.setEmail("john.doe@example.com");
+        bookingRequestCustomerDataDto.setPhoneNumber("+123456789");
+
+        return bookingRequestCustomerDataDto;
     }
 }
