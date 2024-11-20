@@ -1,13 +1,14 @@
 package ludogorie_soft.reservations_platform_api.mapper;
 
+import lombok.NoArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
+import org.springframework.stereotype.Component;
 
+@Component
+@NoArgsConstructor
 public class BookingResponseWithCustomerDataMapper {
-
-    public BookingResponseWithCustomerDataMapper() {
-    }
 
     public static BookingResponseWithCustomerDataDto toBookingWithCustomerDataDto (Booking booking, Customer customer) {
         BookingResponseWithCustomerDataDto dto = new BookingResponseWithCustomerDataDto();
