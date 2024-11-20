@@ -65,7 +65,7 @@ class ConfirmationTokenImplTest {
     }
 
     @Test
-    void testCreateConfirmationToken() {
+    void testCreateConfirmationToken_Success() {
         // GIVEN
         when(confirmationTokenRepository.save(any(ConfirmationToken.class))).thenReturn(confirmationToken);
 
@@ -81,7 +81,7 @@ class ConfirmationTokenImplTest {
     }
 
     @Test
-    void testResetConfirmationToken() {
+    void testResetConfirmationToken_Success() {
         // GIVEN
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
         when(bookingRepository.findByCustomerId(customer.getId())).thenReturn(Optional.of(booking));
