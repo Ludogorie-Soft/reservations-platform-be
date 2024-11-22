@@ -12,7 +12,6 @@ public class CustomerTestHelper {
     private static final String EMAIL = "test@example.com";
     private static final String PHONE_NUMBER = "+381 123 456 789";
 
-
     public static Customer createCustomer(){
         Customer customer = new Customer();
         customer.setId(DEFAULT_ID);
