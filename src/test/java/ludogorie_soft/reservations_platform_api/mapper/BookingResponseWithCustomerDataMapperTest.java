@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingResponseWithCustomerDataMapperTest {
@@ -32,19 +33,23 @@ public class BookingResponseWithCustomerDataMapperTest {
         BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
 
         // THEN
-        assertEquals(booking.getId(), dto.getBookingId());
-        assertEquals(booking.getStartDate().toString(), dto.getStartDate());
-        assertEquals(booking.getEndDate().toString(), dto.getEndDate());
-        assertEquals(booking.getDescription(), dto.getDescription());
-        assertEquals(booking.getAdultCount(), dto.getAdultCount());
-        assertEquals(booking.getChildrenCount(), dto.getChildrenCount());
-        assertEquals(booking.getBabiesCount(), dto.getBabiesCount());
-        assertEquals(booking.isPetContent(), dto.isPetContent());
-        assertEquals(booking.getTotalPrice(), dto.getTotalPrice());
-        assertEquals(customer.getFirstName(), dto.getFirstName());
-        assertEquals(customer.getLastName(), dto.getLastName());
-        assertEquals(customer.getEmail(), dto.getEmail());
-        assertEquals(customer.getPhoneNumber(), dto.getPhoneNumber());
+        assertNotNull(dto.getBookingResponseDto());
+        assertEquals(booking.getId(), dto.getBookingResponseDto().getId());
+        assertEquals(booking.getStartDate().toString(), dto.getBookingResponseDto().getStartDate());
+        assertEquals(booking.getEndDate().toString(), dto.getBookingResponseDto().getEndDate());
+        assertEquals(booking.getDescription(), dto.getBookingResponseDto().getDescription());
+        assertEquals(booking.getAdultCount(), dto.getBookingResponseDto().getAdultCount());
+        assertEquals(booking.getChildrenCount(), dto.getBookingResponseDto().getChildrenCount());
+        assertEquals(booking.getBabiesCount(), dto.getBookingResponseDto().getBabiesCount());
+        assertEquals(booking.isPetContent(), dto.getBookingResponseDto().isPetContent());
+        assertEquals(booking.getTotalPrice(), dto.getBookingResponseDto().getTotalPrice());
+
+        assertNotNull(dto.getBookingRequestCustomerDataDto());
+        assertEquals(booking.getId(), dto.getBookingRequestCustomerDataDto().getBookingId());
+        assertEquals(customer.getFirstName(), dto.getBookingRequestCustomerDataDto().getFirstName());
+        assertEquals(customer.getLastName(), dto.getBookingRequestCustomerDataDto().getLastName());
+        assertEquals(customer.getEmail(), dto.getBookingRequestCustomerDataDto().getEmail());
+        assertEquals(customer.getPhoneNumber(), dto.getBookingRequestCustomerDataDto().getPhoneNumber());
     }
 
 }

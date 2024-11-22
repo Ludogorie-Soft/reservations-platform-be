@@ -330,11 +330,11 @@ class BookingServiceImplTest {
 
         // THEN
         assertNotNull(response);
-        assertEquals(booking.getId(), response.getBookingId());
-        assertEquals(existingCustomer.getFirstName(), response.getFirstName());
-        assertEquals(existingCustomer.getLastName(), response.getLastName());
-        assertEquals(existingCustomer.getEmail(), response.getEmail());
-        assertEquals(existingCustomer.getPhoneNumber(), response.getPhoneNumber());
+        assertEquals(booking.getId(), response.getBookingResponseDto().getId());
+        assertEquals(existingCustomer.getFirstName(), response.getBookingRequestCustomerDataDto().getFirstName());
+        assertEquals(existingCustomer.getLastName(), response.getBookingRequestCustomerDataDto().getLastName());
+        assertEquals(existingCustomer.getEmail(), response.getBookingRequestCustomerDataDto().getEmail());
+        assertEquals(existingCustomer.getPhoneNumber(), response.getBookingRequestCustomerDataDto().getPhoneNumber());
         verify(bookingRepository).save(booking);
         verify(mailService).sendConfirmationEmail(eq(existingCustomer.getEmail()), contains(CONFIRMATION_URL));
     }
@@ -359,11 +359,11 @@ class BookingServiceImplTest {
 
         // THEN
         assertNotNull(response);
-        assertEquals(booking.getId(), response.getBookingId());
-        assertEquals(newCustomer.getFirstName(), response.getFirstName());
-        assertEquals(newCustomer.getLastName(), response.getLastName());
-        assertEquals(newCustomer.getEmail(), response.getEmail());
-        assertEquals(newCustomer.getPhoneNumber(), response.getPhoneNumber());
+        assertEquals(booking.getId(), response.getBookingResponseDto().getId());
+        assertEquals(newCustomer.getFirstName(), response.getBookingRequestCustomerDataDto().getFirstName());
+        assertEquals(newCustomer.getLastName(), response.getBookingRequestCustomerDataDto().getLastName());
+        assertEquals(newCustomer.getEmail(), response.getBookingRequestCustomerDataDto().getEmail());
+        assertEquals(newCustomer.getPhoneNumber(), response.getBookingRequestCustomerDataDto().getPhoneNumber());
         verify(customerRepository).save(any(Customer.class));
         verify(bookingRepository).save(booking);
         verify(mailService).sendConfirmationEmail(eq(newCustomer.getEmail()), contains(CONFIRMATION_URL));

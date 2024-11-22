@@ -440,6 +440,8 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+
+
     private ResponseEntity<String> createUserInDb() {
         return testRestTemplate
                 .postForEntity(REGISTER_URL, registerDto, String.class);

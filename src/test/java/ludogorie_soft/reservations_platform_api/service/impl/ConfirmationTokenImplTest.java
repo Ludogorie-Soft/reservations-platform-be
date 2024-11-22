@@ -132,8 +132,8 @@ class ConfirmationTokenImplTest {
 
         // THEN
         assertNotNull(result);
-        assertEquals(booking.getId(), result.getBookingId());
-        assertEquals(customer.getFirstName(), result.getFirstName());
+        assertEquals(booking.getId(), result.getBookingResponseDto().getId());
+        assertEquals(customer.getFirstName(), result.getBookingRequestCustomerDataDto().getFirstName());
 
         verify(confirmationTokenRepository).save(confirmationToken);
     }
