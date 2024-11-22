@@ -481,45 +481,43 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-//    @Test
-//    void addCustomerDataToBooking_ShouldSucceedAndSendEmail_WhenBookingExists() throws Exception {
-//        // GIVEN: A valid booking and customer data
-//        createUserInDb();
-//        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
-//        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
-//        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
-//
-//        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
-//        booking = createBookingResponse.getBody().;
-//
-//        // WHEN: The service method is called with the valid booking data
-//        ResponseEntity<BookingResponseWithCustomerDataDto> response =
-//                testRestTemplate.exchange(
-//                        CUSTOMER_DATA_URL,
-//                        HttpMethod.POST,
-//                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
-//                        BookingResponseWithCustomerDataDto.class
-//                );
-//
-//        // THEN: Verify that the booking is updated with the customer
-//        //assertEquals(HttpStatus.OK, response.getStatusCode());
-//        Optional<Booking> updatedBooking = bookingRepository.findById(booking.getId());
-//        assertTrue(updatedBooking.isPresent());
-//        assertNotNull(updatedBooking.get().getCustomer());
-//
-//        // Verify that an email was sent using GreenMail
-//        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-//        assertEquals(1, receivedMessages.length);  // Only one email should be sent
-//        assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
-//        assertTrue(receivedMessages[0].getContent().toString().contains("Confirm Your Reservation"));
-//        assertTrue(receivedMessages[0].getContent().toString().contains("http://localhost/confirm"));
-//    }
+    @Test
+    void addCustomerDataToBooking_ShouldSucceedAndSendEmail_WhenBookingExists() throws Exception {
+        // GIVEN
+        createUserInDb();
+        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
+        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
+        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
+
+        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
+
+        // WHEN
+        ResponseEntity<BookingResponseWithCustomerDataDto> response =
+                testRestTemplate.exchange(
+                        CUSTOMER_DATA_URL,
+                        HttpMethod.POST,
+                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
+                        BookingResponseWithCustomerDataDto.class
+                );
+
+        // THEN
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Optional<Booking> updatedBooking = bookingRepository.findById(booking.getId());
+        assertTrue(updatedBooking.isPresent());
+        assertNotNull(updatedBooking.get().getCustomer());
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+        assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
+        assertTrue(receivedMessages[0].getContent().toString().contains("Confirm Your Reservation"));
+        assertTrue(receivedMessages[0].getContent().toString().contains("http://localhost/confirm"));
+    }
 
     @Test
     void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist() throws Exception {
-        // GIVEN: An invalid booking ID
+        // GIVEN:
 
-        // WHEN: The service method is called with an invalid booking ID
+        // WHEN:
         ResponseEntity<String> response =
                 testRestTemplate.exchange(
                         CUSTOMER_DATA_URL,
@@ -528,7 +526,7 @@ class BookingControllerIntegrationTest {
                         String.class
                 );
 
-        // THEN: Verify that a 404 NOT_FOUND response is returned
+        // THEN:
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().contains("Booking not found"));
     }
