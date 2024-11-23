@@ -3,6 +3,8 @@ package ludogorie_soft.reservations_platform_api.controller;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import jakarta.mail.internet.MimeMessage;
+import ludogorie_soft.reservations_platform_api.ReservationsPlatformApiApplication;
+import ludogorie_soft.reservations_platform_api.config.MailSenderTestConfig;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
@@ -52,7 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {
+    ReservationsPlatformApiApplication.class, MailSenderTestConfig.class})
 @ActiveProfiles("test")
 class BookingControllerIntegrationTest {
 
@@ -88,6 +91,7 @@ class BookingControllerIntegrationTest {
     private Customer customer;
     private BookingRequestCustomerDataDto validBookingRequestCustomerDataDto;
     private BookingRequestCustomerDataDto invalidBookingRequestCustomerDataDto;
+
     private GreenMail greenMail;
 
     @BeforeEach
@@ -118,6 +122,8 @@ class BookingControllerIntegrationTest {
             greenMail.stop();
         }
     }
+
+
 
     @Test
     void testCreateBookingSuccessfully() {
@@ -481,37 +487,36 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-//    @Test
-//    void addCustomerDataToBooking_ShouldSucceedAndSendEmail_WhenBookingExists() throws Exception {
-//        // GIVEN
-//        createUserInDb();
-//        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
-//        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
-//        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
-//
-//        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
-//
-//        // WHEN
-//        ResponseEntity<BookingResponseWithCustomerDataDto> response =
-//                testRestTemplate.exchange(
-//                        CUSTOMER_DATA_URL,
-//                        HttpMethod.POST,
-//                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
-//                        BookingResponseWithCustomerDataDto.class
-//                );
-//
-//        // THEN
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        Optional<Booking> updatedBooking = bookingRepository.findById(booking.getId());
-//        assertTrue(updatedBooking.isPresent());
-//        assertNotNull(updatedBooking.get().getCustomer());
-//
-//        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-//        assertEquals(1, receivedMessages.length);
-//        assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
-//        assertTrue(receivedMessages[0].getContent().toString().contains("Confirm Your Reservation"));
-//        assertTrue(receivedMessages[0].getContent().toString().contains("http://localhost/confirm"));
-//    }
+    @Test
+    void addCustomerDataToBooking_ShouldSucceedAndSendEmail_WhenBookingExists() throws Exception {
+        // GIVEN
+        createUserInDb();
+        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
+        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
+        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
+
+        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
+
+        // WHEN
+        ResponseEntity<BookingResponseWithCustomerDataDto> response =
+                testRestTemplate.exchange(
+                        CUSTOMER_DATA_URL,
+                        HttpMethod.POST,
+                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
+                        BookingResponseWithCustomerDataDto.class
+                );
+
+        // THEN
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Optional<Booking> updatedBooking = bookingRepository.findById(response.getBody().getBookingRequestCustomerDataDto()
+            .getBookingId());
+        assertTrue(updatedBooking.isPresent());
+        assertNotNull(updatedBooking.get().getCustomer());
+
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertEquals(1, receivedMessages.length);
+        assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
+    }
 
     @Test
     void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist() throws Exception {
