@@ -137,7 +137,6 @@ public class BookingServiceImpl implements BookingService {
                     newCustomer.setLastName(customerData.getLastName());
                     newCustomer.setEmail(customerData.getEmail());
                     newCustomer.setPhoneNumber(customerData.getPhoneNumber());
-                    newCustomer.setBooking(booking);
                     return customerRepository.save(newCustomer);
                 });
 

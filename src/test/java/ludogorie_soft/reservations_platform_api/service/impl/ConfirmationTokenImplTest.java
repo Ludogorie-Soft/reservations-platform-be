@@ -4,6 +4,11 @@ import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerD
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
+import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenAlreadyConfirmedException;
+import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.ConfirmationTokenTestHelper;
@@ -17,23 +22,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 
 import java.util.Optional;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfirmationTokenImplTest {
+class ConfirmationTokenImplTest {
 
     @Mock
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -43,9 +45,6 @@ public class ConfirmationTokenImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
-
-    @Mock
-    private ModelMapper modelMapper;
 
     @InjectMocks
     private ConfirmationTokenServiceImpl confirmationTokenService;
@@ -63,127 +62,170 @@ public class ConfirmationTokenImplTest {
 
         booking.setCustomer(customer);
         booking.setConfirmationToken(confirmationToken);
-        confirmationToken.setBooking(booking);
-        customer.setBooking(booking);
     }
 
     @Test
-    void createConfirmationToken_ShouldReturnNewToken() {
+    void testCreateConfirmationToken_Success() {
         // GIVEN
-        when(confirmationTokenRepository.save(any(ConfirmationToken.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(confirmationTokenRepository.save(any(ConfirmationToken.class))).thenReturn(confirmationToken);
 
         // WHEN
-        ConfirmationToken result = confirmationTokenService.createConfirmationToken();
+        ConfirmationToken createdToken = confirmationTokenService.createConfirmationToken();
+
+        // THEN
+        assertNotNull(createdToken);
+        assertNotNull(createdToken.getToken());
+        assertNotNull(createdToken.getCreatedAt());
+        assertNotNull(createdToken.getExpiresAt());
+        verify(confirmationTokenRepository, times(1)).save(any(ConfirmationToken.class));
+    }
+
+    @Test
+    void testResetConfirmationToken_Success() {
+        // GIVEN
+        when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
+        when(bookingRepository.findByCustomerId(customer.getId())).thenReturn(Optional.of(booking));
+
+        // WHEN
+        confirmationTokenService.resetConfirmationToken(customer.getId());
+
+        // THEN
+        assertNotNull(confirmationToken.getToken());
+        assertNotNull(confirmationToken.getCreatedAt());
+        assertNotNull(confirmationToken.getExpiresAt());
+        verify(confirmationTokenRepository, times(1)).save(confirmationToken);
+    }
+
+    @Test
+    void testResetConfirmationToken_CustomerNotFound() {
+        // GIVEN
+        when(customerRepository.findById(any())).thenReturn(Optional.empty());
+
+        // WHEN
+        // THEN
+        assertThrows(ResourceNotFoundException.class, () -> confirmationTokenService.resetConfirmationToken(customer.getId()));
+    }
+
+    @Test
+    void testResetConfirmationToken_BookingNotFound() {
+        // GIVEN
+        when(customerRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
+        when(bookingRepository.findByCustomerId(customer.getId())).thenReturn(Optional.empty());
+
+        // WHEN
+        // THEN
+        assertThrows(ResourceNotFoundException.class, () -> confirmationTokenService.resetConfirmationToken(customer.getId()));
+    }
+
+    @Test
+    void testConfirmReservation_ValidToken() {
+        // GIVEN
+        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
+                .thenReturn(Optional.of(confirmationToken));
+        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
+                .thenReturn(Optional.of(booking));
+        when(customerRepository.findById(customer.getId()))
+                .thenReturn(Optional.of(customer));
+
+        // WHEN
+        BookingResponseWithCustomerDataDto result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
 
         // THEN
         assertNotNull(result);
-        assertNotNull(result.getToken());
-        assertTrue(result.getExpiresAt().isAfter(result.getCreatedAt()));
-        verify(confirmationTokenRepository, times(1)).save(any(ConfirmationToken.class));
+        assertEquals(booking.getId(), result.getBookingResponseDto().getId());
+        assertEquals(customer.getFirstName(), result.getBookingRequestCustomerDataDto().getFirstName());
+
+        verify(confirmationTokenRepository).save(confirmationToken);
     }
 
     @Test
-    void resetConfirmationToken_ShouldUpdateToken() {
+    void testConfirmReservation_InvalidToken_NotFound() {
         // GIVEN
-        UUID customerId = customer.getId();
-        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-        when(confirmationTokenRepository.save(any(ConfirmationToken.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        String invalidToken = "non-existent-token";
+        when(confirmationTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
 
         // WHEN
-        confirmationTokenService.resetConfirmationToken(customerId);
-
         // THEN
-        verify(customerRepository, times(1)).findById(customerId);
-        verify(confirmationTokenRepository, times(1)).save(any(ConfirmationToken.class));
-        assertNotNull(customer.getBooking().getConfirmationToken().getToken());
+        assertThrows(ConfirmationTokenNotFoundException.class, () ->
+                confirmationTokenService.confirmReservation(invalidToken)
+        );
+
+        verify(confirmationTokenRepository, never()).save(any());
     }
 
     @Test
-    void resetConfirmationToken_CustomerNotFound_ShouldThrowException() {
-        // GIVEN
-        UUID customerId = UUID.randomUUID();
-        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
-
-        // WHEN
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            confirmationTokenService.resetConfirmationToken(customerId);
-        });
-
-        // THEN
-        assertEquals("Customer not found with id: " + customerId, exception.getMessage());
-        verify(customerRepository, times(1)).findById(customerId);
-        verify(confirmationTokenRepository, times(0)).save(any(ConfirmationToken.class));
-    }
-
-    @Test
-    void getToken_ShouldReturnConfirmationToken() {
-        // GIVEN
-        String token = confirmationToken.getToken();
-        when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
-
-        // WHEN
-        ConfirmationToken result = confirmationTokenService.getToken(token);
-
-        // THEN
-        assertEquals(confirmationToken, result);
-        verify(confirmationTokenRepository, times(1)).findByToken(token);
-    }
-
-    @Test
-    void getToken_TokenNotFound_ShouldThrowException() {
-        // GIVEN
-        String token = "invalid-token";
-        when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
-
-        // WHEN
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            confirmationTokenService.getToken(token);
-        });
-
-        // THEN
-        assertEquals("Token not found!", exception.getMessage());
-        verify(confirmationTokenRepository, times(1)).findByToken(token);
-    }
-
-    @Test
-    void confirmReservation_ValidToken_ShouldReturnBookingResponse() {
-        // GIVEN
-        String token = confirmationToken.getToken();
-        BookingResponseWithCustomerDataDto responseDto = new BookingResponseWithCustomerDataDto();
-        when(confirmationTokenRepository.findByToken(token)).thenReturn(Optional.of(confirmationToken));
-        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
-        when(modelMapper.map(booking, BookingResponseWithCustomerDataDto.class)).thenReturn(responseDto);
-
-        // WHEN
-        BookingResponseWithCustomerDataDto result = confirmationTokenService.confirmReservation(token);
-
-        // THEN
-        assertEquals(responseDto, result);
-        verify(confirmationTokenRepository, times(1)).findByToken(token);
-        verify(bookingRepository, times(1)).findById(booking.getId());
-        verify(confirmationTokenRepository, times(1)).save(confirmationToken);
-        assertNotNull(confirmationToken.getConfirmedAt());
-    }
-
-    @Test
-    void confirmReservation_TokenExpired_ShouldThrowException() {
+    void testConfirmReservation_InvalidToken_Expired() {
         // GIVEN
         ConfirmationToken expiredToken = ConfirmationTokenTestHelper.createExpiredConfirmationToken();
-        expiredToken.setBooking(booking);
-        when(confirmationTokenRepository.findByToken(expiredToken.getToken())).thenReturn(Optional.of(expiredToken));
-        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
+        when(confirmationTokenRepository.findByToken(expiredToken.getToken()))
+                .thenReturn(Optional.of(expiredToken));
+        when(bookingRepository.findByConfirmationTokenId(expiredToken.getId()))
+                .thenReturn(Optional.of(booking));
+        when(customerRepository.findById(booking.getCustomer().getId()))
+                .thenReturn(Optional.of(customer));
 
         // WHEN
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            confirmationTokenService.confirmReservation(expiredToken.getToken());
-        });
-
         // THEN
-        assertEquals("Token is expired or already confirmed!", exception.getMessage());
-        verify(confirmationTokenRepository, times(1)).findByToken(expiredToken.getToken());
-        verify(bookingRepository, times(1)).findById(booking.getId());
+        assertThrows(ConfirmationTokenExpiredException.class, () ->
+                confirmationTokenService.confirmReservation(expiredToken.getToken())
+        );
+
+        verify(confirmationTokenRepository, never()).save(expiredToken);
+    }
+
+    @Test
+    void testConfirmReservation_InvalidToken_AlreadyConfirmed() {
+        // GIVEN
+        confirmationToken.setConfirmedAt(confirmationToken.getCreatedAt().plusMinutes(5));
+        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
+                .thenReturn(Optional.of(confirmationToken));
+        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
+                .thenReturn(Optional.of(booking));
+        when(customerRepository.findById(booking.getCustomer().getId()))
+                .thenReturn(Optional.of(customer));
+
+        // WHEN
+        // THEN
+        assertThrows(ConfirmationTokenAlreadyConfirmedException.class, () ->
+                confirmationTokenService.confirmReservation(confirmationToken.getToken())
+        );
+
+        verify(confirmationTokenRepository, never()).save(confirmationToken);
+    }
+
+    @Test
+    void testConfirmReservation_BookingNotFound() {
+        // GIVEN
+        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
+                .thenReturn(Optional.of(confirmationToken));
+        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
+                .thenReturn(Optional.empty());
+
+        // WHEN
+        // THEN
+        assertThrows(BookingNotFoundException.class, () ->
+                confirmationTokenService.confirmReservation(confirmationToken.getToken())
+        );
+
+        verify(confirmationTokenRepository, never()).save(any());
+    }
+
+    @Test
+    void testConfirmReservation_CustomerNotFound() {
+        // GIVEN
+        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
+                .thenReturn(Optional.of(confirmationToken));
+        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
+                .thenReturn(Optional.of(booking));
+        when(customerRepository.findById(customer.getId())).thenReturn(Optional.empty());
+
+        // WHEN
+        // THEN
+        assertThrows(CustomerNotFoundException.class, () ->
+                confirmationTokenService.confirmReservation(confirmationToken.getToken())
+        );
+
+        verify(confirmationTokenRepository, never()).save(any());
     }
 
 }

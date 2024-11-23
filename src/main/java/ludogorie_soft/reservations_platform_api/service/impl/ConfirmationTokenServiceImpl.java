@@ -5,13 +5,19 @@ import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerD
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
+import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenAlreadyConfirmedException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
+import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
+import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
+import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.ConfirmationTokenRepository;
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.ConfirmationTokenService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,7 +29,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final CustomerRepository customerRepository;
     private final BookingRepository bookingRepository;
-    private final ModelMapper modelMapper;
 
     @Override
     public ConfirmationToken createConfirmationToken() {
@@ -39,8 +44,8 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     @Override
     public void resetConfirmationToken(UUID customerId) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
-
-        ConfirmationToken confirmationToken = customer.getBooking().getConfirmationToken();
+        Booking booking = bookingRepository.findByCustomerId(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        ConfirmationToken confirmationToken = booking.getConfirmationToken();
 
         confirmationToken.setToken(UUID.randomUUID().toString());
         confirmationToken.setCreatedAt(LocalDateTime.now());
@@ -50,35 +55,32 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     }
 
     @Override
-    public ConfirmationToken getToken(String token) {
-        return confirmationTokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Token not found!"));
-    }
-
-    @Override
+    @Transactional
     public BookingResponseWithCustomerDataDto confirmReservation(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Token not found!"));
-        Booking booking = bookingRepository.findById(confirmationToken.getBooking().getId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found with token: " + token));
+        Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId()).orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
+        Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(() -> new CustomerNotFoundException("Customer not found with booking: " + booking.getId()));
 
-        if (isTokenValid(confirmationToken)) {
-            confirmationToken.setConfirmedAt(LocalDateTime.now());
-            confirmationTokenRepository.save(confirmationToken);
-            return modelMapper.map(booking, BookingResponseWithCustomerDataDto.class);
+        if (isTokenNotExpired(confirmationToken)) {
+            if (isTokenNotConfirmed(confirmationToken)) {
+                confirmationToken.setConfirmedAt(LocalDateTime.now());
+                confirmationTokenRepository.save(confirmationToken);
+                return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+            } else {
+                throw new ConfirmationTokenAlreadyConfirmedException("Token is already confirmed!");
+            }
         } else {
-            throw new ResourceNotFoundException("Token is expired or already confirmed!");
+            throw new ConfirmationTokenExpiredException("Token is expired");
         }
     }
 
-    private boolean isTokenValid(ConfirmationToken confirmationToken) {
+    private boolean isTokenNotExpired(ConfirmationToken confirmationToken) {
         LocalDateTime now = LocalDateTime.now();
+        return !confirmationToken.getExpiresAt().isBefore(now);
+    }
 
-        if (confirmationToken.getExpiresAt().isBefore(now)) {
-            return false;
-        }
-        if (confirmationToken.getConfirmedAt() != null) {
-            return false;
-        }
-
-        return true;
+    private boolean isTokenNotConfirmed(ConfirmationToken confirmationToken) {
+        return confirmationToken.getConfirmedAt() == null;
     }
 
 }

@@ -11,7 +11,5 @@ public interface ConfirmationTokenService {
 
     void resetConfirmationToken(UUID customerId);
 
-    ConfirmationToken getToken(String token);
-
     BookingResponseWithCustomerDataDto confirmReservation(String token);
 }

@@ -8,18 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MailServiceImplTest {
+class MailServiceImplTest {
 
     @Mock
     private JavaMailSender mailSender;
@@ -37,12 +41,14 @@ public class MailServiceImplTest {
         confirmationUrl = "http://example.com/confirm";
 
         mimeMessage = mock(MimeMessage.class);
-
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        String fromEmail = "noreply@example.com";
+        ReflectionTestUtils.setField(mailService, "emailAddress", fromEmail);
     }
 
     @Test
-    void testSendConfirmationEmail_Success() throws MessagingException {
+    void testSendConfirmationEmail_Success() {
         // GIVEN - handled in @BeforeEach
         // WHEN
         mailService.sendConfirmationEmail(recipientEmail, confirmationUrl);
@@ -55,10 +61,19 @@ public class MailServiceImplTest {
     @Test
     void testSendConfirmationEmail_MessagingException() {
         // GIVEN
-        when(mailSender.createMimeMessage()).thenThrow(new RuntimeException("Could not send confirmation email"));
+        doAnswer(invocation -> {
+            throw new jakarta.mail.MessagingException("Mock MessagingException");
+        }).when(mailSender).send(any(MimeMessage.class));
 
         // WHEN & THEN
-        assertThrows(RuntimeException.class, () -> mailService.sendConfirmationEmail(recipientEmail, confirmationUrl));
-        verify(mailSender, never()).send(any(MimeMessage.class));
+        MailSendException exception = assertThrows(MailSendException.class, () ->
+                mailService.sendConfirmationEmail(recipientEmail, confirmationUrl)
+        );
+
+        assertEquals("Could not send confirmation email", exception.getMessage());
+        assertInstanceOf(MessagingException.class, exception.getCause());
+
+        verify(mailSender, times(1)).createMimeMessage();
+        verify(mailSender, times(1)).send(any(MimeMessage.class));
     }
 }

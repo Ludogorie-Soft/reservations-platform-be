@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
@@ -20,4 +21,8 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findBookingsByPropertyIdAndDateRange(@Param("propertyId") UUID propertyId,
                                                        @Param("startDate") Date startDate,
                                                        @Param("endDate") Date endDate);
+
+    Optional<Booking> findByCustomerId(UUID id);
+
+    Optional<Booking> findByConfirmationTokenId(Long id);
 }
