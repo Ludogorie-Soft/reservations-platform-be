@@ -12,7 +12,7 @@ public class UserTestHelper {
     private static final String TEST_NAME = "Test Name";
     private static final String TEST_USERNAME = "testUsername";
     private static final String TEST_EMAIL = "test@email.com";
-    private static final String TEST_PASSWORD = "password";
+    private static final String TEST_PASSWORD = "password1234";
     private static final String TEST_ROLE = "ROLE_OWNER";
 
     public static RegisterDto createRegisterDto() {
