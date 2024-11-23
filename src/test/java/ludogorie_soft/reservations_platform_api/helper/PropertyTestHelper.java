@@ -12,7 +12,7 @@ public class PropertyTestHelper {
 
     private static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
     private static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
-    private static final String DEFAULT_WEBSITE_URL = "www.test.com";
+    private static final String DEFAULT_WEBSITE_URL = "http://test.com";
     private static final int DEFAULT_CAPACITY = 4;
     private static final boolean DEFAULT_PET_ALLOWED = true;
     private static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";

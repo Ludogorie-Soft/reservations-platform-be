@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Lob;
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 public class PropertyRequestDto {
@@ -15,6 +16,7 @@ public class PropertyRequestDto {
     private String ownerEmail;
 
     @NotBlank(message = "Website URL is required")
+    @URL
     private String websiteUrl;
 
     @NotNull(message = "Capacity is required")
