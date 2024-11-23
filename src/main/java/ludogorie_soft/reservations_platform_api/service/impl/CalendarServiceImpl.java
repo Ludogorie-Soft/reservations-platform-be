@@ -70,11 +70,8 @@ public class CalendarServiceImpl implements CalendarService {
                     booking.getDescription()
             );
 
-            vEvent.getProperties().add(new Uid(booking.getUid()));
+            vEvent.getProperties().add(new Uid(String.valueOf(booking.getId())));
             calendar.getComponents().add(vEvent);
-
-            booking.setUid(vEvent.getUid().getValue());
-            bookingRepository.save(booking);
         });
 
         createDirectoryIfNotExists(icsMyCalDirectory);
@@ -116,31 +113,27 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public boolean syncForAvailableDates(String filePath, Date startDateRequest, Date endDateRequest) {
+    public boolean syncForAvailableDates(String filePath, Date startDateRequest, Date endDateRequest) throws IOException, ParserException {
 
         File file = new File(filePath);
         if (!file.exists()) {
             return true;
         }
 
-        try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
+        FileInputStream fileInputStream = new FileInputStream(filePath);
 
-            CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendar = builder.build(fileInputStream);
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendar = builder.build(fileInputStream);
 
-            for (CalendarComponent component : calendar.getComponents()) {
-                if (component instanceof VEvent) {
-                    VEvent vEvent = (VEvent) component;
+        for (CalendarComponent component : calendar.getComponents()) {
+            if (component instanceof VEvent) {
+                VEvent vEvent = (VEvent) component;
 
-                    if (startDateRequest.before(vEvent.getEndDate().getDate())
-                            && endDateRequest.after(vEvent.getStartDate().getDate())) {
-                        return false;
-                    }
+                if (startDateRequest.before(vEvent.getEndDate().getDate())
+                        && endDateRequest.after(vEvent.getStartDate().getDate())) {
+                    return false;
                 }
             }
-        } catch (Exception e) {
-            throw new APIException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
         return true;
     }
@@ -150,25 +143,18 @@ public class CalendarServiceImpl implements CalendarService {
 
         String filename = getMyCalendar(propertyId);
 
-        try {
-
-            File file = new File(icsMyCalDirectory + File.separator + filename);
-
-            if (file.exists()) {
-                FileSystemResource resource = new FileSystemResource(file);
-                HttpHeaders headers = new HttpHeaders();
-                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
-
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        File file = new File(icsMyCalDirectory + File.separator + filename);
+        if (!file.exists()) {
+            throw new APIException(HttpStatus.NOT_FOUND, "Calendar not found!");
         }
+
+        FileSystemResource resource = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
 
     @Override
@@ -176,25 +162,18 @@ public class CalendarServiceImpl implements CalendarService {
 
         String filename = "airBnbCalendar-" + propertyId + ".ics";
 
-        try {
-
-            File file = new File(icsAirBnbDirectory + File.separator + filename);
-
-            if (file.exists()) {
-                FileSystemResource resource = new FileSystemResource(file);
-                HttpHeaders headers = new HttpHeaders();
-                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
-
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        File file = new File(icsAirBnbDirectory + File.separator + filename);
+        if (!file.exists()) {
+            throw new APIException(HttpStatus.NOT_FOUND, "AirBnb Calendar not found!");
         }
+
+        FileSystemResource resource = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
 
     private Property getProperty(UUID propertyId) {

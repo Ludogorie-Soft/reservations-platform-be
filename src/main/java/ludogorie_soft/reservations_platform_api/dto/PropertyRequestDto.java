@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Data
@@ -28,4 +29,8 @@ public class PropertyRequestDto {
     @NotNull(message = "Price is required")
     @Min(value = 0, message = "Price must be positive")
     private int price;
+    private int minimumStay;
+    private int petPrice;
+    @Lob
+    private String propertyRules;
 }

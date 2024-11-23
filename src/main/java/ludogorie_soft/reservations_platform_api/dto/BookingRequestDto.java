@@ -9,8 +9,11 @@ import java.util.UUID;
 public class BookingRequestDto {
 
     private UUID propertyId;
-    private String email;
     private Date startDate;
     private Date endDate;
     private String description;
+    int adultCount;
+    int childrenCount;
+    int babiesCount;
+    boolean petContent;
 }
