@@ -27,13 +27,13 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
         String loginResponse = userService.login(loginDto);
 
         if ("Login successful".equals(loginResponse)) {
             return ResponseEntity.ok(loginResponse);
         } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: Invalid username or password.");
         }
     }
 }
