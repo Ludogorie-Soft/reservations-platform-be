@@ -3,6 +3,8 @@ package ludogorie_soft.reservations_platform_api.controller;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import jakarta.mail.internet.MimeMessage;
+import ludogorie_soft.reservations_platform_api.ReservationsPlatformApiApplication;
+import ludogorie_soft.reservations_platform_api.config.MailSenderTestConfig;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
@@ -52,7 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {
+    ReservationsPlatformApiApplication.class, MailSenderTestConfig.class})
 @ActiveProfiles("test")
 class BookingControllerIntegrationTest {
 
