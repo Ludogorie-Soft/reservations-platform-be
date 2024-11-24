@@ -6,7 +6,6 @@ import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
-import ludogorie_soft.reservations_platform_api.service.ConfirmationTokenService;
 import net.fortuna.ical4j.data.ParserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,6 @@ import java.util.UUID;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final ConfirmationTokenService confirmationTokenService;
 
     @PostMapping
     ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
@@ -42,18 +40,6 @@ public class BookingController {
     ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping("/confirm/{token}")
-    ResponseEntity<BookingResponseWithCustomerDataDto> confirmReservation(@PathVariable String token) {
-        BookingResponseWithCustomerDataDto response = confirmationTokenService.confirmReservation(token);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping("/resend-confirmation/{customerId}")
-    ResponseEntity<String> resendConfirmation(@PathVariable UUID customerId) {
-        confirmationTokenService.resetConfirmationToken(customerId);
-        return ResponseEntity.ok("Confirmation link resent!");
     }
 
     @PutMapping("/{id}")

@@ -83,7 +83,6 @@ class BookingControllerIntegrationTest {
     private BookingRequestDto bookingRequestDto;
     private PropertyRequestDto propertyRequestDto;
     private HttpHeaders headers;
-    private Booking booking;
     private ConfirmationToken confirmationToken;
     private Customer customer;
     private BookingRequestCustomerDataDto validBookingRequestCustomerDataDto;
@@ -95,14 +94,13 @@ class BookingControllerIntegrationTest {
         registerDto = UserTestHelper.createRegisterDto();
         bookingRequestDto = BookingTestHelper.createBookingRequest();
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
-        booking = BookingTestHelper.createBooking();
         confirmationToken = ConfirmationTokenTestHelper.createConfirmationToken();
         customer = CustomerTestHelper.createCustomer();
 
-        validBookingRequestCustomerDataDto = BookingTestHelper.createBookingRequestWithCustomerData(booking, customer);
+        validBookingRequestCustomerDataDto = BookingTestHelper.createBookingRequestWithCustomerDataWithoutBooking(customer);
         invalidBookingRequestCustomerDataDto = BookingTestHelper.createBookingRequestWithInvalidBookingId();
 
-        greenMail = new GreenMail(new ServerSetup(3025, "localhost", "smtp"));
+        greenMail = new GreenMail();
         greenMail.start();
     }
 
@@ -502,15 +500,14 @@ class BookingControllerIntegrationTest {
 //
 //        // THEN
 //        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        Optional<Booking> updatedBooking = bookingRepository.findById(booking.getId());
+//        Optional<Booking> updatedBooking = bookingRepository.findById(Objects.requireNonNull(response.getBody()).getBookingRequestCustomerDataDto()
+//                .getBookingId());
 //        assertTrue(updatedBooking.isPresent());
 //        assertNotNull(updatedBooking.get().getCustomer());
 //
 //        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
 //        assertEquals(1, receivedMessages.length);
 //        assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
-//        assertTrue(receivedMessages[0].getContent().toString().contains("Confirm Your Reservation"));
-//        assertTrue(receivedMessages[0].getContent().toString().contains("http://localhost/confirm"));
 //    }
 
     @Test

@@ -27,9 +27,29 @@ public class ConfirmationTokenTestHelper {
         return confirmationToken;
     }
 
+    public static ConfirmationToken createConfirmationTokenForIntegrationTest() {
+        ConfirmationToken confirmationToken = new ConfirmationToken();
+
+        confirmationToken.setToken(TOKEN);
+        confirmationToken.setCreatedAt(CREATED_AT);
+        confirmationToken.setExpiresAt(EXPIRES_AT);
+
+        return confirmationToken;
+    }
+
     public static ConfirmationToken createExpiredConfirmationToken() {
-        ConfirmationToken confirmationToken = createConfirmationToken();
+        ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setId(EXPIRED_TOKEN_ID);
+        confirmationToken.setToken(EXPIRED_TOKEN);
+        confirmationToken.setCreatedAt(EXPIRED_CREATED_AT);
+        confirmationToken.setExpiresAt(EXPIRED_EXPIRES_AT);
+
+        return confirmationToken;
+    }
+
+    public static ConfirmationToken createExpiredConfirmationTokenForIntegrationTest() {
+        ConfirmationToken confirmationToken = new ConfirmationToken();
+
         confirmationToken.setToken(EXPIRED_TOKEN);
         confirmationToken.setCreatedAt(EXPIRED_CREATED_AT);
         confirmationToken.setExpiresAt(EXPIRED_EXPIRES_AT);

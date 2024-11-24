@@ -14,6 +14,13 @@ public class UserTestHelper {
     private static final String TEST_EMAIL = "test@email.com";
     private static final String TEST_PASSWORD = "password";
     private static final String TEST_ROLE = "ROLE_OWNER";
+    private static final String INTEGRATION_TEST_ROLE = "ROLE_TEST";
+
+    private static final String EXPIRED_TEST_NAME = "Expired Test Name";
+    private static final String EXPIRED_TEST_USERNAME = "expiredTestUsername";
+    private static final String EXPIRED_TEST_EMAIL = "expiredtest@email.com";
+    private static final String EXPIRED_TEST_PASSWORD = "expiredpassword";
+    private static final String EXPIRED_INTEGRATION_TEST_ROLE = "ROLE_EXPIRED";
 
     public static RegisterDto createRegisterDto() {
         RegisterDto registerDto = new RegisterDto();
@@ -39,6 +46,18 @@ public class UserTestHelper {
         return role;
     }
 
+    public static Role createRoleForIntegrationTest() {
+        Role role = new Role();
+        role.setName(INTEGRATION_TEST_ROLE);
+        return role;
+    }
+
+    public static Role createExpiredRoleForIntegrationTest() {
+        Role role = new Role();
+        role.setName(EXPIRED_INTEGRATION_TEST_ROLE);
+        return role;
+    }
+
     public static User createTestUser() {
         User user = new User();
         user.setName(TEST_NAME);
@@ -47,6 +66,31 @@ public class UserTestHelper {
         user.setId(1L);
         user.setPassword(TEST_PASSWORD);
         user.setRoles(Set.of(createTestRole()));
+
+        return user;
+    }
+
+    public static User createUserForIntegrationTest() {
+        User user = new User();
+
+        user.setName(TEST_NAME);
+        user.setUsername(TEST_USERNAME);
+        user.setEmail(TEST_EMAIL);
+        user.setPassword(TEST_PASSWORD);
+        user.setRoles(Set.of(createRoleForIntegrationTest()));
+
+        return user;
+    }
+
+    public static User createExpiredUserForIntegrationTest() {
+        User user = new User();
+
+        user.setName(EXPIRED_TEST_NAME);
+        user.setUsername(EXPIRED_TEST_USERNAME);
+        user.setEmail(EXPIRED_TEST_EMAIL);
+        user.setPassword(EXPIRED_TEST_PASSWORD);
+        user.setRoles(Set.of(createExpiredRoleForIntegrationTest()));
+
         return user;
     }
 }
