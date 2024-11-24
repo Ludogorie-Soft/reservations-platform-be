@@ -23,6 +23,7 @@ public class PropertyTestHelper {
     private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
     private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
     private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
+    private static final String UPDATED_OWNER_EMAIL = "updated_mail@mail.com";
     private static final int UPDATED_CAPACITY = 6;
     private static final boolean UPDATED_PET_ALLOWED = false;
     private static final String UPDATED_PET_RULES = "No pets";
@@ -76,6 +77,7 @@ public class PropertyTestHelper {
     public static PropertyRequestDto createUpdatedPropertyRequestDto() {
         PropertyRequestDto requestDto = new PropertyRequestDto();
         requestDto.setWebsiteUrl(UPDATED_WEBSITE_URL);
+        requestDto.setOwnerEmail(UPDATED_OWNER_EMAIL);
         requestDto.setCapacity(UPDATED_CAPACITY);
         requestDto.setPetAllowed(UPDATED_PET_ALLOWED);
         requestDto.setPetRules(UPDATED_PET_RULES);

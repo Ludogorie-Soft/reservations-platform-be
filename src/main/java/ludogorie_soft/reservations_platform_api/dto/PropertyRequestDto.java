@@ -25,7 +25,6 @@ public class PropertyRequestDto {
 
     private boolean isPetAllowed;
 
-    @NotBlank(message = "Pet rules are required if pets are allowed")
     private String petRules;
 
     @NotNull(message = "Price is required")

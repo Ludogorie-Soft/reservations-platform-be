@@ -33,7 +33,7 @@ public class AuthController {
         if ("Login successful".equals(loginResponse)) {
             return ResponseEntity.ok(loginResponse);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: Invalid username or password.");
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
 }
