@@ -9,7 +9,6 @@ import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.ConfirmationTokenTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.CustomerTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
-import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.ConfirmationTokenRepository;
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
@@ -17,14 +16,12 @@ import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles({"test"})
-@TestPropertySource(properties = {
-        "spring.liquibase.enabled=false"
-})
 class ConfirmationTokenControllerIntegrationTest {
 
     @Autowired
@@ -78,15 +72,12 @@ class ConfirmationTokenControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+
         if (!useSetup) {
             return;
         }
 
-        user = UserTestHelper.createUserForIntegrationTest();
-        userRepository.save(user);
-
         property = PropertyTestHelper.createPropertyForIntegrationTest();
-        property.setOwner(user);
         propertyRepository.save(property);
 
         customer = CustomerTestHelper.createCustomerForIntegrationTest();
@@ -106,7 +97,6 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should confirm reservation with valid token")
     void confirmReservation_ShouldReturnBookingResponseWithCustomerData_WhenTokenIsValid() throws Exception {
         mockMvc.perform(get("/api/confirmation-tokens/confirm/{token}", confirmationToken.getToken())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -119,15 +109,10 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should return 400 BAD REQUEST when token is expired")
     void confirmReservation_ShouldReturnBadRequest_WhenTokenIsExpired() throws Exception {
         useSetup = false;
 
-        User expiredUser = UserTestHelper.createExpiredUserForIntegrationTest();
-        userRepository.save(expiredUser);
-
         Property expiredProperty = PropertyTestHelper.createExpiredPropertyForIntegrationTest();
-        expiredProperty.setOwner(expiredUser);
         propertyRepository.save(expiredProperty);
 
         ConfirmationToken expiredToken = ConfirmationTokenTestHelper.createExpiredConfirmationTokenForIntegrationTest();
@@ -151,7 +136,6 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should return 404 NOT FOUND when token is invalid")
     void confirmReservation_ShouldReturnNotFound_WhenTokenIsInvalid() throws Exception {
         mockMvc.perform(get("/api/confirmation-tokens/confirm/{token}", "invalid-token")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -160,7 +144,6 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should resend confirmation link for valid customer")
     void resendConfirmation_ShouldReturnSuccessMessage_WhenCustomerExists() throws Exception {
         mockMvc.perform(post("/api/confirmation-tokens/resend-confirmation/{customerId}", customerId)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -169,7 +152,6 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should return 404 NOT FOUND when customer does not exist")
     void resendConfirmation_ShouldReturnNotFound_WhenCustomerDoesNotExist() throws Exception {
         UUID invalidCustomerId = UUID.randomUUID();
         mockMvc.perform(post("/api/confirmation-tokens/resend-confirmation/{customerId}", invalidCustomerId)
