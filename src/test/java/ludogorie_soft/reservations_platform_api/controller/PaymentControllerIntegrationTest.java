@@ -78,10 +78,11 @@ class PaymentControllerIntegrationTest {
         System.out.println("id " + bookingId);
         System.out.println("url " + url);
 
-        Map<String, String> mockResponse = new HashMap<>();
+        Map<String, Object> mockResponse = new HashMap<>();
         mockResponse.put("paymentIntentId", "pi_test123");
         mockResponse.put("clientSecret", "secret_test123");
-        when(paymentService.createPaymentIntent(Mockito.any(String.class)));
+        when(paymentService.createPaymentIntent(Mockito.any(String.class)))
+                .thenReturn(mockResponse);
         ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
        // ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
