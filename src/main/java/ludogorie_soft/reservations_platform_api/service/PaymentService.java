@@ -3,5 +3,5 @@ import java.util.Map;
 public interface PaymentService {
     Map<String, Object> createPaymentIntent(String itemId);
 
-    Map<String, Object> confirmPayment(String paymentIntentId);
+//    Map<String, Object> confirmPayment(String paymentIntentId);
 }
