@@ -2,6 +2,7 @@ package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWrapper;
 import ludogorie_soft.reservations_platform_api.service.ConfirmationTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,12 @@ public class ConfirmationTokenController {
 
     @GetMapping("/confirm/{token}")
     ResponseEntity<BookingResponseWithCustomerDataDto> confirmReservation(@PathVariable String token) {
-        BookingResponseWithCustomerDataDto response = confirmationTokenService.confirmReservation(token);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        BookingResponseWrapper responseWrapper  = confirmationTokenService.confirmReservation(token);
+        if (responseWrapper.isAlreadyConfirmed()) {
+            return new ResponseEntity<>(responseWrapper.getBookingResponseWithCustomerData(), HttpStatus.ALREADY_REPORTED);
+        } else {
+            return new ResponseEntity<>(responseWrapper.getBookingResponseWithCustomerData(), HttpStatus.OK);
+        }
     }
 
     @PostMapping("/resend-confirmation/{customerId}")

@@ -2,6 +2,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWrapper;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
@@ -43,8 +44,10 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
     @Override
     public void resetConfirmationToken(UUID customerId) {
-        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
-        Booking booking = bookingRepository.findByCustomerId(customer.getId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
+        Booking booking = bookingRepository.findByCustomerId(customer.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
         ConfirmationToken confirmationToken = booking.getConfirmationToken();
 
         confirmationToken.setToken(UUID.randomUUID().toString());
@@ -56,18 +59,26 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
 
     @Override
     @Transactional
-    public BookingResponseWithCustomerDataDto confirmReservation(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found with token: " + token));
-        Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId()).orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
-        Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(() -> new CustomerNotFoundException("Customer not found with booking: " + booking.getId()));
+    public BookingResponseWrapper  confirmReservation(String token) {
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found with token: " + token));
+        Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId())
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
+        Customer customer = customerRepository.findById(booking.getCustomer().getId())
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with booking: " + booking.getId()));
 
         if (isTokenNotExpired(confirmationToken)) {
             if (isTokenNotConfirmed(confirmationToken)) {
                 confirmationToken.setConfirmedAt(LocalDateTime.now());
                 confirmationTokenRepository.save(confirmationToken);
-                return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+                return new BookingResponseWrapper(BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer),
+                        false
+                );
             } else {
-                throw new ConfirmationTokenAlreadyConfirmedException("Token is already confirmed!");
+                return new BookingResponseWrapper(
+                        BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer),
+                        true
+                );
             }
         } else {
             throw new ConfirmationTokenExpiredException("Token is expired");

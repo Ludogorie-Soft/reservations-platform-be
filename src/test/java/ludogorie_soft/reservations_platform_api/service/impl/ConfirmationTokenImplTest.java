@@ -1,13 +1,13 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWrapper;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
 import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
-import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenAlreadyConfirmedException;
 import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
@@ -26,8 +26,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -128,12 +130,15 @@ class ConfirmationTokenImplTest {
                 .thenReturn(Optional.of(customer));
 
         // WHEN
-        BookingResponseWithCustomerDataDto result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
+        BookingResponseWrapper result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
 
         // THEN
         assertNotNull(result);
-        assertEquals(booking.getId(), result.getBookingResponseDto().getId());
-        assertEquals(customer.getFirstName(), result.getBookingRequestCustomerDataDto().getFirstName());
+        assertNotNull(result.getBookingResponseWithCustomerData());
+        assertFalse(result.isAlreadyConfirmed());
+
+        assertEquals(booking.getId(), result.getBookingResponseWithCustomerData().getBookingResponseDto().getId());
+        assertEquals(customer.getFirstName(), result.getBookingResponseWithCustomerData().getBookingRequestCustomerDataDto().getFirstName());
 
         verify(confirmationTokenRepository).save(confirmationToken);
     }
@@ -185,10 +190,16 @@ class ConfirmationTokenImplTest {
                 .thenReturn(Optional.of(customer));
 
         // WHEN
+        BookingResponseWrapper result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
+
         // THEN
-        assertThrows(ConfirmationTokenAlreadyConfirmedException.class, () ->
-                confirmationTokenService.confirmReservation(confirmationToken.getToken())
-        );
+        assertNotNull(result);
+        assertNotNull(result.getBookingResponseWithCustomerData());
+        assertTrue(result.isAlreadyConfirmed());
+
+        BookingResponseWithCustomerDataDto bookingResponse = result.getBookingResponseWithCustomerData();
+        assertEquals(booking.getId(), bookingResponse.getBookingResponseDto().getId());
+        assertEquals(customer.getFirstName(), bookingResponse.getBookingRequestCustomerDataDto().getFirstName());
 
         verify(confirmationTokenRepository, never()).save(confirmationToken);
     }

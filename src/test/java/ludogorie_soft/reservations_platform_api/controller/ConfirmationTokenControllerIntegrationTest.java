@@ -136,6 +136,21 @@ class ConfirmationTokenControllerIntegrationTest {
     }
 
     @Test
+    void confirmReservation_ShouldReturnAlreadyReported_WhenTokenIsAlreadyConfirmed() throws Exception {
+        confirmationToken.setConfirmedAt(confirmationToken.getCreatedAt().plusMinutes(5));
+        confirmationTokenRepository.save(confirmationToken);
+
+        mockMvc.perform(get("/api/confirmation-tokens/confirm/{token}", confirmationToken.getToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isAlreadyReported())
+                .andExpect(jsonPath("$.bookingResponseDto.id").value(booking.getId().toString()))
+                .andExpect(jsonPath("$.bookingRequestCustomerDataDto.firstName").value(booking.getCustomer().getFirstName()))
+                .andExpect(jsonPath("$.bookingRequestCustomerDataDto.lastName").value(booking.getCustomer().getLastName()))
+                .andExpect(jsonPath("$.bookingRequestCustomerDataDto.email").value(booking.getCustomer().getEmail()))
+                .andExpect(jsonPath("$.bookingRequestCustomerDataDto.phoneNumber").value(booking.getCustomer().getPhoneNumber()));
+    }
+
+    @Test
     void confirmReservation_ShouldReturnNotFound_WhenTokenIsInvalid() throws Exception {
         mockMvc.perform(get("/api/confirmation-tokens/confirm/{token}", "invalid-token")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -160,4 +175,6 @@ class ConfirmationTokenControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Customer not found with id: " + invalidCustomerId));
 
     }
+
+
 }
