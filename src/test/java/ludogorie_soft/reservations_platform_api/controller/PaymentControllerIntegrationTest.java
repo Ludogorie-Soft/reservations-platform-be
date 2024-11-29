@@ -120,6 +120,22 @@ class PaymentControllerIntegrationTest {
         //THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+    @Test
+    void createPaymentIntent_ShouldReturnNotFound_WhenInvalidBookingIdProvided() {
+        // GIVEN
+        UUID invalidBookingId = UUID.randomUUID();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        // WHEN
+        ResponseEntity<Map> response = testRestTemplate.postForEntity(
+                BASE_PAYMENT_URL + invalidBookingId, request, Map.class);
+
+        // THEN
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "Response body should not be null");
+        assertTrue(response.getBody().containsKey("message"));
+        assertEquals("Booking with id + " + invalidBookingId + " not found!", response.getBody().get("message"));
+    }
 
     private ResponseEntity<BookingResponseDto> createBookingInDb() {
         return testRestTemplate
