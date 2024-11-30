@@ -24,5 +24,5 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     Optional<Booking> findByCustomerId(UUID id);
 
-    Optional<Booking> findByConfirmationTokenId(Long id);
+    Optional<Booking> findByConfirmationTokenId(UUID id);
 }

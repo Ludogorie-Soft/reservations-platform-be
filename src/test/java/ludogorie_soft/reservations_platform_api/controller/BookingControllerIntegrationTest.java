@@ -508,7 +508,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist() throws Exception {
+    void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist()  {
         // GIVEN:
 
         // WHEN:
