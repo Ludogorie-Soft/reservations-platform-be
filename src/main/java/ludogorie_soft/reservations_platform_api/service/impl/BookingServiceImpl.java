@@ -20,7 +20,6 @@ import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
 import net.fortuna.ical4j.data.ParserException;
-import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -140,9 +139,6 @@ public class BookingServiceImpl implements BookingService {
                     newCustomer.setPhoneNumber(customerData.getPhoneNumber());
                     return customerRepository.save(newCustomer);
                 });
-
-//        Hibernate.initialize(booking.getProperty());
-//        Hibernate.initialize(booking.getCustomer());
 
         ConfirmationToken confirmationToken = confirmationTokenService.createConfirmationToken();
 

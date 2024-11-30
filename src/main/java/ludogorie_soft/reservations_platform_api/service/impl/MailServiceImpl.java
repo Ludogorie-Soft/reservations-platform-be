@@ -1,6 +1,5 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import ludogorie_soft.reservations_platform_api.service.MailService;
@@ -32,9 +31,7 @@ public class MailServiceImpl implements MailService {
 
             helper.setTo(recipientEmail);
             helper.setSubject("Confirm Your Reservation");
-            helper.setText("<html><body><p>Thank you for your reservation!</p>" +
-                    "<p>Please confirm it by clicking the link below:</p>" +
-                    "<p><a href='" + confirmationUrl + "'>Confirm Reservation</a></p></body></html>", true);
+            helper.setText("<html><body><p>Thank you for your reservation!</p>" + "<p>Please confirm it by clicking the link below:</p>" + "<p><a href='" + confirmationUrl + "'>Confirm Reservation</a></p></body></html>", true);
             helper.setFrom(emailAddress);
 
             mailSender.send(message);
