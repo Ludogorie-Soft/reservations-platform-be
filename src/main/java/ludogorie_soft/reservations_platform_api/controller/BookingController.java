@@ -1,8 +1,10 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.RequiredArgsConstructor;
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import net.fortuna.ical4j.data.ParserException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -31,6 +34,12 @@ public class BookingController {
     ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/customer-data")
+    ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
+        BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

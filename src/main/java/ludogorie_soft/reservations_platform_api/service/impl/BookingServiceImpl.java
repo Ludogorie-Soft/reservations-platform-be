@@ -1,23 +1,29 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.entity.ConfirmationToken;
+import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
+import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
+import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.CalendarService;
 import ludogorie_soft.reservations_platform_api.service.PropertyService;
-import ludogorie_soft.reservations_platform_api.service.UserService;
 import net.fortuna.ical4j.data.ParserException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +42,14 @@ public class BookingServiceImpl implements BookingService {
     private final ModelMapper modelMapper;
     private final PropertyService propertyService;
     private final CalendarService calendarService;
+    private final CustomerRepository customerRepository;
+    private final ConfirmationTokenServiceImpl confirmationTokenService;
+    private final MailServiceImpl mailService;
 
     @Value("${booking.ics.airBnb.directory}")
     private String icsAirBnbDirectory;
+    @Value("${confirmation.url}")
+    private String confirmationUrl;
 
     @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws ParserException, IOException {
@@ -115,6 +126,31 @@ public class BookingServiceImpl implements BookingService {
         return modelMapper.map(booking, BookingResponseDto.class);
     }
 
+    @Override
+    @Transactional
+    public BookingResponseWithCustomerDataDto addCustomerDataToBooking(BookingRequestCustomerDataDto customerData) {
+        Booking booking = bookingRepository.findById(customerData.getBookingId()).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+        Customer customer = customerRepository.findByFirstNameAndLastNameAndEmailAndPhoneNumber(customerData.getFirstName(), customerData.getLastName(),customerData.getEmail(), customerData.getPhoneNumber()).orElseGet(() -> {
+                    Customer newCustomer = new Customer();
+                    newCustomer.setFirstName(customerData.getFirstName());
+                    newCustomer.setLastName(customerData.getLastName());
+                    newCustomer.setEmail(customerData.getEmail());
+                    newCustomer.setPhoneNumber(customerData.getPhoneNumber());
+                    return customerRepository.save(newCustomer);
+                });
+
+        ConfirmationToken confirmationToken = confirmationTokenService.createConfirmationToken();
+
+        booking.setConfirmationToken(confirmationToken);
+        booking.setCustomer(customer);
+        bookingRepository.save(booking);
+        mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
+
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+    }
+
+
     private Booking createBookingModel(BookingRequestDto bookingRequestDto, Property property) {
         Booking booking = new Booking();
         setBookingFields(bookingRequestDto, property, booking);
@@ -177,5 +213,9 @@ public class BookingServiceImpl implements BookingService {
 
     private static boolean checkStartDateAndEndDateAreChangedByEdit(Booking booking, BookingRequestDto request) {
         return request.getStartDate().equals(booking.getStartDate()) && request.getEndDate().equals(booking.getEndDate());
+    }
+
+    private String generateConfirmationLink(ConfirmationToken confirmationToken) {
+        return confirmationUrl + confirmationToken.getToken();
     }
 }

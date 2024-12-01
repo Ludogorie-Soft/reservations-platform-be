@@ -5,6 +5,7 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +53,13 @@ class PropertyControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        savedProperty = PropertyTestHelper.createDefaultProperty();
-        savedUser = userRepository.save(savedProperty.getOwner());
+        savedUser = UserTestHelper.createUserForIntegrationTest();
+        userRepository.save(savedUser);
+
+        savedProperty = PropertyTestHelper.createPropertyForIntegrationTest();
         savedProperty.setOwner(savedUser);
-        savedProperty = propertyRepository.save(savedProperty);
+        propertyRepository.save(savedProperty);
+
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
     }
 

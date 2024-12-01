@@ -15,6 +15,7 @@ public class UserTestHelper {
     private static final String TEST_PASSWORD = "password1234";
     private static final String TEST_ROLE = "ROLE_OWNER";
 
+
     public static RegisterDto createRegisterDto() {
         RegisterDto registerDto = new RegisterDto();
         registerDto.setName(TEST_NAME);
@@ -47,6 +48,18 @@ public class UserTestHelper {
         user.setId(1L);
         user.setPassword(TEST_PASSWORD);
         user.setRoles(Set.of(createTestRole()));
+
+        return user;
+    }
+
+    public static User createUserForIntegrationTest() {
+        User user = new User();
+
+        user.setName(TEST_NAME);
+        user.setUsername(TEST_USERNAME);
+        user.setEmail(TEST_EMAIL);
+        user.setPassword(TEST_PASSWORD);
+
         return user;
     }
 }

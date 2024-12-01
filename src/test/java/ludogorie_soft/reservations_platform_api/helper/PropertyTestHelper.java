@@ -47,6 +47,36 @@ public class PropertyTestHelper {
         return property;
     }
 
+    public static Property createPropertyForIntegrationTest(){
+        Property property = new Property();
+
+        property.setWebsiteUrl(DEFAULT_WEBSITE_URL);
+        property.setCapacity(DEFAULT_CAPACITY);
+        property.setPetAllowed(DEFAULT_PET_ALLOWED);
+        property.setPetRules(DEFAULT_PET_RULES);
+        property.setPrice(DEFAULT_PRICE);
+        property.setMinimumStay(DEFAULT_MINIMUM_STAY);
+        property.setPetPrice(DEFAULT_PET_PRICE);
+        property.setPropertyRules(DEFAULT_PROPERTY_RULES);
+
+        return property;
+    }
+
+    public static Property createExpiredPropertyForIntegrationTest() {
+        Property property = new Property();
+
+        property.setWebsiteUrl(UPDATED_WEBSITE_URL);
+        property.setCapacity(UPDATED_CAPACITY);
+        property.setPetAllowed(UPDATED_PET_ALLOWED);
+        property.setPetRules(UPDATED_PET_RULES);
+        property.setPrice(UPDATED_PRICE);
+        property.setMinimumStay(UPDATED_MINIMUM_STAY);
+        property.setPetPrice(UPDATED_PET_PRICE);
+        property.setPropertyRules(UPDATED_PROPERTY_RULES);
+
+        return property;
+    }
+
     public static PropertyRequestDto createDefaultPropertyRequestDto() {
         PropertyRequestDto dto = new PropertyRequestDto();
         dto.setOwnerEmail(DEFAULT_USER_EMAIL);
@@ -115,4 +145,6 @@ public class PropertyTestHelper {
         response.setPropertyRules(updatedProperty.getPropertyRules());
         return response;
     }
+
+
 }
