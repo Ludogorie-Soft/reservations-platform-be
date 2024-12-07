@@ -1,5 +1,6 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingRequestDto;
@@ -31,13 +32,13 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
+    ResponseEntity<BookingResponseDto> createBooking(@Valid @RequestBody BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException {
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/customer-data")
-    ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
+    ResponseEntity<BookingResponseWithCustomerDataDto> addCustomerDataToBooking(@Valid @RequestBody BookingRequestCustomerDataDto bookingRequestCustomerDataDto) {
         BookingResponseWithCustomerDataDto response = bookingService.addCustomerDataToBooking(bookingRequestCustomerDataDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
