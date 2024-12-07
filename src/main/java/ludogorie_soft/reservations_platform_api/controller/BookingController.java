@@ -44,7 +44,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<BookingResponseDto> editBooking(@PathVariable("id") UUID id, @RequestBody BookingRequestDto bookingRequestDto) throws ParserException, IOException {
+    ResponseEntity<BookingResponseDto> editBooking(@Valid @PathVariable("id") UUID id, @RequestBody BookingRequestDto bookingRequestDto) throws ParserException, IOException {
         BookingResponseDto response = bookingService.editBooking(id, bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
