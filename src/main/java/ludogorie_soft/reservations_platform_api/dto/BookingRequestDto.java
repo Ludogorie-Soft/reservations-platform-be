@@ -1,8 +1,5 @@
 package ludogorie_soft.reservations_platform_api.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,11 +15,9 @@ public class BookingRequestDto {
     private UUID propertyId;
 
     @NotNull(message = "Start date cannot be null")
-    //@FutureOrPresent(message = "Start date must be in the present or future")
     private Date startDate;
 
     @NotNull(message = "End date cannot be null")
-    //@Future(message = "End date must be in the future")
     private Date endDate;
 
     @NotNull(message = "Description cannot be null")
