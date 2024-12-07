@@ -18,11 +18,11 @@ public class BookingRequestDto {
     private UUID propertyId;
 
     @NotNull(message = "Start date cannot be null")
-    @FutureOrPresent(message = "Start date must be in the present or future")
+    //@FutureOrPresent(message = "Start date must be in the present or future")
     private Date startDate;
 
     @NotNull(message = "End date cannot be null")
-    @Future(message = "End date must be in the future")
+    //@Future(message = "End date must be in the future")
     private Date endDate;
 
     @NotNull(message = "Description cannot be null")
