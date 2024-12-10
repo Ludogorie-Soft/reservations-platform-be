@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class CustomUserDetailsServiceTest {
 
     private static final String TEST_EMAIL = "test@email.com";
-    private static final String TEST_PASSWORD = "password";
+    private static final String TEST_PASSWORD = "password1234";
 
     @Mock
     private UserRepository userRepository;
