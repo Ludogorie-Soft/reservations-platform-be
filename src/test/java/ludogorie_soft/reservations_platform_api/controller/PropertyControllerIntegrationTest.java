@@ -5,6 +5,7 @@ import ludogorie_soft.reservations_platform_api.dto.PropertyRequestDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
+import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +53,13 @@ class PropertyControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        savedProperty = PropertyTestHelper.createDefaultProperty();
-        savedUser = userRepository.save(savedProperty.getOwner());
+        savedUser = UserTestHelper.createUserForIntegrationTest();
+        userRepository.save(savedUser);
+
+        savedProperty = PropertyTestHelper.createPropertyForIntegrationTest();
         savedProperty.setOwner(savedUser);
-        savedProperty = propertyRepository.save(savedProperty);
+        propertyRepository.save(savedProperty);
+
         propertyRequestDto = PropertyTestHelper.createDefaultPropertyRequestDto();
     }
 
@@ -65,7 +69,7 @@ class PropertyControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(propertyRequestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$.websiteUrl").value("http://test.com"))
                 .andExpect(jsonPath("$.capacity").value(4))
                 .andExpect(jsonPath("$.petAllowed").value(true))
                 .andExpect(jsonPath("$.petRules").value("Pets must be supervised at all times"))
@@ -80,7 +84,7 @@ class PropertyControllerIntegrationTest {
         mockMvc.perform(get("/api/properties/" + savedProperty.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$.websiteUrl").value("http://test.com"))
                 .andExpect(jsonPath("$.capacity").value(4))
                 .andExpect(jsonPath("$.petAllowed").value(true))
                 .andExpect(jsonPath("$.petRules").value("Pets must be supervised at all times"))
@@ -105,7 +109,7 @@ class PropertyControllerIntegrationTest {
         mockMvc.perform(get("/api/properties")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].websiteUrl").value("www.test.com"))
+                .andExpect(jsonPath("$[0].websiteUrl").value("http://test.com"))
                 .andExpect(jsonPath("$[0].capacity").value(4))
                 .andExpect(jsonPath("$[0].petAllowed").value(true))
                 .andExpect(jsonPath("$[0].petRules").value("Pets must be supervised at all times"))

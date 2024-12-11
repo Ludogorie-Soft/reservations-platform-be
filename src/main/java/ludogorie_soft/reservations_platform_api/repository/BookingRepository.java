@@ -4,13 +4,12 @@ import ludogorie_soft.reservations_platform_api.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     List<Booking> findByPropertyId(UUID id);
@@ -22,4 +21,8 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findBookingsByPropertyIdAndDateRange(@Param("propertyId") UUID propertyId,
                                                        @Param("startDate") Date startDate,
                                                        @Param("endDate") Date endDate);
+
+    Optional<Booking> findByCustomerId(UUID id);
+
+    Optional<Booking> findByConfirmationTokenId(UUID id);
 }

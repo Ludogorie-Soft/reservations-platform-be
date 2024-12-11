@@ -12,7 +12,7 @@ public class PropertyTestHelper {
 
     private static final UUID DEFAULT_PROPERTY_ID = UUID.randomUUID();
     private static final String DEFAULT_PROPERTY_RULES = "No smoking allowed";
-    private static final String DEFAULT_WEBSITE_URL = "www.test.com";
+    private static final String DEFAULT_WEBSITE_URL = "http://test.com";
     private static final int DEFAULT_CAPACITY = 4;
     private static final boolean DEFAULT_PET_ALLOWED = true;
     private static final String DEFAULT_PET_RULES = "Pets must be supervised at all times";
@@ -23,6 +23,7 @@ public class PropertyTestHelper {
     private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
     private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
     private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
+    private static final String UPDATED_OWNER_EMAIL = "updated_mail@mail.com";
     private static final int UPDATED_CAPACITY = 6;
     private static final boolean UPDATED_PET_ALLOWED = false;
     private static final String UPDATED_PET_RULES = "No pets";
@@ -43,6 +44,36 @@ public class PropertyTestHelper {
         property.setMinimumStay(DEFAULT_MINIMUM_STAY);
         property.setPetPrice(DEFAULT_PET_PRICE);
         property.setPropertyRules(DEFAULT_PROPERTY_RULES);
+        return property;
+    }
+
+    public static Property createPropertyForIntegrationTest(){
+        Property property = new Property();
+
+        property.setWebsiteUrl(DEFAULT_WEBSITE_URL);
+        property.setCapacity(DEFAULT_CAPACITY);
+        property.setPetAllowed(DEFAULT_PET_ALLOWED);
+        property.setPetRules(DEFAULT_PET_RULES);
+        property.setPrice(DEFAULT_PRICE);
+        property.setMinimumStay(DEFAULT_MINIMUM_STAY);
+        property.setPetPrice(DEFAULT_PET_PRICE);
+        property.setPropertyRules(DEFAULT_PROPERTY_RULES);
+
+        return property;
+    }
+
+    public static Property createExpiredPropertyForIntegrationTest() {
+        Property property = new Property();
+
+        property.setWebsiteUrl(UPDATED_WEBSITE_URL);
+        property.setCapacity(UPDATED_CAPACITY);
+        property.setPetAllowed(UPDATED_PET_ALLOWED);
+        property.setPetRules(UPDATED_PET_RULES);
+        property.setPrice(UPDATED_PRICE);
+        property.setMinimumStay(UPDATED_MINIMUM_STAY);
+        property.setPetPrice(UPDATED_PET_PRICE);
+        property.setPropertyRules(UPDATED_PROPERTY_RULES);
+
         return property;
     }
 
@@ -76,6 +107,7 @@ public class PropertyTestHelper {
     public static PropertyRequestDto createUpdatedPropertyRequestDto() {
         PropertyRequestDto requestDto = new PropertyRequestDto();
         requestDto.setWebsiteUrl(UPDATED_WEBSITE_URL);
+        requestDto.setOwnerEmail(UPDATED_OWNER_EMAIL);
         requestDto.setCapacity(UPDATED_CAPACITY);
         requestDto.setPetAllowed(UPDATED_PET_ALLOWED);
         requestDto.setPetRules(UPDATED_PET_RULES);
@@ -113,4 +145,6 @@ public class PropertyTestHelper {
         response.setPropertyRules(updatedProperty.getPropertyRules());
         return response;
     }
+
+
 }
