@@ -164,11 +164,18 @@ class BookingControllerIntegrationTest {
         bookingRequestDto.setStartDate(endDate);
         bookingRequestDto.setEndDate(startDate);
 
-        //WHEN
-        ResponseEntity<BookingResponseDto> response = createBookingInDb();
+        // WHEN: Send request
+        ResponseEntity<List> response = testRestTemplate.postForEntity(BASE_BOOKING_URL, bookingRequestDto, List.class);
 
-        //THEN
+        // THEN: Verify response
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        List<String> errors = response.getBody();
+
+        // Check specific validation messages
+        assertTrue(errors.contains("startDate: Start date cannot be in the past"));
+        assertTrue(errors.contains("endDate: End date cannot be in the past"));
     }
 
     @Test
