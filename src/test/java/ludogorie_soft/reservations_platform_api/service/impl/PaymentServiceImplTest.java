@@ -8,13 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 
 class PaymentServiceImplTest {
 
@@ -26,7 +24,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void testCreatePaymentIntent_Success() throws StripeException {
+    void testCreatePaymentIntent_Success() {
         try (MockedStatic<PaymentIntent> paymentIntentMockedStatic = Mockito.mockStatic(PaymentIntent.class)) {
             PaymentIntent mockPaymentIntent = Mockito.mock(PaymentIntent.class);
             Mockito.when(mockPaymentIntent.getId()).thenReturn("pi_mock123");
@@ -43,7 +41,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void testCreatePaymentIntent_Failure() throws StripeException {
+    void testCreatePaymentIntent_Failure() {
         try (MockedStatic<PaymentIntent> paymentIntentMockedStatic = Mockito.mockStatic(PaymentIntent.class)) {
             StripeException mockException = Mockito.mock(StripeException.class);
             Mockito.when(mockException.getMessage()).thenReturn("Test Stripe exception");
