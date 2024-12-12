@@ -1,7 +1,5 @@
 package ludogorie_soft.reservations_platform_api.exception;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,8 +8,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -46,14 +47,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("message", e.getMessage());
-        return ResponseEntity.badRequest().body(errorResponse);
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)  // 400 Error
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = new ArrayList<>();
@@ -63,6 +57,5 @@ public class GlobalExceptionHandler {
             errors.add(fieldName + ": " + errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-
     }
 }

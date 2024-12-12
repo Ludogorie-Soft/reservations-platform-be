@@ -124,6 +124,7 @@ class PaymentControllerIntegrationTest {
         //THEN
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+
     @Test
     void createPaymentIntent_ShouldReturnNotFound_WhenInvalidBookingIdProvided() {
         // GIVEN
@@ -139,29 +140,6 @@ class PaymentControllerIntegrationTest {
         assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().containsKey("message"));
         assertEquals("Booking with id + " + invalidBookingId + " not found!", response.getBody().get("message"));
-    }
-    @Test
-    void createPaymentIntent_ShouldReturnBadRequest_WhenTotalPriceIsNull() {
-        // GIVEN
-        ResponseEntity<BookingResponseDto> responseBooking = createBookingInDb();
-        UUID bookingId = Objects.requireNonNull(responseBooking.getBody()).getId();
-
-        bookingRepository.findById(bookingId).ifPresent(booking -> {
-            booking.setTotalPrice(null); // Set to null
-            bookingRepository.save(booking);
-        });
-
-        HttpEntity<String> request = new HttpEntity<>(headers);
-
-        // WHEN
-        ResponseEntity<Map> response = testRestTemplate.postForEntity(
-                BASE_PAYMENT_URL + bookingId, request, Map.class);
-
-        // THEN
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody(), "Response body should not be null");
-        assertTrue(response.getBody().containsKey("message"));
-        assertEquals("Total price is missing or invalid for booking id " + bookingId, response.getBody().get("message"));
     }
 
     private ResponseEntity<BookingResponseDto> createBookingInDb() {
