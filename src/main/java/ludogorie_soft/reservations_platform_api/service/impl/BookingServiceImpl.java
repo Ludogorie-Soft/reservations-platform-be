@@ -29,7 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -165,11 +167,22 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
-        int totalPrice = property.getPrice();
+        booking.setTotalPrice(calculateBookingPrice(bookingRequestDto, property));
+    }
+
+    private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, Property property){
+        int totalPropertyPrice = property.getPrice();
+
         if (bookingRequestDto.isPetContent()) {
-            totalPrice = property.getPrice() + property.getPetPrice();
+            totalPropertyPrice += property.getPetPrice();
         }
-        booking.setTotalPrice(BigDecimal.valueOf(totalPrice));
+
+        LocalDate startLocalDate = bookingRequestDto.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = bookingRequestDto.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        long numberOfDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+
+        long totalBookingPrice = numberOfDays * totalPropertyPrice;
+        return new BigDecimal(totalBookingPrice);
     }
 
     private boolean checkCalendarsForAvailableDates(Property property, BookingRequestDto bookingRequestDto) throws ParserException, IOException {
