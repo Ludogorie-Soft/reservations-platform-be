@@ -13,6 +13,7 @@ import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundExcepti
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
+import ludogorie_soft.reservations_platform_api.exception.PetNotAllowedException;
 import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
@@ -29,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -167,7 +167,15 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
+        checkPetContent(bookingRequestDto, property, booking);
         booking.setTotalPrice(calculateBookingPrice(bookingRequestDto, property));
+    }
+
+    private static void checkPetContent(BookingRequestDto bookingRequestDto, Property property, Booking booking) {
+        if (bookingRequestDto.isPetContent() && !property.isPetAllowed()) {
+            throw new PetNotAllowedException("This property does not permit pets");
+        }
+        booking.setPetContent(property.isPetAllowed() && bookingRequestDto.isPetContent());
     }
 
     private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, Property property){
