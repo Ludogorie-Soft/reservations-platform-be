@@ -39,8 +39,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -101,7 +103,6 @@ class BookingControllerIntegrationTest {
 
         validBookingRequestCustomerDataDto = BookingTestHelper.createBookingRequestWithCustomerDataWithoutBooking(customer);
         invalidBookingRequestCustomerDataDto = BookingTestHelper.createBookingRequestWithInvalidBookingId();
-
     }
 
     @AfterEach
@@ -129,6 +130,23 @@ class BookingControllerIntegrationTest {
         assertNotNull(response.getBody());
         assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
         assertEquals(bookingRequestDto.getDescription(), response.getBody().getDescription());
+        assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
+    }
+
+    @Test
+    void testCreateBooking_ShouldThrow_WhenPetExistsButIsNotAllowed() {
+        //GIVEN
+        createUserInDb();
+        propertyRequestDto.setPetAllowed(false);
+        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
+        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
+        bookingRequestDto.setPetContent(true);
+
+        //WHEN
+        ResponseEntity<BookingResponseDto> response = createBookingInDb();
+
+        //THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -546,5 +564,20 @@ class BookingControllerIntegrationTest {
     private ResponseEntity<BookingResponseDto> createBookingInDb() {
         return testRestTemplate
                 .postForEntity(BASE_BOOKING_URL, bookingRequestDto, BookingResponseDto.class);
+    }
+
+    private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, PropertyResponseDto property){
+        int totalPropertyPrice = property.getPrice();
+
+        if (bookingRequestDto.isPetContent()) {
+            totalPropertyPrice += property.getPetPrice();
+        }
+
+        LocalDate startLocalDate = bookingRequestDto.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = bookingRequestDto.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        long numberOfDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+
+        long totalBookingPrice = numberOfDays * totalPropertyPrice;
+        return new BigDecimal(totalBookingPrice);
     }
 }
