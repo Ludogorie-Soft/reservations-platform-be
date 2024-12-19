@@ -134,13 +134,34 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void testCreateBookingSuccessfullyWithPetContent() {
+    void testCreateBookingSuccessfullyWithoutPetContent() {
         //GIVEN
         createUserInDb();
         propertyRequestDto.setPetAllowed(true);
         ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
         bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
         bookingRequestDto.setPetContent(false);
+
+        //WHEN
+        ResponseEntity<BookingResponseDto> response = createBookingInDb();
+
+        //THEN
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
+        assertEquals(bookingRequestDto.getDescription(), response.getBody().getDescription());
+        assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
+        assertEquals(bookingRequestDto.isPetContent(), response.getBody().isPetContent());
+    }
+
+    @Test
+    void testCreateBookingSuccessfullyWithPetContent() {
+        //GIVEN
+        createUserInDb();
+        propertyRequestDto.setPetAllowed(true);
+        ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
+        bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
+        bookingRequestDto.setPetContent(true);
 
         //WHEN
         ResponseEntity<BookingResponseDto> response = createBookingInDb();
