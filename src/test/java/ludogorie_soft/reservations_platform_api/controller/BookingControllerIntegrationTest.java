@@ -140,7 +140,7 @@ class BookingControllerIntegrationTest {
         propertyRequestDto.setPetAllowed(true);
         ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
         bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
-        bookingRequestDto.setPetContent(true);
+        bookingRequestDto.setPetContent(false);
 
         //WHEN
         ResponseEntity<BookingResponseDto> response = createBookingInDb();
@@ -151,6 +151,7 @@ class BookingControllerIntegrationTest {
         assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
         assertEquals(bookingRequestDto.getDescription(), response.getBody().getDescription());
         assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
+        assertEquals(bookingRequestDto.isPetContent(), response.getBody().isPetContent());
     }
 
     @Test
