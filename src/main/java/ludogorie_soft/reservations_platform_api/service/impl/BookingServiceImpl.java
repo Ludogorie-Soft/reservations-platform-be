@@ -175,7 +175,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.isPetContent() && !property.isPetAllowed()) {
             throw new PetNotAllowedException("This property does not permit pets");
         } else {
-            booking.setPetContent(property.isPetAllowed());
+            booking.setPetContent(bookingRequestDto.isPetContent());
         }
     }
 
