@@ -13,6 +13,7 @@ import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundExcepti
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
+import ludogorie_soft.reservations_platform_api.exception.PetNotAllowedException;
 import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
 import ludogorie_soft.reservations_platform_api.repository.CustomerRepository;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -165,11 +167,31 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
-        int totalPrice = property.getPrice();
-        if (bookingRequestDto.isPetContent()) {
-            totalPrice = property.getPrice() + property.getPetPrice();
+        checkPetContent(bookingRequestDto, property, booking);
+        booking.setTotalPrice(calculateBookingPrice(bookingRequestDto, property));
+    }
+
+    private static void checkPetContent(BookingRequestDto bookingRequestDto, Property property, Booking booking) {
+        if (bookingRequestDto.isPetContent() && !property.isPetAllowed()) {
+            throw new PetNotAllowedException("This property does not permit pets");
+        } else {
+            booking.setPetContent(bookingRequestDto.isPetContent());
         }
-        booking.setTotalPrice(BigDecimal.valueOf(totalPrice));
+    }
+
+    private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, Property property){
+        int totalPropertyPrice = property.getPrice();
+
+        if (bookingRequestDto.isPetContent()) {
+            totalPropertyPrice += property.getPetPrice();
+        }
+
+        LocalDate startLocalDate = bookingRequestDto.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = bookingRequestDto.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        long numberOfDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+
+        long totalBookingPrice = numberOfDays * totalPropertyPrice;
+        return new BigDecimal(totalBookingPrice);
     }
 
     private boolean checkCalendarsForAvailableDates(Property property, BookingRequestDto bookingRequestDto) throws ParserException, IOException {
