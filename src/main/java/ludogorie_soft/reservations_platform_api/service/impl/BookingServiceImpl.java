@@ -174,8 +174,9 @@ public class BookingServiceImpl implements BookingService {
     private static void checkPetContent(BookingRequestDto bookingRequestDto, Property property, Booking booking) {
         if (bookingRequestDto.isPetContent() && !property.isPetAllowed()) {
             throw new PetNotAllowedException("This property does not permit pets");
+        } else {
+            booking.setPetContent(property.isPetAllowed());
         }
-        booking.setPetContent(property.isPetAllowed() && bookingRequestDto.isPetContent());
     }
 
     private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, Property property){
