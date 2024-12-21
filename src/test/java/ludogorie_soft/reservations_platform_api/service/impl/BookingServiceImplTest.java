@@ -12,6 +12,7 @@ import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundExcepti
 import ludogorie_soft.reservations_platform_api.exception.InvalidCapacityException;
 import ludogorie_soft.reservations_platform_api.exception.InvalidDateRequestException;
 import ludogorie_soft.reservations_platform_api.exception.NotAvailableDatesException;
+import ludogorie_soft.reservations_platform_api.exception.PetNotAllowedException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.ConfirmationTokenTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.CustomerTestHelper;
@@ -133,6 +134,20 @@ class BookingServiceImplTest {
         assertNotNull(response);
         assertEquals(BigDecimal.valueOf(property.getPrice() + property.getPetPrice()), response.getTotalPrice());
         verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    void createBookingShouldThrowWhenPetExistsAndIsNotAllowed() throws ParserException, IOException {
+        // GIVEN
+        property.setPetAllowed(false);
+        when(propertyService.findById(property.getId())).thenReturn(property);
+        bookingRequestDto.setPropertyId(property.getId());
+        bookingRequestDto.setPetContent(true);
+        when(calendarService.syncForAvailableDates(anyString(), any(), any())).thenReturn(true);
+
+        // WHEN & THEN
+        assertThrows(PetNotAllowedException.class,
+                () -> bookingService.createBooking(bookingRequestDto));
     }
 
     @Test
