@@ -209,7 +209,6 @@ class BookingServiceImplTest {
     void testGetBookingSuccessfully() {
         // GIVEN
         when(bookingRepository.findById(any(UUID.class))).thenReturn(Optional.of(createdBooking));
-        //when(modelMapper.map(createdBooking, BookingResponseDto.class)).thenReturn(bookingResponseDto);
 
         // WHEN
         BookingResponseWithCustomerDataDto response = bookingService.getBooking(createdBooking.getId());

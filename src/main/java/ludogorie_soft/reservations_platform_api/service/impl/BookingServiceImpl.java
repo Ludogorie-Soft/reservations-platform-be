@@ -110,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseWithCustomerDataDto> getAllBookings() {
         return bookingRepository.findAll().stream()
                 .map(BookingResponseWithCustomerDataMapper::toBookingWithCustomerDataDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

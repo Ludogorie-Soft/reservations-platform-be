@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.AllArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
