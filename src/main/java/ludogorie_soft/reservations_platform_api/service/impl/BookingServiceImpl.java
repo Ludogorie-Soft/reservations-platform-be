@@ -101,22 +101,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDto getBooking(UUID id) {
+    public BookingResponseWithCustomerDataDto getBooking(UUID id) {
         Booking booking = getBookingById(id);
-        return modelMapper.map(booking, BookingResponseDto.class);
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
     }
 
     @Override
     public List<BookingResponseWithCustomerDataDto> getAllBookings() {
-        List<Booking> bookings = bookingRepository.findAll();
-        List<BookingResponseWithCustomerDataDto> response = new ArrayList<>();
-
-        for (var booking: bookings) {
-            BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
-            response.add(dto);
-        }
-
-        return response;
+        return bookingRepository.findAll().stream()
+                .map(BookingResponseWithCustomerDataMapper::toBookingWithCustomerDataDto)
+                .collect(Collectors.toList());
     }
 
     @Override

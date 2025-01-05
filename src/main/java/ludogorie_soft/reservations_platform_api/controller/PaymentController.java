@@ -2,6 +2,7 @@ package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +22,7 @@ public class PaymentController {
 
     @PostMapping("/create-payment-intent/{bookingId}")
     public Map<String, Object> createPaymentIntent(@PathVariable UUID bookingId) {
-        BookingResponseDto booking = bookingService.getBooking(bookingId);
-        return paymentService.createPaymentIntent(String.valueOf(booking.getTotalPrice()));
+        BookingResponseWithCustomerDataDto booking = bookingService.getBooking(bookingId);
+        return paymentService.createPaymentIntent(String.valueOf(booking.getBookingResponseDto().getTotalPrice()));
     }
 }

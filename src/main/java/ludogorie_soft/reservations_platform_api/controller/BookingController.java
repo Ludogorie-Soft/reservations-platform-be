@@ -49,11 +49,6 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-//    @GetMapping
-//    ResponseEntity<List<BookingResponseDto>> getAllBookings2() {
-//        List<BookingResponseDto> bookings = bookingService.getAllBookings();
-//        return new ResponseEntity<>(bookings, HttpStatus.OK);
-//    }
 
     @GetMapping
     ResponseEntity<List<BookingResponseWithCustomerDataDto>> getAllBookings() {
@@ -69,8 +64,8 @@ public class BookingController {
 
 
     @GetMapping("/{id}")
-    ResponseEntity<BookingResponseDto> getBooking(@PathVariable("id") UUID id) {
-        BookingResponseDto bookings = bookingService.getBooking(id);
+    ResponseEntity<BookingResponseWithCustomerDataDto> getBooking(@PathVariable("id") UUID id) {
+        BookingResponseWithCustomerDataDto bookings = bookingService.getBooking(id);
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
