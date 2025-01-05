@@ -49,9 +49,15 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+//    @GetMapping
+//    ResponseEntity<List<BookingResponseDto>> getAllBookings2() {
+//        List<BookingResponseDto> bookings = bookingService.getAllBookings();
+//        return new ResponseEntity<>(bookings, HttpStatus.OK);
+//    }
+
     @GetMapping
-    ResponseEntity<List<BookingResponseDto>> getAllBookings() {
-        List<BookingResponseDto> bookings = bookingService.getAllBookings();
+    ResponseEntity<List<BookingResponseWithCustomerDataDto>> getAllBookings() {
+        List<BookingResponseWithCustomerDataDto> bookings = bookingService.getAllBookings();
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 

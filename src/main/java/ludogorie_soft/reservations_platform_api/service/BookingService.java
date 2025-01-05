@@ -15,7 +15,7 @@ public interface BookingService {
 
     BookingResponseDto getBooking(UUID id);
 
-    List<BookingResponseDto> getAllBookings();
+    List<BookingResponseWithCustomerDataDto> getAllBookings();
 
     List<BookingResponseDto> getAllBookingsOfProperty(UUID id);
 

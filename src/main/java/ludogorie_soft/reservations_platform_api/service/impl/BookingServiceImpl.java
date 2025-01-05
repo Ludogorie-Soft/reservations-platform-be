@@ -32,9 +32,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,10 +107,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookings() {
-        return bookingRepository.findAll().stream()
-                .map(booking -> modelMapper.map(booking, BookingResponseDto.class))
-                .toList();
+    public List<BookingResponseWithCustomerDataDto> getAllBookings() {
+        List<Booking> bookings = bookingRepository.findAll();
+        List<BookingResponseWithCustomerDataDto> response = new ArrayList<>();
+
+        for (var booking: bookings) {
+            BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
+            response.add(dto);
+        }
+
+        return response;
     }
 
     @Override

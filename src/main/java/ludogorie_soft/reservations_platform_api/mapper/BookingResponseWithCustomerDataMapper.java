@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class BookingResponseWithCustomerDataMapper {
 
-    public static BookingResponseWithCustomerDataDto toBookingWithCustomerDataDto (Booking booking, Customer customer) {
+    public static BookingResponseWithCustomerDataDto toBookingWithCustomerDataDto(Booking booking, Customer customer) {
         BookingResponseWithCustomerDataDto dto = new BookingResponseWithCustomerDataDto();
         BookingResponseDto bookingResponseDto = new BookingResponseDto();
         BookingRequestCustomerDataDto bookingRequestCustomerDataDto = new BookingRequestCustomerDataDto();
@@ -39,4 +39,32 @@ public class BookingResponseWithCustomerDataMapper {
         return dto;
     }
 
+    public static BookingResponseWithCustomerDataDto toBookingWithCustomerDataDto(Booking booking) {
+        BookingResponseWithCustomerDataDto dto = new BookingResponseWithCustomerDataDto();
+        BookingResponseDto bookingResponseDto = new BookingResponseDto();
+        BookingRequestCustomerDataDto bookingRequestCustomerDataDto = new BookingRequestCustomerDataDto();
+
+        bookingResponseDto.setId(booking.getId());
+        bookingResponseDto.setStartDate(booking.getStartDate().toString());
+        bookingResponseDto.setEndDate(booking.getEndDate().toString());
+        bookingResponseDto.setDescription(booking.getDescription());
+        bookingResponseDto.setAdultCount(booking.getAdultCount());
+        bookingResponseDto.setChildrenCount(booking.getChildrenCount());
+        bookingResponseDto.setBabiesCount(booking.getBabiesCount());
+        bookingResponseDto.setPetContent(booking.isPetContent());
+        bookingResponseDto.setTotalPrice(booking.getTotalPrice());
+
+        bookingRequestCustomerDataDto.setBookingId(booking.getId());
+        if (booking.getCustomer() != null) {
+            bookingRequestCustomerDataDto.setFirstName(booking.getCustomer().getFirstName());
+            bookingRequestCustomerDataDto.setLastName(booking.getCustomer().getLastName());
+            bookingRequestCustomerDataDto.setEmail(booking.getCustomer().getEmail());
+            bookingRequestCustomerDataDto.setPhoneNumber(booking.getCustomer().getPhoneNumber());
+        }
+
+        dto.setBookingResponseDto(bookingResponseDto);
+        dto.setBookingRequestCustomerDataDto(bookingRequestCustomerDataDto);
+
+        return dto;
+    }
 }
