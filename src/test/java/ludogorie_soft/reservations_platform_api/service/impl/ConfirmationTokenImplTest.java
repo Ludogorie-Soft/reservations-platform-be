@@ -8,7 +8,6 @@ import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
-import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.helper.ConfirmationTokenTestHelper;
@@ -126,8 +125,6 @@ class ConfirmationTokenImplTest {
                 .thenReturn(Optional.of(confirmationToken));
         when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
                 .thenReturn(Optional.of(booking));
-        when(customerRepository.findById(customer.getId()))
-                .thenReturn(Optional.of(customer));
 
         // WHEN
         BookingResponseWrapper result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
@@ -166,8 +163,6 @@ class ConfirmationTokenImplTest {
                 .thenReturn(Optional.of(expiredToken));
         when(bookingRepository.findByConfirmationTokenId(expiredToken.getId()))
                 .thenReturn(Optional.of(booking));
-        when(customerRepository.findById(booking.getCustomer().getId()))
-                .thenReturn(Optional.of(customer));
 
         // WHEN
         // THEN
@@ -186,8 +181,6 @@ class ConfirmationTokenImplTest {
                 .thenReturn(Optional.of(confirmationToken));
         when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
                 .thenReturn(Optional.of(booking));
-        when(customerRepository.findById(booking.getCustomer().getId()))
-                .thenReturn(Optional.of(customer));
 
         // WHEN
         BookingResponseWrapper result = confirmationTokenService.confirmReservation(confirmationToken.getToken());
@@ -215,24 +208,6 @@ class ConfirmationTokenImplTest {
         // WHEN
         // THEN
         assertThrows(BookingNotFoundException.class, () ->
-                confirmationTokenService.confirmReservation(confirmationToken.getToken())
-        );
-
-        verify(confirmationTokenRepository, never()).save(any());
-    }
-
-    @Test
-    void testConfirmReservation_CustomerNotFound() {
-        // GIVEN
-        when(confirmationTokenRepository.findByToken(confirmationToken.getToken()))
-                .thenReturn(Optional.of(confirmationToken));
-        when(bookingRepository.findByConfirmationTokenId(confirmationToken.getId()))
-                .thenReturn(Optional.of(booking));
-        when(customerRepository.findById(customer.getId())).thenReturn(Optional.empty());
-
-        // WHEN
-        // THEN
-        assertThrows(CustomerNotFoundException.class, () ->
                 confirmationTokenService.confirmReservation(confirmationToken.getToken())
         );
 
