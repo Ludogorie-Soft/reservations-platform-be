@@ -448,9 +448,9 @@ class BookingControllerIntegrationTest {
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
         //WHEN
-        ResponseEntity<BookingResponseDto> response = testRestTemplate.getForEntity(
+        ResponseEntity<BookingResponseWithCustomerDataDto> response = testRestTemplate.getForEntity(
                 BASE_BOOKING_URL + "/" + Objects.requireNonNull(createBookingResponse.getBody()).getId(),
-                BookingResponseDto.class
+                BookingResponseWithCustomerDataDto.class
         );
 
         //THEN
@@ -478,7 +478,7 @@ class BookingControllerIntegrationTest {
         createBookingInDb();
 
         //WHEN
-        ResponseEntity<List<BookingResponseDto>> response =
+        ResponseEntity<List<BookingResponseWithCustomerDataDto>> response =
                 this.testRestTemplate.exchange(
                         BASE_BOOKING_URL, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                         });

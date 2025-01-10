@@ -66,6 +66,7 @@ public class BookingTestHelper {
         booking.setBabiesCount(TEST_BABIES_COUNT);
         booking.setTotalPrice(BigDecimal.valueOf(property.getPrice()));
         booking.setPetContent(false);
+        booking.setCustomer(CustomerTestHelper.createCustomer());
         return booking;
     }
 
@@ -163,8 +164,8 @@ public class BookingTestHelper {
         return bookingRequestCustomerDataDto;
     }
 
-    public static BookingResponseWithCustomerDataDto createBookingResponseWithCustomerData(Booking booking, Customer customer) {
-        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+    public static BookingResponseWithCustomerDataDto createBookingResponseWithCustomerData(Booking booking) {
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
     }
 
 

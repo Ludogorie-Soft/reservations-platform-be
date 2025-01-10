@@ -69,12 +69,12 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
             if (isTokenNotConfirmed(confirmationToken)) {
                 confirmationToken.setConfirmedAt(LocalDateTime.now());
                 confirmationTokenRepository.save(confirmationToken);
-                return new BookingResponseWrapper(BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer),
+                return new BookingResponseWrapper(BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking),
                         false
                 );
             } else {
                 return new BookingResponseWrapper(
-                        BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer),
+                        BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking),
                         true
                 );
             }

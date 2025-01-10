@@ -114,9 +114,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookingsOfProperty(UUID id) {
+    public List<BookingResponseWithCustomerDataDto> getAllBookingsOfProperty(UUID id) {
         return bookingRepository.findByPropertyId(id).stream()
-                .map(booking -> modelMapper.map(booking, BookingResponseDto.class))
+                .map(BookingResponseWithCustomerDataMapper::toBookingWithCustomerDataDto)
                 .toList();
     }
 
@@ -151,7 +151,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
 
-        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
     }
 
 

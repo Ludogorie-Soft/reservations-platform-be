@@ -57,8 +57,8 @@ public class BookingController {
     }
 
     @GetMapping("/property/{id}")
-    ResponseEntity<List<BookingResponseDto>> getAllBookingsOfProperty(@PathVariable("id") UUID id) {
-        List<BookingResponseDto> bookings = bookingService.getAllBookingsOfProperty(id);
+    ResponseEntity<List<BookingResponseWithCustomerDataDto>> getAllBookingsOfProperty(@PathVariable("id") UUID id) {
+        List<BookingResponseWithCustomerDataDto> bookings = bookingService.getAllBookingsOfProperty(id);
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 

@@ -24,13 +24,14 @@ class BookingResponseWithCustomerDataMapperTest {
     void setUp() {
         booking = BookingTestHelper.createBooking();
         customer = CustomerTestHelper.createCustomer();
+        booking.setCustomer(customer);
     }
 
     @Test
     void testToBookingWithCustomerDataDto_validData() {
         // GIVEN
         // WHEN
-        BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+        BookingResponseWithCustomerDataDto dto = BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
 
         // THEN
         assertNotNull(dto.getBookingResponseDto());
@@ -46,10 +47,10 @@ class BookingResponseWithCustomerDataMapperTest {
 
         assertNotNull(dto.getBookingRequestCustomerDataDto());
         assertEquals(booking.getId(), dto.getBookingRequestCustomerDataDto().getBookingId());
-        assertEquals(customer.getFirstName(), dto.getBookingRequestCustomerDataDto().getFirstName());
-        assertEquals(customer.getLastName(), dto.getBookingRequestCustomerDataDto().getLastName());
-        assertEquals(customer.getEmail(), dto.getBookingRequestCustomerDataDto().getEmail());
-        assertEquals(customer.getPhoneNumber(), dto.getBookingRequestCustomerDataDto().getPhoneNumber());
+        assertEquals(booking.getCustomer().getFirstName(), dto.getBookingRequestCustomerDataDto().getFirstName());
+        assertEquals(booking.getCustomer().getLastName(), dto.getBookingRequestCustomerDataDto().getLastName());
+        assertEquals(booking.getCustomer().getEmail(), dto.getBookingRequestCustomerDataDto().getEmail());
+        assertEquals(booking.getCustomer().getPhoneNumber(), dto.getBookingRequestCustomerDataDto().getPhoneNumber());
     }
 
 }
