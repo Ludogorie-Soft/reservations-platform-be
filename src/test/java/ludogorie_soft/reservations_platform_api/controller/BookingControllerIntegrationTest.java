@@ -520,7 +520,17 @@ class BookingControllerIntegrationTest {
         createUserInDb();
         ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
         bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
-        createBookingInDb();
+        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
+
+        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
+
+        ResponseEntity<BookingResponseWithCustomerDataDto> customerData =
+                testRestTemplate.exchange(
+                        CUSTOMER_DATA_URL,
+                        HttpMethod.POST,
+                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
+                        BookingResponseWithCustomerDataDto.class
+                );
 
         //WHEN
         ResponseEntity<List<BookingResponseWithCustomerDataDto>> response =
@@ -532,6 +542,8 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
+        assertEquals(Objects.requireNonNull(customerData.getBody()).getBookingRequestCustomerDataDto().getFirstName(),
+                Objects.requireNonNull(response.getBody()).getFirst().getBookingRequestCustomerDataDto().getFirstName());
     }
 
     @Test
