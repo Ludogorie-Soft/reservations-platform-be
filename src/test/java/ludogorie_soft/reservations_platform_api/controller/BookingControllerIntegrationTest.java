@@ -51,11 +51,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {
-    ReservationsPlatformApiApplication.class})
+        ReservationsPlatformApiApplication.class})
 @ActiveProfiles("test")
 @Import(MailSenderTestConfig.class)
 class BookingControllerIntegrationTest {
@@ -447,6 +448,16 @@ class BookingControllerIntegrationTest {
         bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
+        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
+
+        ResponseEntity<BookingResponseWithCustomerDataDto> customerData =
+                testRestTemplate.exchange(
+                        CUSTOMER_DATA_URL,
+                        HttpMethod.POST,
+                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
+                        BookingResponseWithCustomerDataDto.class
+                );
+
         //WHEN
         ResponseEntity<BookingResponseWithCustomerDataDto> response = testRestTemplate.getForEntity(
                 BASE_BOOKING_URL + "/" + Objects.requireNonNull(createBookingResponse.getBody()).getId(),
@@ -455,6 +466,8 @@ class BookingControllerIntegrationTest {
 
         //THEN
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Objects.requireNonNull(customerData.getBody()).getBookingRequestCustomerDataDto().getFirstName(),
+                Objects.requireNonNull(response.getBody()).getBookingRequestCustomerDataDto().getFirstName());
     }
 
     @Test
@@ -475,7 +488,17 @@ class BookingControllerIntegrationTest {
         createUserInDb();
         ResponseEntity<PropertyResponseDto> propertyResponse = createPropertyInDb();
         bookingRequestDto.setPropertyId(Objects.requireNonNull(propertyResponse.getBody()).getId());
-        createBookingInDb();
+        ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
+
+        validBookingRequestCustomerDataDto.setBookingId(Objects.requireNonNull(createBookingResponse.getBody()).getId());
+
+        ResponseEntity<BookingResponseWithCustomerDataDto> customerData =
+                testRestTemplate.exchange(
+                        CUSTOMER_DATA_URL,
+                        HttpMethod.POST,
+                        new HttpEntity<>(validBookingRequestCustomerDataDto, new HttpHeaders()),
+                        BookingResponseWithCustomerDataDto.class
+                );
 
         //WHEN
         ResponseEntity<List<BookingResponseWithCustomerDataDto>> response =
@@ -487,6 +510,8 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
+        assertEquals(Objects.requireNonNull(customerData.getBody()).getBookingRequestCustomerDataDto().getFirstName(),
+                Objects.requireNonNull(response.getBody()).getFirst().getBookingRequestCustomerDataDto().getFirstName());
     }
 
     @Test
@@ -498,7 +523,7 @@ class BookingControllerIntegrationTest {
         createBookingInDb();
 
         //WHEN
-        ResponseEntity<List<BookingResponseDto>> response =
+        ResponseEntity<List<BookingResponseWithCustomerDataDto>> response =
                 this.testRestTemplate.exchange(
                         BASE_BOOKING_URL + "/property/" + propertyResponse.getBody().getId(), HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                         });
@@ -575,7 +600,7 @@ class BookingControllerIntegrationTest {
     }
 
     @Test
-    void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist()  {
+    void addCustomerDataToBooking_ShouldThrowBookingNotFoundException_WhenBookingDoesNotExist() {
         // GIVEN:
 
         // WHEN:
@@ -608,7 +633,7 @@ class BookingControllerIntegrationTest {
                 .postForEntity(BASE_BOOKING_URL, bookingRequestDto, BookingResponseDto.class);
     }
 
-    private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, PropertyResponseDto property){
+    private BigDecimal calculateBookingPrice(BookingRequestDto bookingRequestDto, PropertyResponseDto property) {
         int totalPropertyPrice = property.getPrice();
 
         if (bookingRequestDto.isPetContent()) {
