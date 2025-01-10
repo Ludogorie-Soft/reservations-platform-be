@@ -7,7 +7,6 @@ import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerD
 import ludogorie_soft.reservations_platform_api.entity.Booking;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 
 @Component
 @NoArgsConstructor

@@ -8,7 +8,6 @@ import ludogorie_soft.reservations_platform_api.entity.Customer;
 import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenExpiredException;
 import ludogorie_soft.reservations_platform_api.exception.ConfirmationTokenNotFoundException;
-import ludogorie_soft.reservations_platform_api.exception.CustomerNotFoundException;
 import ludogorie_soft.reservations_platform_api.exception.ResourceNotFoundException;
 import ludogorie_soft.reservations_platform_api.mapper.BookingResponseWithCustomerDataMapper;
 import ludogorie_soft.reservations_platform_api.repository.BookingRepository;
@@ -62,8 +61,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
                 .orElseThrow(() -> new ConfirmationTokenNotFoundException("Token not found with token: " + token));
         Booking booking = bookingRepository.findByConfirmationTokenId(confirmationToken.getId())
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with token: " + token));
-        Customer customer = customerRepository.findById(booking.getCustomer().getId())
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with booking: " + booking.getId()));
 
         if (isTokenNotExpired(confirmationToken)) {
             if (isTokenNotConfirmed(confirmationToken)) {
