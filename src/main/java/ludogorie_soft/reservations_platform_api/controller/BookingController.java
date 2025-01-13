@@ -49,22 +49,23 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
     @GetMapping
-    ResponseEntity<List<BookingResponseDto>> getAllBookings() {
-        List<BookingResponseDto> bookings = bookingService.getAllBookings();
+    ResponseEntity<List<BookingResponseWithCustomerDataDto>> getAllBookings() {
+        List<BookingResponseWithCustomerDataDto> bookings = bookingService.getAllBookings();
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
     @GetMapping("/property/{id}")
-    ResponseEntity<List<BookingResponseDto>> getAllBookingsOfProperty(@PathVariable("id") UUID id) {
-        List<BookingResponseDto> bookings = bookingService.getAllBookingsOfProperty(id);
+    ResponseEntity<List<BookingResponseWithCustomerDataDto>> getAllBookingsOfProperty(@PathVariable("id") UUID id) {
+        List<BookingResponseWithCustomerDataDto> bookings = bookingService.getAllBookingsOfProperty(id);
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
 
     @GetMapping("/{id}")
-    ResponseEntity<BookingResponseDto> getBooking(@PathVariable("id") UUID id) {
-        BookingResponseDto bookings = bookingService.getBooking(id);
+    ResponseEntity<BookingResponseWithCustomerDataDto> getBooking(@PathVariable("id") UUID id) {
+        BookingResponseWithCustomerDataDto bookings = bookingService.getBooking(id);
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 

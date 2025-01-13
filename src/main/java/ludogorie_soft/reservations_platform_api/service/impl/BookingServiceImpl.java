@@ -32,9 +32,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,22 +101,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDto getBooking(UUID id) {
+    public BookingResponseWithCustomerDataDto getBooking(UUID id) {
         Booking booking = getBookingById(id);
-        return modelMapper.map(booking, BookingResponseDto.class);
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookings() {
+    public List<BookingResponseWithCustomerDataDto> getAllBookings() {
         return bookingRepository.findAll().stream()
-                .map(booking -> modelMapper.map(booking, BookingResponseDto.class))
+                .map(BookingResponseWithCustomerDataMapper::toBookingWithCustomerDataDto)
                 .toList();
     }
 
     @Override
-    public List<BookingResponseDto> getAllBookingsOfProperty(UUID id) {
+    public List<BookingResponseWithCustomerDataDto> getAllBookingsOfProperty(UUID id) {
         return bookingRepository.findByPropertyId(id).stream()
-                .map(booking -> modelMapper.map(booking, BookingResponseDto.class))
+                .map(BookingResponseWithCustomerDataMapper::toBookingWithCustomerDataDto)
                 .toList();
     }
 
@@ -149,7 +151,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
 
-        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking, customer);
+        return BookingResponseWithCustomerDataMapper.toBookingWithCustomerDataDto(booking);
     }
 
 

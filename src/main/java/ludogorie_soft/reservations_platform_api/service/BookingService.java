@@ -13,11 +13,11 @@ import java.util.UUID;
 public interface BookingService {
     BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws IOException, URISyntaxException, ParserException;
 
-    BookingResponseDto getBooking(UUID id);
+    BookingResponseWithCustomerDataDto getBooking(UUID id);
 
-    List<BookingResponseDto> getAllBookings();
+    List<BookingResponseWithCustomerDataDto> getAllBookings();
 
-    List<BookingResponseDto> getAllBookingsOfProperty(UUID id);
+    List<BookingResponseWithCustomerDataDto> getAllBookingsOfProperty(UUID id);
 
     BookingResponseDto editBooking(UUID id, BookingRequestDto bookingRequestDto) throws ParserException, IOException;
 
