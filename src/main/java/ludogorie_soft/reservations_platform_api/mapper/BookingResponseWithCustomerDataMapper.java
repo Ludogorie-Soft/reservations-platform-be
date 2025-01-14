@@ -20,7 +20,6 @@ public class BookingResponseWithCustomerDataMapper {
         bookingResponseDto.setId(booking.getId());
         bookingResponseDto.setStartDate(booking.getStartDate().toString());
         bookingResponseDto.setEndDate(booking.getEndDate().toString());
-        bookingResponseDto.setDescription(booking.getDescription());
         bookingResponseDto.setAdultCount(booking.getAdultCount());
         bookingResponseDto.setChildrenCount(booking.getChildrenCount());
         bookingResponseDto.setBabiesCount(booking.getBabiesCount());
@@ -33,6 +32,7 @@ public class BookingResponseWithCustomerDataMapper {
             bookingRequestCustomerDataDto.setLastName(booking.getCustomer().getLastName());
             bookingRequestCustomerDataDto.setEmail(booking.getCustomer().getEmail());
             bookingRequestCustomerDataDto.setPhoneNumber(booking.getCustomer().getPhoneNumber());
+            bookingRequestCustomerDataDto.setReservationNotes(booking.getCustomer().getReservationNotes());
         }
 
         dto.setBookingResponseDto(bookingResponseDto);

@@ -141,6 +141,7 @@ public class BookingServiceImpl implements BookingService {
                     newCustomer.setLastName(customerData.getLastName());
                     newCustomer.setEmail(customerData.getEmail());
                     newCustomer.setPhoneNumber(customerData.getPhoneNumber());
+                    newCustomer.setReservationNotes(customerData.getReservationNotes());
                     return customerRepository.save(newCustomer);
                 });
 
@@ -165,7 +166,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setProperty(property);
         booking.setStartDate(bookingRequestDto.getStartDate());
         booking.setEndDate(bookingRequestDto.getEndDate());
-        booking.setDescription(bookingRequestDto.getDescription());
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
