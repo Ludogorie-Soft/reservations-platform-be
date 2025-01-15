@@ -608,6 +608,7 @@ class BookingControllerIntegrationTest {
         MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
         assertEquals(1, receivedMessages.length);
         assertEquals(customer.getEmail(), receivedMessages[0].getAllRecipients()[0].toString());
+        assertEquals(validBookingRequestCustomerDataDto.getReservationNotes(), response.getBody().getBookingResponseDto().getReservationNotes());
     }
 
     @Test
