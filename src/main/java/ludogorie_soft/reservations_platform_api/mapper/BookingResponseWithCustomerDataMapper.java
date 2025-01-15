@@ -20,7 +20,7 @@ public class BookingResponseWithCustomerDataMapper {
         bookingResponseDto.setId(booking.getId());
         bookingResponseDto.setStartDate(booking.getStartDate().toString());
         bookingResponseDto.setEndDate(booking.getEndDate().toString());
-        bookingResponseDto.setDescription(booking.getDescription());
+        bookingResponseDto.setReservationNotes(booking.getReservationNotes());
         bookingResponseDto.setAdultCount(booking.getAdultCount());
         bookingResponseDto.setChildrenCount(booking.getChildrenCount());
         bookingResponseDto.setBabiesCount(booking.getBabiesCount());

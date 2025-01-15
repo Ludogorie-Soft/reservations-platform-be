@@ -67,7 +67,7 @@ public class CalendarServiceImpl implements CalendarService {
             VEvent vEvent = new VEvent(
                     new net.fortuna.ical4j.model.DateTime(booking.getStartDate()),
                     new net.fortuna.ical4j.model.DateTime(booking.getEndDate()),
-                    booking.getDescription()
+                    booking.getReservationNotes()
             );
 
             vEvent.getProperties().add(new Uid(String.valueOf(booking.getId())));

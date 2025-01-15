@@ -36,7 +36,7 @@ public class Booking {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    private String description;
+    private String reservationNotes;
     int adultCount;
     int childrenCount;
     int babiesCount;

@@ -23,9 +23,9 @@ public class BookingRequestDto {
     @Future(message = "End date cannot be in the past")
     private Date endDate;
 
-    @NotNull(message = "Description cannot be null")
-    @Size(max = 500, message = "Description cannot exceed 500 characters")
-    private String description;
+//    @NotNull(message = "Description cannot be null")
+//    @Size(max = 500, message = "Description cannot exceed 500 characters")
+//    private String description;
 
     @Min(value = 1, message = "At least one adult is required")
     private int adultCount;

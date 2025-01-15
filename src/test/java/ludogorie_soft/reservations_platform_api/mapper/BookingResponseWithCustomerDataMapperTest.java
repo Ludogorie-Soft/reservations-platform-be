@@ -38,7 +38,7 @@ class BookingResponseWithCustomerDataMapperTest {
         assertEquals(booking.getId(), dto.getBookingResponseDto().getId());
         assertEquals(booking.getStartDate().toString(), dto.getBookingResponseDto().getStartDate());
         assertEquals(booking.getEndDate().toString(), dto.getBookingResponseDto().getEndDate());
-        assertEquals(booking.getDescription(), dto.getBookingResponseDto().getDescription());
+        assertEquals(booking.getReservationNotes(), dto.getBookingResponseDto().getReservationNotes());
         assertEquals(booking.getAdultCount(), dto.getBookingResponseDto().getAdultCount());
         assertEquals(booking.getChildrenCount(), dto.getBookingResponseDto().getChildrenCount());
         assertEquals(booking.getBabiesCount(), dto.getBookingResponseDto().getBabiesCount());

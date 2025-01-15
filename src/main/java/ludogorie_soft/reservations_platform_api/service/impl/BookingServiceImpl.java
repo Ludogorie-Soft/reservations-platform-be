@@ -32,11 +32,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -147,6 +145,7 @@ public class BookingServiceImpl implements BookingService {
         ConfirmationToken confirmationToken = confirmationTokenService.createConfirmationToken();
 
         booking.setConfirmationToken(confirmationToken);
+        booking.setReservationNotes(customerData.getReservationNotes());
         booking.setCustomer(customer);
         bookingRepository.save(booking);
         mailService.sendConfirmationEmail(customerData.getEmail(), generateConfirmationLink(confirmationToken));
@@ -165,7 +164,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setProperty(property);
         booking.setStartDate(bookingRequestDto.getStartDate());
         booking.setEndDate(bookingRequestDto.getEndDate());
-        booking.setDescription(bookingRequestDto.getDescription());
+        //booking.setReservationNotes(bookingRequestDto.getDescription());
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
