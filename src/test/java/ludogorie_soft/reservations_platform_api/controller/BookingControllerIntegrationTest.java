@@ -129,6 +129,7 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
+        assertEquals(bookingRequestDto.getAdultCount(), response.getBody().getAdultCount());
         assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
     }
 
@@ -148,6 +149,7 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
+        assertEquals(bookingRequestDto.getAdultCount(), response.getBody().getAdultCount());
         assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
         assertEquals(bookingRequestDto.isPetContent(), response.getBody().isPetContent());
     }
@@ -168,6 +170,7 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(bookingRequestDto.getStartDate().toString(), response.getBody().getStartDate());
+        assertEquals(bookingRequestDto.getAdultCount(), response.getBody().getAdultCount());
         assertEquals(calculateBookingPrice(bookingRequestDto, propertyResponse.getBody()), response.getBody().getTotalPrice());
         assertEquals(bookingRequestDto.isPetContent(), response.getBody().isPetContent());
     }
@@ -275,8 +278,10 @@ class BookingControllerIntegrationTest {
 
         assertEquals(HttpStatus.CREATED, createBookingResponse.getStatusCode());
         assertEquals(bookingRequestDto.getAdultCount(), Objects.requireNonNull(createBookingResponse.getBody()).getAdultCount());
+        assertEquals(bookingRequestDto.getAdultCount(), createBookingResponse.getBody().getAdultCount());
 
         BookingRequestDto editBookingRequest = BookingTestHelper.createBookingRequest();
+        editBookingRequest.setAdultCount(6);
         editBookingRequest.setAdultCount(1);
 
 
@@ -293,6 +298,7 @@ class BookingControllerIntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(editBookingRequest.getAdultCount(), response.getBody().getAdultCount());
+        assertEquals(editBookingRequest.getAdultCount(), response.getBody().getAdultCount());
     }
 
     @Test
@@ -304,6 +310,7 @@ class BookingControllerIntegrationTest {
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
         assertEquals(HttpStatus.CREATED, createBookingResponse.getStatusCode());
+        assertEquals(bookingRequestDto.getAdultCount(), Objects.requireNonNull(createBookingResponse.getBody()).getAdultCount());
         assertEquals(bookingRequestDto.getAdultCount(), createBookingResponse.getBody().getAdultCount());
 
         BookingRequestDto editBookingRequest = BookingTestHelper.createBookingRequest();
@@ -336,6 +343,7 @@ class BookingControllerIntegrationTest {
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
         assertEquals(HttpStatus.CREATED, createBookingResponse.getStatusCode());
+        assertEquals(bookingRequestDto.getAdultCount(), Objects.requireNonNull(createBookingResponse.getBody()).getAdultCount());
         assertEquals(bookingRequestDto.getAdultCount(), createBookingResponse.getBody().getAdultCount());
 
         BookingRequestDto editBookingRequest = BookingTestHelper.createBookingRequest();
@@ -368,6 +376,7 @@ class BookingControllerIntegrationTest {
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
         assertEquals(HttpStatus.CREATED, createBookingResponse.getStatusCode());
+        assertEquals(bookingRequestDto.getAdultCount(), Objects.requireNonNull(createBookingResponse.getBody()).getAdultCount());
         assertEquals(bookingRequestDto.getAdultCount(), createBookingResponse.getBody().getAdultCount());
 
         BookingRequestDto secondBookingRequest = BookingTestHelper.createBookingRequest();
@@ -411,6 +420,7 @@ class BookingControllerIntegrationTest {
         ResponseEntity<BookingResponseDto> createBookingResponse = createBookingInDb();
 
         assertEquals(HttpStatus.CREATED, createBookingResponse.getStatusCode());
+        assertEquals(bookingRequestDto.getAdultCount(), Objects.requireNonNull(createBookingResponse.getBody()).getAdultCount());
         assertEquals(bookingRequestDto.getAdultCount(), createBookingResponse.getBody().getAdultCount());
 
         BookingRequestDto editBookingRequest = BookingTestHelper.createBookingRequest();

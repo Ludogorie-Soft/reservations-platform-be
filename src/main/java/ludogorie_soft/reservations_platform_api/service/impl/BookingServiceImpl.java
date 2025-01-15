@@ -164,7 +164,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setProperty(property);
         booking.setStartDate(bookingRequestDto.getStartDate());
         booking.setEndDate(bookingRequestDto.getEndDate());
-        //booking.setReservationNotes(bookingRequestDto.getDescription());
         booking.setAdultCount(bookingRequestDto.getAdultCount());
         booking.setChildrenCount(bookingRequestDto.getChildrenCount());
         booking.setBabiesCount(bookingRequestDto.getBabiesCount());
