@@ -136,6 +136,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName(customer.getLastName());
         bookingRequestCustomerDataDto.setEmail(customer.getEmail());
         bookingRequestCustomerDataDto.setPhoneNumber(customer.getPhoneNumber());
+        bookingRequestCustomerDataDto.setReservationNotes(TEST_RESERVATION_NOTES);
 
         return bookingRequestCustomerDataDto;
     }
@@ -147,6 +148,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName(customer.getLastName());
         bookingRequestCustomerDataDto.setEmail(customer.getEmail());
         bookingRequestCustomerDataDto.setPhoneNumber(customer.getPhoneNumber());
+        bookingRequestCustomerDataDto.setReservationNotes(TEST_RESERVATION_NOTES);
 
         return bookingRequestCustomerDataDto;
     }
@@ -159,6 +161,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName("Doe");
         bookingRequestCustomerDataDto.setEmail("john.doe@example.com");
         bookingRequestCustomerDataDto.setPhoneNumber("+123456789");
+        bookingRequestCustomerDataDto.setReservationNotes("asdsadxzczx");
 
         return bookingRequestCustomerDataDto;
     }
