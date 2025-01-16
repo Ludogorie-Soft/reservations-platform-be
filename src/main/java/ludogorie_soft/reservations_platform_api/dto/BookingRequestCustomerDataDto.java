@@ -30,8 +30,7 @@ public class BookingRequestCustomerDataDto {
     @Size(min = 3, max = 15, message = "Invalid phone number length")
     private String phoneNumber;
 
-    @NotBlank(message = "Reservation notes cannot be blank")
-    @Size(min = 1, max = 1500, message = "Invalid reservation note length")
+    @Size(max = 1500, message = "Reservation note cannot be longer than 1500 characters")
     private String reservationNotes;
 
 }
