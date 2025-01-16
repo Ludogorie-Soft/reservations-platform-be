@@ -33,6 +33,7 @@ public class BookingResponseWithCustomerDataMapper {
             bookingRequestCustomerDataDto.setLastName(booking.getCustomer().getLastName());
             bookingRequestCustomerDataDto.setEmail(booking.getCustomer().getEmail());
             bookingRequestCustomerDataDto.setPhoneNumber(booking.getCustomer().getPhoneNumber());
+            bookingRequestCustomerDataDto.setReservationNotes(booking.getReservationNotes());
         }
 
         dto.setBookingResponseDto(bookingResponseDto);
