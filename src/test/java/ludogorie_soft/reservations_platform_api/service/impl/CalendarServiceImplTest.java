@@ -93,7 +93,7 @@ class CalendarServiceImplTest {
         Booking booking = new Booking();
         booking.setStartDate(new Date());
         booking.setEndDate(new Date());
-        booking.setDescription("Test Booking");
+        booking.setReservationNotes("Test Booking");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));
@@ -183,7 +183,7 @@ class CalendarServiceImplTest {
         Booking booking = new Booking();
         booking.setStartDate(new Date());
         booking.setEndDate(new Date());
-        booking.setDescription("Test Booking");
+        booking.setReservationNotes("Test Booking");
 
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
         when(bookingRepository.findByPropertyId(propertyId)).thenReturn(Collections.singletonList(booking));

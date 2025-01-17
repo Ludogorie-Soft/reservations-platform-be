@@ -17,12 +17,12 @@ import java.util.UUID;
 
 public class BookingTestHelper {
 
-    private static final String TEST_DESCRIPTION = "TEST_DESCRIPTION";
+    private static final String TEST_RESERVATION_NOTES = "TEST_RESERVATION_NOTES";
     private static final int TEST_ADULT_COUNT = 2;
     private static final int TEST_CHILDREN_COUNT = 1;
     private static final int TEST_BABIES_COUNT = 0;
 
-    private static final String EXPIRED_TEST_DESCRIPTION = "TEST_DESCRIPTIONNumber2";
+    private static final String EXPIRED_TEST_RESERVATION_NOTES = "TEST_RESERVATION_NOTES_EXPIRED";
     private static final int EXPIRED_TEST_ADULT_COUNT = 1;
     private static final int EXPIRED_TEST_CHILDREN_COUNT = 0;
     private static final int EXPIRED_TEST_BABIES_COUNT = 0;
@@ -38,7 +38,6 @@ public class BookingTestHelper {
         BookingRequestDto request = new BookingRequestDto();
         request.setStartDate(startDate);
         request.setEndDate(endDate);
-        request.setDescription(TEST_DESCRIPTION);
         request.setAdultCount(TEST_ADULT_COUNT);
         request.setChildrenCount(TEST_CHILDREN_COUNT);
         request.setBabiesCount(TEST_BABIES_COUNT);
@@ -60,7 +59,7 @@ public class BookingTestHelper {
         booking.setProperty(property);
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
-        booking.setDescription(TEST_DESCRIPTION);
+        booking.setReservationNotes(TEST_RESERVATION_NOTES);
         booking.setAdultCount(TEST_ADULT_COUNT);
         booking.setChildrenCount(TEST_CHILDREN_COUNT);
         booking.setBabiesCount(TEST_BABIES_COUNT);
@@ -81,7 +80,7 @@ public class BookingTestHelper {
 
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
-        booking.setDescription(TEST_DESCRIPTION);
+        booking.setReservationNotes(TEST_RESERVATION_NOTES);
         booking.setAdultCount(TEST_ADULT_COUNT);
         booking.setChildrenCount(TEST_CHILDREN_COUNT);
         booking.setBabiesCount(TEST_BABIES_COUNT);
@@ -101,7 +100,7 @@ public class BookingTestHelper {
 
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
-        booking.setDescription(EXPIRED_TEST_DESCRIPTION);
+        booking.setReservationNotes(EXPIRED_TEST_RESERVATION_NOTES);
         booking.setAdultCount(EXPIRED_TEST_ADULT_COUNT);
         booking.setChildrenCount(EXPIRED_TEST_CHILDREN_COUNT);
         booking.setBabiesCount(EXPIRED_TEST_BABIES_COUNT);
@@ -121,7 +120,7 @@ public class BookingTestHelper {
         Date endDate = Date.from(endLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         bookingResponseDto.setStartDate(startDate.toString());
         bookingResponseDto.setEndDate(endDate.toString());
-        bookingResponseDto.setDescription(TEST_DESCRIPTION);
+        bookingResponseDto.setReservationNotes(TEST_RESERVATION_NOTES);
         bookingResponseDto.setAdultCount(TEST_ADULT_COUNT);
         bookingResponseDto.setChildrenCount(TEST_CHILDREN_COUNT);
         bookingResponseDto.setBabiesCount(TEST_BABIES_COUNT);
@@ -137,6 +136,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName(customer.getLastName());
         bookingRequestCustomerDataDto.setEmail(customer.getEmail());
         bookingRequestCustomerDataDto.setPhoneNumber(customer.getPhoneNumber());
+        bookingRequestCustomerDataDto.setReservationNotes(TEST_RESERVATION_NOTES);
 
         return bookingRequestCustomerDataDto;
     }
@@ -148,6 +148,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName(customer.getLastName());
         bookingRequestCustomerDataDto.setEmail(customer.getEmail());
         bookingRequestCustomerDataDto.setPhoneNumber(customer.getPhoneNumber());
+        bookingRequestCustomerDataDto.setReservationNotes(TEST_RESERVATION_NOTES);
 
         return bookingRequestCustomerDataDto;
     }
@@ -160,6 +161,7 @@ public class BookingTestHelper {
         bookingRequestCustomerDataDto.setLastName("Doe");
         bookingRequestCustomerDataDto.setEmail("john.doe@example.com");
         bookingRequestCustomerDataDto.setPhoneNumber("+123456789");
+        bookingRequestCustomerDataDto.setReservationNotes("asdsadxzczx");
 
         return bookingRequestCustomerDataDto;
     }

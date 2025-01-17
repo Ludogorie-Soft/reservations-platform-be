@@ -11,7 +11,7 @@ public class BookingResponseDto {
     private UUID id;
     private String startDate;
     private String endDate;
-    private String description;
+    private String reservationNotes;
     int adultCount;
     int childrenCount;
     int babiesCount;

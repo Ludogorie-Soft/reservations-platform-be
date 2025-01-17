@@ -33,7 +33,7 @@ public class AuthController {
         if ("Login successful".equals(loginResponse)) {
             return ResponseEntity.ok(loginResponse);
         } else {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 }
