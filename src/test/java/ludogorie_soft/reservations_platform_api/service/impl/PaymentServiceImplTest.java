@@ -3,6 +3,8 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+import ludogorie_soft.reservations_platform_api.entity.Property;
+import ludogorie_soft.reservations_platform_api.helper.PropertyTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -17,10 +19,12 @@ import static org.mockito.ArgumentMatchers.any;
 class PaymentServiceImplTest {
 
     private PaymentServiceImpl paymentService;
+    private Property property;
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentServiceImpl();
+        property = PropertyTestHelper.createDefaultProperty();
+        paymentService = new PaymentServiceImpl(property);
     }
 
     @Test

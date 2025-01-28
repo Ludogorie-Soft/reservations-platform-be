@@ -57,6 +57,11 @@ public class PropertyServiceImpl implements PropertyService {
         property.setPetPrice(propertyRequestDto.getPetPrice());
         property.setPropertyRules(propertyRequestDto.getPropertyRules());
 
+        if (propertyRequestDto.getSecretKey() != null && propertyRequestDto.getPublicKey() != null) {
+            property.setSecretKey(propertyRequestDto.getSecretKey());
+            property.setPublicKey(propertyRequestDto.getPublicKey());
+        }
+
         Property createdProperty = propertyRepository.save(property);
         return modelMapper.map(createdProperty, PropertyResponseDto.class);
     }
@@ -121,6 +126,11 @@ public class PropertyServiceImpl implements PropertyService {
         updatedProperty.setMinimumStay(oldProperty.getMinimumStay());
         updatedProperty.setPetPrice(oldProperty.getPetPrice());
         updatedProperty.setPropertyRules(oldProperty.getPropertyRules());
+
+        if (oldProperty.getSecretKey() != null && oldProperty.getPublicKey() != null) {
+            updatedProperty.setSecretKey(oldProperty.getSecretKey());
+            updatedProperty.setPublicKey(oldProperty.getPublicKey());
+        }
 
         propertyRepository.save(updatedProperty);
         return modelMapper.map(updatedProperty, PropertyResponseDto.class);

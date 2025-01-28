@@ -24,4 +24,6 @@ public class PropertyResponseDto {
     private int petPrice;
     @Lob
     private String propertyRules;
+    private String publicKey;
+    private String secretKey;
 }

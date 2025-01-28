@@ -3,6 +3,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+import ludogorie_soft.reservations_platform_api.entity.Property;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,8 @@ import java.util.Map;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    public PaymentServiceImpl() {
-        Stripe.apiKey = System.getenv("STRIPE_SECRET_KEY");
+    public PaymentServiceImpl(Property property) {
+        Stripe.apiKey = property.getSecretKey();
     }
 
     @Override
