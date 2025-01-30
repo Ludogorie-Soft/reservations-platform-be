@@ -20,6 +20,7 @@ public class PropertyTestHelper {
     private static final int DEFAULT_PET_PRICE = 10;
     private static final int DEFAULT_MINIMUM_STAY = 1;
 
+
     private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
     private static final String UPDATED_PROPERTY_RULES = "Guests must be quiet after 10 PM";
     private static final String UPDATED_WEBSITE_URL = "http://example_updated.com";
@@ -44,6 +45,7 @@ public class PropertyTestHelper {
         property.setMinimumStay(DEFAULT_MINIMUM_STAY);
         property.setPetPrice(DEFAULT_PET_PRICE);
         property.setPropertyRules(DEFAULT_PROPERTY_RULES);
+
         return property;
     }
 
