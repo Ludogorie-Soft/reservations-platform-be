@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,12 @@ public class PaymentController {
     private final BookingService bookingService;
 
     @PostMapping("/create-payment-intent/{bookingId}")
-    public Map<String, Object> createPaymentIntent(@PathVariable UUID bookingId) {
-        BookingResponseWithCustomerDataDto booking = bookingService.getBooking(bookingId);
-        return paymentService.createPaymentIntent(String.valueOf(booking.getBookingResponseDto().getTotalPrice()));
+    public ResponseEntity<Map<String, Object>> createPaymentIntent(@PathVariable UUID bookingId) {
+        try {
+            Map<String, Object> response = paymentService.createPaymentIntent(bookingId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

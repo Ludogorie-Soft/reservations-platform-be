@@ -9,6 +9,7 @@ import java.util.UUID;
 public class BookingResponseDto {
 
     private UUID id;
+    private UUID propertyId;
     private String startDate;
     private String endDate;
     private String reservationNotes;

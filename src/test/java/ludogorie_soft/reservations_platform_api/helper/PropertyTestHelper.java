@@ -19,6 +19,7 @@ public class PropertyTestHelper {
     private static final int DEFAULT_PRICE = 20;
     private static final int DEFAULT_PET_PRICE = 10;
     private static final int DEFAULT_MINIMUM_STAY = 1;
+    private static final String DEFAULT_STRIPE_SK = "sk_test_SecretKey";
 
 
     private static final UUID UPDATED_PROPERTY_ID = UUID.randomUUID();
@@ -45,6 +46,7 @@ public class PropertyTestHelper {
         property.setMinimumStay(DEFAULT_MINIMUM_STAY);
         property.setPetPrice(DEFAULT_PET_PRICE);
         property.setPropertyRules(DEFAULT_PROPERTY_RULES);
+        property.setSecretKey(DEFAULT_STRIPE_SK);
 
         return property;
     }
