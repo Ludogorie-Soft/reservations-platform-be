@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.AllArgsConstructor;
-import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
