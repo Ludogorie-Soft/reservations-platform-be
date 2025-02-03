@@ -107,7 +107,7 @@ class PaymentServiceImplTest {
 
     @Test
     void testCreatePaymentIntent_Failure_MissingSecretKey() {
-        booking.getProperty().setSecretKey(null);
+        booking.getProperty().setStripeSecretKey(null);
 
         when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
         when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.of(booking.getProperty()));

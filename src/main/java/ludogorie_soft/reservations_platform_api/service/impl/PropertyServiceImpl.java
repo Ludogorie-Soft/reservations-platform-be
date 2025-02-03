@@ -58,8 +58,8 @@ public class PropertyServiceImpl implements PropertyService {
         property.setPropertyRules(propertyRequestDto.getPropertyRules());
 
         if (propertyRequestDto.getSecretKey() != null && propertyRequestDto.getPublicKey() != null) {
-            property.setSecretKey(propertyRequestDto.getSecretKey());
-            property.setPublicKey(propertyRequestDto.getPublicKey());
+            property.setStripeSecretKey(propertyRequestDto.getSecretKey());
+            property.setStripePublicKey(propertyRequestDto.getPublicKey());
         }
 
         Property createdProperty = propertyRepository.save(property);
@@ -128,8 +128,8 @@ public class PropertyServiceImpl implements PropertyService {
         updatedProperty.setPropertyRules(oldProperty.getPropertyRules());
 
         if (oldProperty.getSecretKey() != null && oldProperty.getPublicKey() != null) {
-            updatedProperty.setSecretKey(oldProperty.getSecretKey());
-            updatedProperty.setPublicKey(oldProperty.getPublicKey());
+            updatedProperty.setStripeSecretKey(oldProperty.getSecretKey());
+            updatedProperty.setStripePublicKey(oldProperty.getPublicKey());
         }
 
         propertyRepository.save(updatedProperty);

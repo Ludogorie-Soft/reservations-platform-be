@@ -46,7 +46,7 @@ public class PropertyTestHelper {
         property.setMinimumStay(DEFAULT_MINIMUM_STAY);
         property.setPetPrice(DEFAULT_PET_PRICE);
         property.setPropertyRules(DEFAULT_PROPERTY_RULES);
-        property.setSecretKey(DEFAULT_STRIPE_SK);
+        property.setStripeSecretKey(DEFAULT_STRIPE_SK);
 
         return property;
     }

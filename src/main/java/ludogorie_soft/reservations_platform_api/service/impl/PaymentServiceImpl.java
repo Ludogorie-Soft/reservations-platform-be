@@ -31,11 +31,11 @@ public class PaymentServiceImpl implements PaymentService {
         Property property = propertyRepository.findById(booking.getBookingResponseDto().getPropertyId())
                 .orElseThrow(() -> new IllegalArgumentException("Property not found"));
 
-        if (property.getSecretKey() == null || property.getSecretKey().isEmpty()) {
+        if (property.getStripeSecretKey() == null || property.getStripeSecretKey().isEmpty()) {
             throw new IllegalArgumentException("Stripe secret key is missing for this property.");
         }
 
-        Stripe.apiKey = property.getSecretKey();
+        Stripe.apiKey = property.getStripeSecretKey();
 
         Map<String, Object> response = new HashMap<>();
         try {
