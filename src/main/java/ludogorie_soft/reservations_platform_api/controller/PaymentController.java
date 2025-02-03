@@ -1,7 +1,6 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.AllArgsConstructor;
-import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import java.util.UUID;
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
-    private final BookingService bookingService;
 
     @PostMapping("/create-payment-intent/{bookingId}")
     public ResponseEntity<Map<String, Object>> createPaymentIntent(@PathVariable UUID bookingId) {
