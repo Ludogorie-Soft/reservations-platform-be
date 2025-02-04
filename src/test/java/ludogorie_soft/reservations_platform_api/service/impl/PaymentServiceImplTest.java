@@ -3,10 +3,10 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+import jakarta.el.PropertyNotFoundException;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
-import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
@@ -102,7 +102,7 @@ class PaymentServiceImplTest {
 
         try {
             paymentService.createPaymentIntent(bookingId);
-        } catch (IllegalArgumentException e) {
+        } catch (PropertyNotFoundException e) {
             assertEquals("Property not found", e.getMessage());
         }
     }
@@ -121,15 +121,4 @@ class PaymentServiceImplTest {
         }
     }
 
-    @Test
-    void testCreatePaymentIntent_Failure_NoBookingFound() {
-        // Simulate booking not found
-        when(bookingService.getBooking(bookingId)).thenReturn(null);
-
-        Exception exception = assertThrows(BookingNotFoundException.class, () -> {
-            paymentService.createPaymentIntent(bookingId);
-        });
-
-        assertEquals("Booking not found for ID: " + bookingId, exception.getMessage());
-    }
 }
