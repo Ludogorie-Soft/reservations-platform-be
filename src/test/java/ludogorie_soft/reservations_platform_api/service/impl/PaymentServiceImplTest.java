@@ -6,6 +6,7 @@ import com.stripe.param.PaymentIntentCreateParams;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Booking;
+import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.helper.BookingTestHelper;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -117,5 +119,17 @@ class PaymentServiceImplTest {
         } catch (IllegalArgumentException e) {
             assertEquals("Stripe secret key is missing for this property.", e.getMessage());
         }
+    }
+
+    @Test
+    void testCreatePaymentIntent_Failure_NoBookingFound() {
+        // Simulate booking not found
+        when(bookingService.getBooking(bookingId)).thenReturn(null);
+
+        Exception exception = assertThrows(BookingNotFoundException.class, () -> {
+            paymentService.createPaymentIntent(bookingId);
+        });
+
+        assertEquals("Booking not found for ID: " + bookingId, exception.getMessage());
     }
 }

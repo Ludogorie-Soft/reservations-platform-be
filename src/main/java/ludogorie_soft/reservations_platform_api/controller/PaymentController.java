@@ -1,7 +1,11 @@
 package ludogorie_soft.reservations_platform_api.controller;
 
 import lombok.AllArgsConstructor;
+import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
+import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +20,11 @@ import java.util.UUID;
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final BookingService bookingService;
 
     @PostMapping("/create-payment-intent/{bookingId}")
-    public ResponseEntity<Map<String, Object>> createPaymentIntent(@PathVariable UUID bookingId) {
-        try {
-            Map<String, Object> response = paymentService.createPaymentIntent(bookingId);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public Map<String, Object> createPaymentIntent(@PathVariable UUID bookingId) {
+        BookingResponseWithCustomerDataDto booking = bookingService.getBooking(bookingId);
+        return paymentService.createPaymentIntent(booking.getBookingRequestCustomerDataDto().getBookingId());
     }
 }
