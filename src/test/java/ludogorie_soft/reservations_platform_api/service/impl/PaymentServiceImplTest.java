@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -83,17 +84,22 @@ class PaymentServiceImplTest {
 
     @Test
     void testCreatePaymentIntent_Failure_PaymentError() {
+        // Arrange
         when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
         when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.of(booking.getProperty()));
 
         try (MockedStatic<PaymentIntent> paymentIntentMockedStatic = Mockito.mockStatic(PaymentIntent.class)) {
             StripeException mockException = Mockito.mock(StripeException.class);
+            when(mockException.getMessage()).thenReturn("Stripe API error");
 
-            paymentIntentMockedStatic.when(() -> PaymentIntent.create(any(PaymentIntentCreateParams.class)))
-                    .thenThrow(mockException);
+            paymentIntentMockedStatic.when(() ->
+                    PaymentIntent.create(any(PaymentIntentCreateParams.class), any(RequestOptions.class))
+            ).thenThrow(mockException);
 
+            // Act
             Map<String, Object> response = paymentService.createPaymentIntent(bookingId);
 
+            // Assert
             assertTrue(response.containsKey("error"));
             assertEquals("Payment creation failed.", response.get("error"));
         }
@@ -101,14 +107,16 @@ class PaymentServiceImplTest {
 
     @Test
     void testCreatePaymentIntent_Failure_MissingProperty() {
+        // Arrange
         when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
         when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.empty());
 
-        try {
-            paymentService.createPaymentIntent(bookingId);
-        } catch (PropertyNotFoundException e) {
-            assertEquals("Property not found", e.getMessage());
-        }
+        // Act & Assert
+        PropertyNotFoundException thrown = assertThrows(
+                PropertyNotFoundException.class,
+                () -> paymentService.createPaymentIntent(bookingId)
+        );
+        assertEquals("Property not found", thrown.getMessage());
     }
 
     @Test
