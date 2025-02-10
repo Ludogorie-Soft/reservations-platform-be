@@ -2,6 +2,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.el.PropertyNotFoundException;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseDto;
@@ -58,6 +59,7 @@ class PaymentServiceImplTest {
 
     @Test
     void testCreatePaymentIntent_Success() {
+        // Arrange
         when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
         when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.of(booking.getProperty()));
 
@@ -66,11 +68,14 @@ class PaymentServiceImplTest {
             when(mockPaymentIntent.getId()).thenReturn("pi_mock123");
             when(mockPaymentIntent.getClientSecret()).thenReturn("secret_mock123");
 
-            paymentIntentMockedStatic.when(() -> PaymentIntent.create(any(PaymentIntentCreateParams.class)))
-                    .thenReturn(mockPaymentIntent);
+            paymentIntentMockedStatic.when(() ->
+                    PaymentIntent.create(any(PaymentIntentCreateParams.class), any(RequestOptions.class))
+            ).thenReturn(mockPaymentIntent);
 
+            // Act
             Map<String, Object> response = paymentService.createPaymentIntent(bookingId);
 
+            // Assert
             assertEquals("pi_mock123", response.get("paymentIntentId"));
             assertEquals("secret_mock123", response.get("clientSecret"));
         }
