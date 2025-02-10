@@ -90,7 +90,6 @@ class PaymentServiceImplTest {
 
         try (MockedStatic<PaymentIntent> paymentIntentMockedStatic = Mockito.mockStatic(PaymentIntent.class)) {
             StripeException mockException = Mockito.mock(StripeException.class);
-            when(mockException.getMessage()).thenReturn("Stripe API error");
 
             paymentIntentMockedStatic.when(() ->
                     PaymentIntent.create(any(PaymentIntentCreateParams.class), any(RequestOptions.class))
