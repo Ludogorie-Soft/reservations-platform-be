@@ -120,16 +120,32 @@ class PaymentServiceImplTest {
 
     @Test
     void testCreatePaymentIntent_Failure_MissingSecretKey() {
+        // Arrange
         booking.getProperty().setStripeSecretKey(null);
-
         when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
         when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.of(booking.getProperty()));
 
-        try {
-            paymentService.createPaymentIntent(bookingId);
-        } catch (IllegalArgumentException e) {
-            assertEquals("Stripe secret key is missing for this property.", e.getMessage());
-        }
+        // Act & Assert
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> paymentService.createPaymentIntent(bookingId)
+        );
+        assertEquals("Stripe secret key is missing for this property.", thrown.getMessage());
+    }
+
+    @Test
+    void testCreatePaymentIntent_Failure_EmptySecretKey() {
+        // Arrange
+        booking.getProperty().setStripeSecretKey("");
+        when(bookingService.getBooking(bookingId)).thenReturn(mockBooking);
+        when(propertyRepository.findById(booking.getProperty().getId())).thenReturn(java.util.Optional.of(booking.getProperty()));
+
+        // Act & Assert
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> paymentService.createPaymentIntent(bookingId)
+        );
+        assertEquals("Stripe secret key is missing for this property.", thrown.getMessage());
     }
 
 }
