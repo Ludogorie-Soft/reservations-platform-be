@@ -2,6 +2,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.el.PropertyNotFoundException;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,9 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("Stripe secret key is missing for this property.");
         }
 
-        Stripe.apiKey = property.getStripeSecretKey();
+        RequestOptions requestOptions = RequestOptions.builder()
+                .setApiKey(property.getStripeSecretKey())
+                .build();
 
         Map<String, Object> response = new HashMap<>();
         try {
@@ -51,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
                                     .build())
                     .build();
 
-            PaymentIntent paymentIntent = PaymentIntent.create(params);
+            PaymentIntent paymentIntent = PaymentIntent.create(params, requestOptions);
 
             response.put("paymentIntentId", paymentIntent.getId());
             response.put("clientSecret", paymentIntent.getClientSecret());
