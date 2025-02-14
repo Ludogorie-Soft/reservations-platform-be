@@ -1,6 +1,5 @@
 package ludogorie_soft.reservations_platform_api.service.impl;
 
-import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -8,7 +7,6 @@ import jakarta.el.PropertyNotFoundException;
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.BookingResponseWithCustomerDataDto;
 import ludogorie_soft.reservations_platform_api.entity.Property;
-import ludogorie_soft.reservations_platform_api.exception.BookingNotFoundException;
 import ludogorie_soft.reservations_platform_api.repository.PropertyRepository;
 import ludogorie_soft.reservations_platform_api.service.BookingService;
 import ludogorie_soft.reservations_platform_api.service.PaymentService;
