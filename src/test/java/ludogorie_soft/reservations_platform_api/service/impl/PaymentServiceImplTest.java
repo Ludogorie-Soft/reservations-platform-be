@@ -115,7 +115,7 @@ class PaymentServiceImplTest {
                 PropertyNotFoundException.class,
                 () -> paymentService.createPaymentIntent(bookingId)
         );
-        assertEquals("Property not found", thrown.getMessage());
+        assertEquals("Property not found with id: " + booking.getProperty().getId(), thrown.getMessage());
     }
 
     @Test
