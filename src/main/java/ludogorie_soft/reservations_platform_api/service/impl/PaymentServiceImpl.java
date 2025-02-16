@@ -31,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
         String totalPrice = String.valueOf(booking.getBookingResponseDto().getTotalPrice());
 
         Property property = propertyRepository.findById(booking.getBookingResponseDto().getPropertyId())
-                .orElseThrow(() -> new PropertyNotFoundException("Property not found"));
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + booking.getBookingResponseDto().getPropertyId()));
 
         if (property.getStripeSecretKey() == null || property.getStripeSecretKey().isEmpty()) {
             throw new IllegalArgumentException("Stripe secret key is missing for this property.");
