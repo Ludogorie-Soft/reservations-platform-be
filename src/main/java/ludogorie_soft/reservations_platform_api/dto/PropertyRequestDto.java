@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.Lob;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -34,4 +35,8 @@ public class PropertyRequestDto {
     private int petPrice;
     @Lob
     private String propertyRules;
+    @Size(max = 300, message = "Invalid public key size")
+    private String publicKey;
+    @Size(max = 300, message = "Invalid private key size")
+    private String secretKey;
 }

@@ -22,6 +22,6 @@ public class PaymentController {
     @PostMapping("/create-payment-intent/{bookingId}")
     public Map<String, Object> createPaymentIntent(@PathVariable UUID bookingId) {
         BookingResponseWithCustomerDataDto booking = bookingService.getBooking(bookingId);
-        return paymentService.createPaymentIntent(String.valueOf(booking.getBookingResponseDto().getTotalPrice()));
+        return paymentService.createPaymentIntent(booking.getBookingRequestCustomerDataDto().getBookingId());
     }
 }

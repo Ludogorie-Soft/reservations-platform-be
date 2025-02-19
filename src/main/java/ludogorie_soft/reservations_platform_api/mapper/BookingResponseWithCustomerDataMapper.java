@@ -18,6 +18,7 @@ public class BookingResponseWithCustomerDataMapper {
         BookingRequestCustomerDataDto bookingRequestCustomerDataDto = new BookingRequestCustomerDataDto();
 
         bookingResponseDto.setId(booking.getId());
+        bookingResponseDto.setPropertyId(booking.getProperty().getId());
         bookingResponseDto.setStartDate(booking.getStartDate().toString());
         bookingResponseDto.setEndDate(booking.getEndDate().toString());
         bookingResponseDto.setReservationNotes(booking.getReservationNotes());

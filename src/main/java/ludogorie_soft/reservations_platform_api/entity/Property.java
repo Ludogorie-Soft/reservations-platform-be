@@ -46,5 +46,6 @@ public class Property {
     private int petPrice;
     @Lob
     private String propertyRules;
-
+    private String stripePublicKey;
+    private String stripeSecretKey;
 }
