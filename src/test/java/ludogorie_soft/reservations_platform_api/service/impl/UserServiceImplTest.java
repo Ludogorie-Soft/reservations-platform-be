@@ -45,7 +45,7 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    private User user;
+    private User createdUser;
     private UserResponseDto userResponseDto;
 
     @BeforeEach
@@ -162,16 +162,16 @@ class UserServiceImplTest {
     @Test
     void getAllUsers_ShouldReturnUserResponseDtoList() {
         // GIVEN
-        user = UserTestHelper.createTestUser();
+        createdUser = UserTestHelper.createTestUser();
         userResponseDto = new UserResponseDto();
-        userResponseDto.setId(user.getId());
-        userResponseDto.setName(user.getName());
-        userResponseDto.setUsername(user.getUsername());
-        userResponseDto.setEmail(user.getEmail());
+        userResponseDto.setId(createdUser.getId());
+        userResponseDto.setName(createdUser.getName());
+        userResponseDto.setUsername(createdUser.getUsername());
+        userResponseDto.setEmail(createdUser.getEmail());
 
-        List<User> users = List.of(user);
+        List<User> users = List.of(createdUser);
         Mockito.when(userRepository.findAll()).thenReturn(users);
-        Mockito.when(modelMapper.map(user, UserResponseDto.class)).thenReturn(userResponseDto);
+        Mockito.when(modelMapper.map(createdUser, UserResponseDto.class)).thenReturn(userResponseDto);
 
         // WHEN
         List<UserResponseDto> result = userService.getAllUsers();
@@ -179,14 +179,14 @@ class UserServiceImplTest {
         // THEN
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(user.getId(), result.get(0).getId());
-        assertEquals(user.getName(), result.get(0).getName());
-        assertEquals(user.getUsername(), result.get(0).getUsername());
-        assertEquals(user.getEmail(), result.get(0).getEmail());
+        assertEquals(createdUser.getId(), result.get(0).getId());
+        assertEquals(createdUser.getName(), result.get(0).getName());
+        assertEquals(createdUser.getUsername(), result.get(0).getUsername());
+        assertEquals(createdUser.getEmail(), result.get(0).getEmail());
 
         // Verify
         Mockito.verify(userRepository, Mockito.times(1)).findAll();
-        Mockito.verify(modelMapper, Mockito.times(1)).map(user, UserResponseDto.class);
+        Mockito.verify(modelMapper, Mockito.times(1)).map(createdUser, UserResponseDto.class);
     }
 }
 
