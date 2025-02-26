@@ -3,6 +3,7 @@ package ludogorie_soft.reservations_platform_api.service.impl;
 import lombok.AllArgsConstructor;
 import ludogorie_soft.reservations_platform_api.dto.LoginDto;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
+import ludogorie_soft.reservations_platform_api.dto.UserResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.APIException;
@@ -10,11 +11,13 @@ import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
 import ludogorie_soft.reservations_platform_api.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public String register(RegisterDto registerDto) {
@@ -70,5 +74,13 @@ public class UserServiceImpl implements UserService {
         return userRepository
                 .findByUsernameOrEmail(email, username)
                 .orElseThrow(() -> new APIException(HttpStatus.NOT_FOUND, "User with this username or email not found!"));
+    }
+
+    @Override
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> modelMapper.map(user, UserResponseDto.class))
+                .toList();
     }
 }

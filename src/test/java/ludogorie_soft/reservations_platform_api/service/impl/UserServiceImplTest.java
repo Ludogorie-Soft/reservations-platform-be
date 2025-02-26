@@ -1,26 +1,34 @@
-package ludogorie_soft.reservations_platform_api;
+package ludogorie_soft.reservations_platform_api.service.impl;
 
 import ludogorie_soft.reservations_platform_api.dto.LoginDto;
 import ludogorie_soft.reservations_platform_api.dto.RegisterDto;
+import ludogorie_soft.reservations_platform_api.dto.UserResponseDto;
 import ludogorie_soft.reservations_platform_api.entity.Role;
 import ludogorie_soft.reservations_platform_api.entity.User;
 import ludogorie_soft.reservations_platform_api.exception.APIException;
+import ludogorie_soft.reservations_platform_api.helper.UserTestHelper;
 import ludogorie_soft.reservations_platform_api.mapper.UserMapper;
 import ludogorie_soft.reservations_platform_api.repository.RoleRepository;
 import ludogorie_soft.reservations_platform_api.repository.UserRepository;
-import ludogorie_soft.reservations_platform_api.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserServiceImplTest {
+
+    @Mock
+    private ModelMapper modelMapper;
 
     @Mock
     private UserMapper userMapper;
@@ -36,6 +44,9 @@ class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    private User user;
+    private UserResponseDto userResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -146,6 +157,36 @@ class UserServiceImplTest {
         String result = userService.login(loginDto);
 
         assertEquals("Login successful", result);
+    }
+
+    @Test
+    void getAllUsers_ShouldReturnUserResponseDtoList() {
+        // GIVEN
+        user = UserTestHelper.createTestUser();
+        userResponseDto = new UserResponseDto();
+        userResponseDto.setId(user.getId());
+        userResponseDto.setName(user.getName());
+        userResponseDto.setUsername(user.getUsername());
+        userResponseDto.setEmail(user.getEmail());
+
+        List<User> users = List.of(user);
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+        Mockito.when(modelMapper.map(user, UserResponseDto.class)).thenReturn(userResponseDto);
+
+        // WHEN
+        List<UserResponseDto> result = userService.getAllUsers();
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(user.getId(), result.get(0).getId());
+        assertEquals(user.getName(), result.get(0).getName());
+        assertEquals(user.getUsername(), result.get(0).getUsername());
+        assertEquals(user.getEmail(), result.get(0).getEmail());
+
+        // Verify
+        Mockito.verify(userRepository, Mockito.times(1)).findAll();
+        Mockito.verify(modelMapper, Mockito.times(1)).map(user, UserResponseDto.class);
     }
 }
 
