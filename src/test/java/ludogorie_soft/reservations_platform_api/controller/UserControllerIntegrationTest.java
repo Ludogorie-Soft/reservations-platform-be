@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 public class UserControllerIntegrationTest {
 
-    public static final String USERS = "/user";
+    public static final String USERS = "/users";
 
     private static final String REGISTER_URL = "/auth/register";
 
@@ -71,8 +71,6 @@ public class UserControllerIntegrationTest {
         assertTrue(response.getBody().stream()
                 .anyMatch(user -> user.getEmail().equals(registerDto.getEmail())));
     }
-
-
 
     private ResponseEntity<String> createUserInDb() {
         return testRestTemplate
